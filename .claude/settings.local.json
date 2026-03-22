@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "mcp__WebSearch__bailian_web_search"
+    ]
+  }
+}
