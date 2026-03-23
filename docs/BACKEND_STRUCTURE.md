@@ -1978,6 +1978,14 @@ export async function trackStyleView(styleId: string) {
 
 ---
 
+## 参考文档
+
+- [docs/guides/supabase-guide.md](./guides/supabase-guide.md) - Supabase 使用指南
+- [docs/research/supabase-technical-research.md](./research/supabase-technical-research.md) - Supabase 技术调研
+- [docs/database-schema.md](./database-schema.md) - StyleSnap 数据库 Schema 设计
+
+---
+
 ## 附录：开发检查清单
 
 ### 开发新功能时
@@ -2006,3 +2014,4 @@ export async function trackStyleView(styleId: string) {
 |------|------|------|----------|
 | 1.0 | 2026-03-21 | StyleSnap Team | 初始版本 |
 | 1.1 | 2026-03-22 | StyleSnap Team | 补充 API 端点合约（12 章）、边缘情况处理（13 章）、完善监控与日志（14 章） |
+| 1.2 | 2026-03-23 | StyleSnap Team | 添加 Supabase 参考文档链接 |

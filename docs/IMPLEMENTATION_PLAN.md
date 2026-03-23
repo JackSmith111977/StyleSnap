@@ -575,6 +575,8 @@ pnpm supabase db push
 - [FRONTEND_GUIDELINES.md](./FRONTEND_GUIDELINES.md) - 前端指南
 - [BACKEND_STRUCTURE.md](./BACKEND_STRUCTURE.md) - 后端结构
 - [MULTI_AGENT_COLLABORATION.md](./MULTI_AGENT_COLLABORATION.md) - 多智能体协同方案
+- [docs/guides/supabase-guide.md](./guides/supabase-guide.md) - Supabase 使用指南
+- [docs/research/supabase-technical-research.md](./research/supabase-technical-research.md) - Supabase 技术调研
 
 ---
 
