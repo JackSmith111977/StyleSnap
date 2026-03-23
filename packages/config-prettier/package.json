@@ -1,0 +1,15 @@
+{
+  "name": "@stylesnap/config-prettier",
+  "version": "0.0.1",
+  "private": true,
+  "main": "./prettier.config.mjs",
+  "type": "module",
+  "scripts": {
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,md,mdx,json}\"",
+    "clean": "rm -rf node_modules"
+  },
+  "dependencies": {
+    "prettier": "^3.4.2",
+    "prettier-plugin-tailwindcss": "^0.6.11"
+  }
+}

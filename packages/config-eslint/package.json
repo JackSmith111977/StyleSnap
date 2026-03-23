@@ -1,0 +1,24 @@
+{
+  "name": "@stylesnap/config-eslint",
+  "version": "0.0.1",
+  "private": true,
+  "main": "./eslint.config.mjs",
+  "type": "module",
+  "scripts": {
+    "lint": "eslint . --config eslint.config.local.mjs",
+    "clean": "rm -rf node_modules"
+  },
+  "dependencies": {
+    "@eslint/js": "^9.17.0",
+    "@next/eslint-plugin-next": "^15.1.4",
+    "@typescript-eslint/eslint-plugin": "^8.19.1",
+    "@typescript-eslint/parser": "^8.19.1",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-react-hooks": "^5.1.0"
+  },
+  "peerDependencies": {
+    "eslint": "^9.0.0",
+    "typescript": "^5.0.0"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "name": "@stylesnap/web",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint . --ext .ts,.tsx",
+    "lint:fix": "eslint . --ext .ts,.tsx --fix",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,md,mdx,json}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,md,mdx,json}\"",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf .next node_modules .turbo"
+  },
+  "dependencies": {
+    "next": "^16.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@stylesnap/config-eslint": "workspace:*",
+    "@stylesnap/config-prettier": "workspace:*",
+    "@stylesnap/config-typescript": "workspace:*",
+    "@types/node": "^22.10.5",
+    "@types/react": "^19.0.3",
+    "@types/react-dom": "^19.0.2",
+    "typescript": "^5.7.2"
+  }
+}
