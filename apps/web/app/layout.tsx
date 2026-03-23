@@ -1,6 +1,11 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Inter, Geist } from 'next/font/google';
 import '@/styles/globals.css';
+import { cn } from "@/lib/utils";
+import { Layout } from '@/components/layout/Layout';
+import { initializeTheme } from '@/stores/theme-store';
+
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 const inter = Inter({
   subsets: ['latin'],
@@ -26,9 +31,14 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // 初始化主题（客户端）
+  initializeTheme();
+
   return (
-    <html lang="zh-CN" suppressHydrationWarning>
-      <body className={inter.variable}>{children}</body>
+    <html lang="zh-CN" suppressHydrationWarning className={cn("font-sans", geist.variable)}>
+      <body className={inter.variable}>
+        <Layout>{children}</Layout>
+      </body>
     </html>
   );
 }
