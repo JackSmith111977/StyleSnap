@@ -1,6 +1,6 @@
 # StyleSnap - 任务进度跟踪
 
-> 最后更新：2026-03-24（任务 1.6 邮件服务集成完成）
+> 最后更新：2026-03-24（任务 1.5 修复完成 - Auth 触发器 search_path 问题）
 
 ---
 
@@ -24,7 +24,7 @@
 2. **任务进行中** - 更新进度状态，记录关键节点
 3. **任务完成后** - 标记任务完成，移入【历史完成记录】
 
-当前任务优先级：完成剩余文档 → 项目初始化
+当前任务优先级：完成任务 1.5 修复 → 任务 1.7 → 项目初始化
 
 ---
 
@@ -56,27 +56,30 @@ D:\WorkPlace\VibeCoding\Design Style\
 │   │   ├── 03-email-service-selection.md # 邮件服务选型
 │   │   ├── 04-component-library-selection.md # 组件库选型
 │   │   └── 05-monorepo-structure.md      # Monorepo 结构
-│   └── guides/            # 配置指南
-│       └── resend-email-guide.md         # Resend 配置指南
-└── (后续代码目录)
+│   ├── guides/            # 配置指南
+│   │   ├── resend-email-guide.md         # Resend 配置指南
+│   │   └── supabase-auth-trigger-fix.md  # Auth 触发器修复经验
+│   └── (后续代码目录)
+└── supabase/
+    ├── migrations/        # 数据库迁移文件
+    └── config.toml        # Supabase 配置
 ```
 
 ---
 
 ## 当前任务
 
-**任务 1.6: 邮件服务集成（Resend）**
+**任务 1.5 修复：Auth 触发器 search_path 问题**
 - 开始时间：2026-03-24
 - 状态：已完成 ✅
-- 完成内容：
-  - [x] 安装 resend、@react-email/components、react-email
-  - [x] 创建 Resend 客户端封装（lib/email.ts）
-  - [x] 创建验证邮件模板（emails/verification-email.tsx）
-  - [x] 创建密码重置邮件模板（emails/password-reset-email.tsx）
-  - [x] 实现邮件发送 Server Action（actions/email/index.ts）
-  - [x] 集成到认证系统（注册后发送验证邮件）
-  - [x] 更新 .env.example（添加 Resend 配置）
-  - [x] 创建配置指南文档（docs/guides/resend-email-guide.md）
+- 问题：注册时报 "Database error saving new user"
+- 根本原因：SECURITY DEFINER 函数没有显式设置 `search_path = public`
+- 修复方案：
+  - [x] 创建迁移文件 0006_fix_auth_trigger_search_path.sql
+  - [x] 设置 `SET search_path = public` 在函数定义中
+  - [x] 授予 `supabase_auth_admin` 完整权限
+  - [x] 确保 RLS 策略允许 INSERT
+- 验证：注册功能恢复正常，邮件发送成功
 
 **下一步任务**：任务 1.7 - 错误监控配置（Sentry）或 项目初始化
 
@@ -104,6 +107,7 @@ D:\WorkPlace\VibeCoding\Design Style\
 
 ### 开发任务
 - [x] 任务 1.5: 认证系统（登录/注册/重置密码）
+- [x] 任务 1.5 修复：Auth 触发器 search_path 问题
 - [x] 任务 1.6: 邮件服务集成（Resend）
 - [ ] 项目初始化
 - [ ] 基础架构搭建
@@ -131,6 +135,7 @@ D:\WorkPlace\VibeCoding\Design Style\
 | 技术栈调研索引 | 2026-03-22 | `docs/tech-stack-research/tech-stack-index.md`（按功效归类所有调研文档） |
 | Sub-agents 配置 | 2026-03-22 | `.claude/agents/` 7 个 Agent 配置（架构师、前端、后端、数据库、测试、文档、部署） |
 | 任务 1.5: 认证系统 | 2026-03-24 | 完整认证流程（登录/注册/登出/重置密码） |
+| 任务 1.5 修复：Auth 触发器 | 2026-03-24 | 修复 search_path 问题，创建完整诊断和修复文档 |
 | 任务 1.6: 邮件服务集成 | 2026-03-24 | Resend 集成、React Email 模板、配置指南 |
 | Supabase CLI 文档 | 2026-03-24 | 技术调研报告 + AI 知识库文档 |
 
@@ -168,5 +173,30 @@ nextjs, supabase, typescript, design-system, web-design, tailwind-css, shadcn-ui
 **解决状态**: ✅ 已修复 - 工具现已正常工作
 
 **当前状态**: 可用于网络调研任务
+
+---
+
+## 错误修复经验记录
+
+### Auth 触发器 "Database error saving new user"
+
+**日期**：2026-03-24
+
+**问题**：用户注册时报错 "Database error saving new user"
+
+**根本原因**：SECURITY DEFINER 函数没有显式设置 `search_path = public`
+
+**修复方案**：
+1. 创建迁移文件 `0006_fix_auth_trigger_search_path.sql`
+2. 在函数定义中添加 `SET search_path = public`
+3. 授予 `supabase_auth_admin` 完整权限
+4. 确保 RLS 策略允许 INSERT
+
+**详细文档**：`docs/guides/supabase-auth-trigger-fix.md`
+
+**教训**：
+- SECURITY DEFINER 函数必须显式设置 `search_path`
+- 授予表权限时同时需要授予 schema 使用权
+- 即使触发器使用 SECURITY DEFINER，RLS 策略仍需允许 INSERT
 
 ---

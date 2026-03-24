@@ -200,6 +200,9 @@ DROP FUNCTION IF EXISTS create_profile_on_signup() CASCADE;
 CREATE OR REPLACE FUNCTION create_profile_on_signup()
 RETURNS TRIGGER AS $$
 BEGIN
+    -- 必需：显式设置 search_path，否则 SECURITY DEFINER 函数找不到 public  schema 中的表
+    SET LOCAL search_path = public;
+
     INSERT INTO profiles (id, username, avatar_url, role)
     VALUES (
         NEW.id,
@@ -209,7 +212,7 @@ BEGIN
     );
     RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
 DROP TRIGGER IF EXISTS create_profile_on_signup ON auth.users;
 
@@ -222,6 +225,16 @@ CREATE TRIGGER create_profile_on_signup
 # 推送迁移
 supabase db push
 ```
+
+**关键注意事项**：
+
+| 问题 | 原因 | 修复 |
+|------|------|------|
+| `relation "profiles" does not exist` | SECURITY DEFINER 函数的 `search_path` 默认为 `pg_catalog` | 函数定义时添加 `SET search_path = public` |
+| `permission denied for table profiles` | `supabase_auth_admin` 没有 profiles 表权限 | `GRANT ALL ON profiles TO supabase_auth_admin` |
+| `new row violates row-level security policy` | profiles 表启用 RLS 但没有允许 INSERT 的策略 | 创建 `FOR INSERT WITH CHECK (true)` 策略 |
+
+完整修复流程请参考：[docs/guides/supabase-auth-trigger-fix.md](../../docs/guides/supabase-auth-trigger-fix.md)
 
 ### 4.2 迁移历史不一致
 
