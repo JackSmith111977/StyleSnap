@@ -17,6 +17,12 @@
 9. **分支开发流程** - 开发新功能前，先从 `main` 分支创建新分支（命名格式：`feature/功能名`），开发完成后合并回 `main` 分支
 10. **Supabase CLI 使用** - 执行 Supabase 相关命令前必须查阅 `docs/tech-stack-research/supabase-cli-technical-research.md` 和 `.claude/knowledge/supabase-cli-knowledge.md`
 
+11. **进度跟踪规范** - 任务开始前/完成时主动更新 `.claude/progress.txt`：
+    - **任务开始前**：标记任务为 🔄 进行中，记录开始时间
+    - **任务进行中**：记录关键节点和进度状态
+    - **任务完成后**：标记为 ✅ 已完成，移入历史完成记录，**不删除已完成内容**
+    - **文档完成后**：提交 git 并推送到远程仓库
+
 ---
 
 ## 约束条件
