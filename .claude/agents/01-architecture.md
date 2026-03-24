@@ -25,3 +25,7 @@ model: qwen3.5-plus
 - 架构决策必须有 ADR 文档
 - 输出包含架构图（ASCII 或 Mermaid）
 - 所有选型必须有 pros/cons 分析
+
+## 代码验证流程
+- 提交前必须运行：`pnpm typecheck` → `pnpm lint` → `pnpm build`
+- 遇到问题修复两次仍无法解决：优先查阅官方文档，若无文档则联网搜索最佳实践

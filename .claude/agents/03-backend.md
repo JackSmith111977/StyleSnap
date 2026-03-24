@@ -25,3 +25,10 @@ model: qwen3.5-plus
 - Server Actions 统一返回 `ActionResponse<T>`
 - 必须使用 Zod 验证输入
 - 错误必须有 Sentry 捕获
+
+## 代码验证流程
+- 提交前必须运行：`pnpm typecheck` → `pnpm lint` → `pnpm build`
+- 遇到问题修复两次仍无法解决：优先查阅官方文档，若无文档则联网搜索最佳实践
+- Server Actions 必须是 async 函数
+- 调用其他 Server Action 时需要 await
+- Sentry 配置：生产环境才启用插件，开发环境只输出到控制台

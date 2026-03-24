@@ -5,7 +5,7 @@ import * as Sentry from '@sentry/nextjs'
 /**
  * 捕获 Server Action 中的错误
  */
-export function captureActionError(error: unknown, context: {
+export async function captureActionError(error: unknown, context: {
   action: string
   userId?: string
   [key: string]: unknown
@@ -31,7 +31,7 @@ export function captureActionError(error: unknown, context: {
 /**
  * 设置 Sentry 用户上下文
  */
-export function setSentryUser(user: {
+export async function setSentryUser(user: {
   id: string
   email?: string
   username?: string
@@ -46,7 +46,7 @@ export function setSentryUser(user: {
 /**
  * 清除 Sentry 用户上下文
  */
-export function clearSentryUser() {
+export async function clearSentryUser() {
   if (process.env.NODE_ENV === 'development') {
     return
   }

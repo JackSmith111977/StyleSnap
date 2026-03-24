@@ -26,7 +26,7 @@ Sentry.init({
   replaysOnErrorSampleRate: 1.0,
 
   // 开发环境不发送错误到 Sentry
-  beforeSend(event, hint) {
+  beforeSend(event, _hint) {
     if (process.env.NODE_ENV === 'development') {
       console.error('[Sentry Error]', event.message, event.exception?.values?.[0]?.value)
       return null

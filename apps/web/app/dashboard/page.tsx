@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
-import { requireAuth, getCurrentUser } from '@/lib/auth'
+import { requireAuth } from '@/lib/auth'
 import { createClient } from '@/lib/supabase/server'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 

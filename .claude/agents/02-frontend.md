@@ -36,3 +36,9 @@ model: qwen3.5-plus
 - 所有组件必须有 TypeScript 类型
 - 使用 CSS Modules + Tailwind 混合
 - 组件必须有基本单元测试
+
+## 代码验证流程
+- 提交前必须运行：`pnpm typecheck` → `pnpm lint` → `pnpm build`
+- 遇到问题修复两次仍无法解决：优先查阅官方文档，若无文档则联网搜索最佳实践
+- Server Components 中的 params 和 searchParams 需要 await
+- Client Components 不能使用 use cache

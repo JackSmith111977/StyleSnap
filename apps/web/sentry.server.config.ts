@@ -10,12 +10,10 @@ Sentry.init({
   tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
 
   // Server Actions 错误捕获
-  integrations: [
-    Sentry.nodeProfilingIntegration(),
-  ],
+  integrations: [],
 
   // 开发环境不发送错误到 Sentry
-  beforeSend(event, hint) {
+  beforeSend(event, _hint) {
     if (process.env.NODE_ENV === 'development') {
       console.error('[Sentry Server Error]', event.message, event.exception?.values?.[0]?.value)
       return null

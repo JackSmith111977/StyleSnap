@@ -22,3 +22,9 @@ model: qwen3.5-plus
 - Development（本地）
 - Preview（每 PR 自动）
 - Production（main 分支）
+
+## 代码验证流程
+- 部署前必须运行：`pnpm typecheck` → `pnpm lint` → `pnpm build`
+- 遇到问题修复两次仍无法解决：优先查阅官方文档，若无文档则联网搜索最佳实践
+- Sentry 配置：生产环境才启用插件，开发环境只输出到控制台
+- next.config.js 使用异步函数方式配置 Sentry（ES module 兼容）

@@ -20,10 +20,15 @@ const nextConfig = {
   },
 }
 
-// Sentry 配置 - 开发环境禁用
-if (process.env.NODE_ENV !== 'development') {
-  const { withSentryConfig } = require('@sentry/nextjs')
-  module.exports = withSentryConfig(nextConfig, {
+// Sentry 配置 - 仅生产环境启用
+async function createConfig() {
+  if (process.env.NODE_ENV !== 'production') {
+    return nextConfig
+  }
+
+  const { withSentryConfig } = await import('@sentry/nextjs')
+
+  return withSentryConfig(nextConfig, {
     // Sentry 项目配置
     org: process.env.SENTRY_ORG,
     project: process.env.SENTRY_PROJECT,
@@ -44,6 +49,6 @@ if (process.env.NODE_ENV !== 'development') {
     // Server Actions 自动包装（与我们的自定义捕获不冲突）
     autoInstrumentServerFunctions: true,
   })
-} else {
-  module.exports = nextConfig
 }
+
+export default createConfig()

@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { UserMenu } from '@/components/auth/user-menu';
-import { Button } from '@/components/ui/button';
 
 /**
  * Header - 头部导航组件

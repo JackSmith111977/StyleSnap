@@ -47,7 +47,7 @@ export async function login(
     }
 
     // 设置 Sentry 用户上下文
-    setSentryUser({
+    await setSentryUser({
       id: data.user.id,
       email: data.user.email,
     })
@@ -55,7 +55,7 @@ export async function login(
     revalidatePath('/')
     redirect('/dashboard')
   } catch (error) {
-    captureActionError(error, {
+    await captureActionError(error, {
       action: 'auth/login',
       email,
     })
@@ -178,7 +178,7 @@ export async function register(
     // create_profile_on_signup 触发器会自动创建 profile
     return { success: true }
   } catch (error) {
-    captureActionError(error, {
+    await captureActionError(error, {
       action: 'auth/register',
       email,
       username,
@@ -200,15 +200,13 @@ export async function logout(): Promise<void> {
     const supabase = await createClient()
 
     // 清除 Sentry 用户上下文
-    import('@/lib/sentry-capture').then(({ clearSentryUser }) => {
-      clearSentryUser()
-    })
+    await import('@/lib/sentry-capture').then(({ clearSentryUser }) => clearSentryUser())
 
     await supabase.auth.signOut()
     revalidatePath('/')
     redirect('/')
   } catch (error) {
-    captureActionError(error, {
+    await captureActionError(error, {
       action: 'auth/logout',
     })
     console.error('登出失败:', error)
@@ -238,7 +236,7 @@ export async function resetPassword(
 
     return { success: true }
   } catch (error) {
-    captureActionError(error, {
+    await captureActionError(error, {
       action: 'auth/resetPassword',
       email,
     })
@@ -267,7 +265,7 @@ export async function updatePassword(
 
     return { success: true }
   } catch (error) {
-    captureActionError(error, {
+    await captureActionError(error, {
       action: 'auth/updatePassword',
     })
     console.error('密码更新异常:', error)
