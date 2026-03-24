@@ -60,16 +60,24 @@ D:\WorkPlace\VibeCoding\Design Style\
 
 ## 当前任务
 
-**实现计划文档**
-- 开始时间：2026-03-22
+**任务 1.5: 认证系统（登录/注册/重置密码）**
+- 开始时间：2026-03-24
 - 状态：已完成 ✅
 - 完成内容：
-  - [x] IMPLEMENTATION_PLAN.md 创建（版本 1.0）
-  - [x] 19 轮问答确认所有设计决策
-  - [x] P0/P1/P2 阶段任务分解
-  - [x] 时间规划（18 周完整路线）
+  - [x] 安装 @supabase/ssr、@supabase/supabase-js
+  - [x] 创建 Supabase 客户端封装（server、browser）
+  - [x] 创建环境变量验证（env.ts）
+  - [x] 实现登录 Action（邮箱密码）
+  - [x] 实现注册 Action（含邮箱验证）
+  - [x] 实现登出 Action
+  - [x] 实现密码重置 Action
+  - [x] 创建 useAuth Hook
+  - [x] 创建认证路由中间件（middleware.ts）
+  - [x] 创建登录/注册/重置密码页面
+  - [x] 创建仪表板页面（受保护路由示例）
+  - [x] 创建未授权页面
 
-**下一步任务**：项目初始化（Monorepo + Next.js 16 + Supabase）
+**下一步任务**：任务 1.6 - 邮件服务集成（Resend）或 任务 1.7 - 错误监控配置（Sentry）
 
 ---
 
@@ -119,6 +127,29 @@ D:\WorkPlace\VibeCoding\Design Style\
 | MULTI_AGENT_COLLABORATION.md | 2026-03-22 | 多智能体协同方案 v1.4（完整重构：区分 Subagents 和 Agent Teams 两种模式、开启方法、选型对比） |
 | 技术栈调研索引 | 2026-03-22 | `docs/tech-stack-research/tech-stack-index.md`（按功效归类所有调研文档） |
 | Sub-agents 配置 | 2026-03-22 | `.claude/agents/` 7 个 Agent 配置（架构师、前端、后端、数据库、测试、文档、部署） |
+
+---
+
+## GitHub 集成进度 (2026-03-22)
+
+| 任务 | 状态 | 说明 |
+|------|------|------|
+| Git 仓库初始化 | ✅ 已完成 | 本地 git init 完成 |
+| .gitignore 创建 | ✅ 已完成 | 排除 node_modules、.env 等 |
+| README.md 创建 | ✅ 已完成 | 项目说明文档 |
+| .env.example 创建 | ✅ 已完成 | 环境变量示例 |
+| 首次 commit | ✅ 已完成 | 40 文件，21523 行代码 |
+| 远程仓库关联 | ✅ 已完成 | 已关联 JackSmith111977/StyleSnap |
+| 代码推送 | ✅ 已完成 | 已推送到 main 分支 |
+| GitHub CLI 安装 | ✅ 已完成 | gh v2.88.1 (MSI 安装) |
+| MIT License 添加 | ✅ 已完成 | 已推送到仓库 |
+| Topics 添加 | ⏳ 待执行 | 需手动在 GitHub 网页添加 |
+
+**待用户操作**：
+在 GitHub 网页添加 Topics（访问 https://github.com/JackSmith111977/StyleSnap → Manage topics）：
+```
+nextjs, supabase, typescript, design-system, web-design, tailwind-css, shadcn-ui, open-source, developer-tools
+```
 
 ---
 

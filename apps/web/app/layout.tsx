@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
 import { Inter, Geist } from 'next/font/google';
 import '@/styles/globals.css';
-import { cn } from "@/lib/utils";
+import { cn } from '@/lib/utils';
 import { Layout } from '@/components/layout/Layout';
 import { initializeTheme } from '@/stores/theme-store';
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+const geist = Geist({ subsets: ['latin'], variable: '--font-sans' });
 
 const inter = Inter({
   subsets: ['latin'],
@@ -35,7 +35,7 @@ export default function RootLayout({
   initializeTheme();
 
   return (
-    <html lang="zh-CN" suppressHydrationWarning className={cn("font-sans", geist.variable)}>
+    <html lang="zh-CN" suppressHydrationWarning className={cn('font-sans', geist.variable)}>
       <body className={inter.variable}>
         <Layout>{children}</Layout>
       </body>

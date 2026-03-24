@@ -4,7 +4,7 @@
 > 创建日期：2026-03-23
 > 基于：Next.js 16.2.1 官方文档及行业最佳实践
 
----
+***
 
 ## 目录
 
@@ -16,7 +16,7 @@
 6. [项目运行机制](#6-项目运行机制)
 7. [核心配置文件详解](#7-核心配置文件详解)
 
----
+***
 
 ## 1. Next.js 本质理解
 
@@ -44,18 +44,19 @@
 
 ### 1.2 框架 vs 库的区别
 
-| 维度 | 库 (Library) | 框架 (Framework) |
-|------|------------|-----------------|
-| **控制权** | 你调用库 | 框架调用你 |
-| **结构** | 自由组织 | 约定结构 |
-| **示例** | React, Lodash | Next.js, NestJS |
+| 维度      | 库 (Library)   | 框架 (Framework)  |
+| ------- | ------------- | --------------- |
+| **控制权** | 你调用库          | 框架调用你           |
+| **结构**  | 自由组织          | 约定结构            |
+| **示例**  | React, Lodash | Next.js, NestJS |
 
 **Next.js 的约定**：
+
 - 路由：`app/page.tsx` → `/`
 - 布局：`app/layout.tsx` → 根布局
 - 动态路由：`app/[id]/page.tsx` → `/123`
 
----
+***
 
 ## 2. 最小运行条件
 
@@ -121,7 +122,7 @@ pnpm dev
 
 **就能跑！不需要任何配置！**
 
----
+***
 
 ## 3. 脚手架 vs 手动搭建
 
@@ -134,6 +135,7 @@ npx create-next-app@latest my-app
 ```
 
 **交互选项**：
+
 ```
 ✓ 项目名称：my-app
 ✓ TypeScript: Yes
@@ -146,6 +148,7 @@ npx create-next-app@latest my-app
 ```
 
 **生成的结构**：
+
 ```
 my-app/
 ├── src/
@@ -161,13 +164,13 @@ my-app/
 └── README.md
 ```
 
-| 优势 | 劣势 |
-|------|------|
-| ✅ 快速，1 分钟完成 | ❌ 生成不需要的文件 |
+| 优势          | 劣势          |
+| ----------- | ----------- |
+| ✅ 快速，1 分钟完成 | ❌ 生成不需要的文件  |
 | ✅ 标准配置，不易出错 | ❌ 需要删除/修改配置 |
-| ✅ 适合新手 | ❌ 不理解原理难定制 |
+| ✅ 适合新手      | ❌ 不理解原理难定制  |
 
----
+***
 
 ### 3.2 手动搭建方式
 
@@ -194,25 +197,25 @@ pnpm add -D typescript @types/react @types/node
 pnpm dev
 ```
 
-| 优势 | 劣势 |
-|------|------|
-| ✅ 完全可控 | ❌ 需要时间配置 |
-| ✅ 理解原理 | ❌ 容易踩坑 |
+| 优势            | 劣势         |
+| ------------- | ---------- |
+| ✅ 完全可控        | ❌ 需要时间配置   |
+| ✅ 理解原理        | ❌ 容易踩坑     |
 | ✅ 适合 Monorepo | ❌ 需要知道配置什么 |
 
----
+***
 
 ### 3.3 方式对比
 
-| 维度 | 脚手架 | 手动搭建 |
-|------|--------|---------|
-| 速度 | 1 分钟 | 15-30 分钟 |
-| 可控性 | 中等 | 完全 |
-| 理解要求 | 低 | 高 |
-| Monorepo 适用 | 否 | 是 |
-| 适合场景 | 快速原型、学习 | 定制项目、Monorepo |
+| 维度          | 脚手架     | 手动搭建          |
+| ----------- | ------- | ------------- |
+| 速度          | 1 分钟    | 15-30 分钟      |
+| 可控性         | 中等      | 完全            |
+| 理解要求        | 低       | 高             |
+| Monorepo 适用 | 否       | 是             |
+| 适合场景        | 快速原型、学习 | 定制项目、Monorepo |
 
----
+***
 
 ## 4. 从零手动搭建 Next.js 项目
 
@@ -341,7 +344,7 @@ pnpm dev
 # 访问 http://localhost:3000
 ```
 
----
+***
 
 ## 5. Monorepo 项目搭建
 
@@ -362,11 +365,12 @@ Monorepo:
 ```
 
 **优势**：
+
 - 代码复用：UI 组件、工具函数共享
 - 版本统一：所有应用用同一版本
 - 原子提交：一个 PR 改多个包
 
----
+***
 
 ### 5.2 pnpm + Turborepo Monorepo 搭建
 
@@ -521,7 +525,7 @@ pnpm dev
 pnpm --filter @monorepo/web dev
 ```
 
----
+***
 
 ### 5.3 完整 Monorepo 结构
 
@@ -557,7 +561,7 @@ monorepo/
 └── node_modules/             # 根 node_modules
 ```
 
----
+***
 
 ## 6. 项目运行机制
 
@@ -653,7 +657,7 @@ app/
 └─────────────────────────────────────────────────────────────┘
 ```
 
----
+***
 
 ## 7. 核心配置文件详解
 
@@ -706,7 +710,7 @@ const nextConfig = {
 module.exports = nextConfig
 ```
 
----
+***
 
 ### 7.2 tsconfig.json
 
@@ -742,7 +746,7 @@ module.exports = nextConfig
 }
 ```
 
----
+***
 
 ### 7.3 pnpm-workspace.yaml
 
@@ -764,7 +768,7 @@ shared-config:
   prettier: packages/config-prettier
 ```
 
----
+***
 
 ### 7.4 turbo.json
 
@@ -801,7 +805,7 @@ shared-config:
 }
 ```
 
----
+***
 
 ## 附录
 
@@ -830,18 +834,18 @@ pnpm --filter @pkg/web dev
 turbo run build --filter=@pkg/web
 ```
 
----
+***
 
 ### B. 常见问题
 
-| 问题 | 解决方案 |
-|------|----------|
-| `moduleResolution: bundler` 报错 | 添加 `"module": "ESNext"` |
-| 路径别名 `@/*` 不生效 | 检查 tsconfig.json paths 配置 |
-| Monorepo 包导入失败 | 检查 pnpm-workspace.yaml |
-| Turborepo 缓存不命中 | 检查 globalDependencies |
+| 问题                             | 解决方案                      |
+| ------------------------------ | ------------------------- |
+| `moduleResolution: bundler` 报错 | 添加 `"module": "ESNext"`   |
+| 路径别名 `@/*` 不生效                 | 检查 tsconfig.json paths 配置 |
+| Monorepo 包导入失败                 | 检查 pnpm-workspace.yaml    |
+| Turborepo 缓存不命中                | 检查 globalDependencies     |
 
----
+***
 
 ### C. 参考文档
 
@@ -849,10 +853,11 @@ turbo run build --filter=@pkg/web
 - [Turborepo 文档](https://turbo.build/repo)
 - [pnpm Workspace 文档](https://pnpm.io/pnpm-workspace_yaml)
 
----
+***
 
 ## 修订历史
 
-| 版本 | 日期 | 作者 | 变更说明 |
-|------|------|------|----------|
+| 版本  | 日期         | 作者             | 变更说明 |
+| --- | ---------- | -------------- | ---- |
 | 1.0 | 2026-03-23 | StyleSnap Team | 初始版本 |
+

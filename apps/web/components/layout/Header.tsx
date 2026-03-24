@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { UserMenu } from '@/components/auth/user-menu';
 import { Button } from '@/components/ui/button';
 
 /**
@@ -53,15 +54,8 @@ export function Header() {
           {/* 主题切换 */}
           <ThemeToggle />
 
-          {/* 登录/注册按钮 - 鹰角风格 */}
-          <div className="hidden sm:flex items-center gap-2">
-            <Link href="/login">
-              <Button variant="ghost" size="sm">登录</Button>
-            </Link>
-            <Link href="/register">
-              <Button size="sm" className="hypergryph-btn">注册</Button>
-            </Link>
-          </div>
+          {/* 用户菜单（包含登录/注册） */}
+          <UserMenu />
         </div>
       </div>
     </header>
