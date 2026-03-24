@@ -1,20 +1,28 @@
 # StyleSnap - 任务进度跟踪
 
-> 最后更新：2026-03-24（任务 1.5 修复完成 - Auth 触发器 search_path 问题）
+> 最后更新：2026-03-24（任务 1.5 修复完成 + 任务 1.6 完成）
 
 ---
 
 ## 当前阶段
-**需求定义与调研阶段 - 已完成 ✅**
+**P0 阶段 - 核心功能** 🔄 进行中
 
-**下一阶段**：多智能体项目初始化
+**已完成里程碑**：
+- ✅ 需求定义与调研阶段（2026-03-20 ~ 2026-03-22）
+- ✅ P0 基础架构（部分完成）
 
-**环境检查** (2026-03-22)
-- Node.js v25.0.0 ✅
-- pnpm 10.29.3 ✅ (可更新到 10.32.1)
-- Git 2.51.1.windows.1 ✅
-- Playwright 1.58.2 ✅
-- Supabase CLI: 项目初始化时作为 devDependency 安装 (npx supabase)
+---
+
+## 环境检查 (2026-03-22)
+
+| 项目 | 版本 | 状态 |
+|------|------|------|
+| Node.js | v25.0.0 | ✅ |
+| pnpm | 10.29.3 | ✅ (可更新到 10.32.1) |
+| Git | 2.51.1.windows.1 | ✅ |
+| Playwright | 1.58.2 | ✅ |
+| Supabase CLI | devDependency | ✅ |
+| Claude Code | 最新 | ✅ |
 
 ---
 
@@ -23,8 +31,6 @@
 1. **任务开始前** - 在 `progress.txt` 中添加本次任务到【当前任务】区块
 2. **任务进行中** - 更新进度状态，记录关键节点
 3. **任务完成后** - 标记任务完成，移入【历史完成记录】
-
-当前任务优先级：完成任务 1.5 修复 → 任务 1.7 → 项目初始化
 
 ---
 
@@ -36,167 +42,270 @@ D:\WorkPlace\VibeCoding\Design Style\
 │   ├── CLAUDE.md          # 会话规则
 │   ├── progress.txt       # 任务进度
 │   ├── knowledge/         # AI 知识库
-│   │   └── supabase-cli-knowledge.md  # Supabase CLI 快速参考
-│   └── agents/            # Sub-agents 配置
-│       ├── 01-architecture.md
-│       ├── 02-frontend.md
-│       ├── 03-backend.md
-│       ├── 04-database.md
-│       ├── 05-testing.md
-│       ├── 06-documentation.md
-│       └── 07-deploy.md
+│   │   └── supabase-cli-knowledge.md
+│   └── agents/            # Sub-agents 配置 (7 个)
+├── apps/
+│   └── web/
+│       ├── app/           # Next.js 路由
+│       ├── actions/       # Server Actions
+│       ├── components/    # React 组件
+│       ├── emails/        # React Email 模板
+│       ├── lib/           # 工具库
+│       ├── hooks/         # 自定义 Hooks
+│       └── stores/        # Zustand Stores
+├── packages/
+│   ├── config-eslint/     # ESLint 配置
+│   └── config-prettier/   # Prettier 配置
 ├── docs/
-│   ├── PRD.md             # 产品需求文档（已补充调研结果）
-│   ├── tech-stack-research/  # 技术栈调研
-│   │   ├── tech-stack-index.md  # 调研索引
-│   │   └── supabase-cli-technical-research.md  # Supabase CLI 调研
-│   ├── research/          # 调研报告
-│   │   ├── 01-style-classification.md    # 风格分类体系
-│   │   ├── 02-hypergryph-ui-analysis.md  # 鹰角 UI 风格分析
-│   │   ├── 03-email-service-selection.md # 邮件服务选型
-│   │   ├── 04-component-library-selection.md # 组件库选型
-│   │   └── 05-monorepo-structure.md      # Monorepo 结构
-│   ├── guides/            # 配置指南
-│   │   ├── resend-email-guide.md         # Resend 配置指南
-│   │   └── supabase-auth-trigger-fix.md  # Auth 触发器修复经验
-│   └── (后续代码目录)
+│   ├── PRD.md             # 产品需求文档
+│   ├── IMPLEMENTATION_PLAN.md  # 实现计划
+│   ├── tech-stack-research/    # 技术栈调研 (10 篇)
+│   ├── research/          # 调研报告 (5 篇)
+│   └── guides/            # 配置指南 (8 篇)
 └── supabase/
-    ├── migrations/        # 数据库迁移文件
-    └── config.toml        # Supabase 配置
+    ├── migrations/        # 数据库迁移 (0001-0006)
+    └── config.toml
 ```
 
 ---
 
 ## 当前任务
 
-**任务 1.5 修复：Auth 触发器 search_path 问题**
-- 开始时间：2026-03-24
-- 状态：已完成 ✅
-- 问题：注册时报 "Database error saving new user"
-- 根本原因：SECURITY DEFINER 函数没有显式设置 `search_path = public`
-- 修复方案：
-  - [x] 创建迁移文件 0006_fix_auth_trigger_search_path.sql
-  - [x] 设置 `SET search_path = public` 在函数定义中
-  - [x] 授予 `supabase_auth_admin` 完整权限
-  - [x] 确保 RLS 策略允许 INSERT
-- 验证：注册功能恢复正常，邮件发送成功
+### P0-AUTH: 认证系统 ✅ 已完成
 
-**下一步任务**：任务 1.7 - 错误监控配置（Sentry）或 项目初始化
+- [x] 任务 1.5: 实现完整认证系统（登录/注册/登出/重置密码）
+- [x] 任务 1.5 修复 #1: 创建 `create_profile_on_signup` 触发器
+- [x] 任务 1.5 修复 #2: 添加 profiles INSERT RLS 策略
+- [x] 任务 1.5 修复 #3: 修复 profiles RLS 无限递归
+- [x] 任务 1.5 修复 #4: 修复 SECURITY DEFINER search_path 问题
+- [x] 任务 1.6: 邮件服务集成（Resend + React Email）
+- [x] 验证：注册功能正常，用户可成功创建
 
----
-
-## 任务列表
-
-### 调研任务
-- [x] 风格分类体系 - 已完成 `docs/research/01-style-classification.md`（已重构）
-- [x] 鹰角 UI 风格元素 - 已完成 `docs/research/02-hypergryph-ui-analysis.md`（已重构）
-- [x] 邮件服务选型 - 已完成 `docs/research/03-email-service-selection.md`
-- [x] 组件库选型 - 已完成 `docs/research/04-component-library-selection.md`
-- [x] Monorepo 结构 - 已完成 `docs/research/05-monorepo-structure.md`
-
-### 文档任务
-- [x] PRD.md（✅ 已补充调研结果）
-- [x] APP_FLOW.md（✅ 已完成）
-- [x] IMPLEMENTATION_PLAN.md（✅ 已完成，v1.1 添加多智能体协作）
-- [x] BACKEND_STRUCTURE.md（✅ 已完成，v1.1 补充 API 端点合约和边缘情况）
-- [x] FRONTEND_GUIDELINES.md（✅ 已完成，v1.1）
-- [x] TECH_STACK.md（✅ 已完成，v1.0）
-- [x] MULTI_AGENT_COLLABORATION.md（✅ 已完成，v1.4 完整重构：区分 Subagents 和 Agent Teams 两种模式）
-- [x] 技术栈调研索引（✅ 已完成，`docs/tech-stack-research/tech-stack-index.md`）
-- [x] Sub-agents 配置（✅ 已完成，`.claude/agents/` 7 个 Agent 配置文件）
-
-### 开发任务
-- [x] 任务 1.5: 认证系统（登录/注册/重置密码）
-- [x] 任务 1.5 修复：Auth 触发器 search_path 问题
-- [x] 任务 1.6: 邮件服务集成（Resend）
-- [ ] 项目初始化
-- [ ] 基础架构搭建
-- [ ] 核心功能实现
+**遗留问题**：
+- ⚠️ 开发环境需禁用邮箱验证（便于测试登录）
+- ⚠️ Resend 域名 `stylesnap.com` 需验证（生产环境前）
 
 ---
 
-## 历史完成记录
+## P0 阶段任务完成状态
 
-| 任务 | 完成时间 | 备注 |
-|------|----------|------|
-| PRD.md | 2026-03-20 | 已创建到 docs/ 目录 |
-| PRD.md 调研结果补充 | 2026-03-21 | 补充风格分类、技术栈选型、关键决策汇总 |
-| APP_FLOW.md | 2026-03-21 | 应用流程文档（45 轮问答确认） |
-| 风格分类体系调研 | 2026-03-20 | docs/research/01-style-classification.md（已重构） |
-| 鹰角 UI 风格分析 | 2026-03-20 | docs/research/02-hypergryph-ui-analysis.md（已重构） |
-| 邮件服务选型 | 2026-03-20 | docs/research/03-email-service-selection.md |
-| 组件库选型 | 2026-03-20 | docs/research/04-component-library-selection.md |
-| Monorepo 结构 | 2026-03-21 | docs/research/05-monorepo-structure.md |
-| FRONTEND_GUIDELINES.md | 2026-03-21 | 前端指南 v1.1（Zustand 主题切换、混合样式方案） |
-| TECH_STACK.md | 2026-03-21 | 技术栈版本清单 v1.0 |
-| BACKEND_STRUCTURE.md | 2026-03-22 | 后端结构 v1.1（含 API 端点合约、边缘情况处理） |
-| IMPLEMENTATION_PLAN.md | 2026-03-22 | 实现计划 v1.2（19 轮问答确认、18 周路线、多智能体任务分配、qwen3.5-plus 配置） |
-| MULTI_AGENT_COLLABORATION.md | 2026-03-22 | 多智能体协同方案 v1.4（完整重构：区分 Subagents 和 Agent Teams 两种模式、开启方法、选型对比） |
-| 技术栈调研索引 | 2026-03-22 | `docs/tech-stack-research/tech-stack-index.md`（按功效归类所有调研文档） |
-| Sub-agents 配置 | 2026-03-22 | `.claude/agents/` 7 个 Agent 配置（架构师、前端、后端、数据库、测试、文档、部署） |
-| 任务 1.5: 认证系统 | 2026-03-24 | 完整认证流程（登录/注册/登出/重置密码） |
-| 任务 1.5 修复：Auth 触发器 | 2026-03-24 | 修复 search_path 问题，创建完整诊断和修复文档 |
-| 任务 1.6: 邮件服务集成 | 2026-03-24 | Resend 集成、React Email 模板、配置指南 |
-| Supabase CLI 文档 | 2026-03-24 | 技术调研报告 + AI 知识库文档 |
-
----
-
-## GitHub 集成进度 (2026-03-22)
+### 阶段 1：基础架构搭建 🔄 部分完成
 
 | 任务 | 状态 | 说明 |
 |------|------|------|
-| Git 仓库初始化 | ✅ 已完成 | 本地 git init 完成 |
-| .gitignore 创建 | ✅ 已完成 | 排除 node_modules、.env 等 |
-| README.md 创建 | ✅ 已完成 | 项目说明文档 |
-| .env.example 创建 | ✅ 已完成 | 环境变量示例 |
-| 首次 commit | ✅ 已完成 | 40 文件，21523 行代码 |
-| 远程仓库关联 | ✅ 已完成 | 已关联 JackSmith111977/StyleSnap |
-| 代码推送 | ✅ 已完成 | 已推送到 main 分支 |
-| GitHub CLI 安装 | ✅ 已完成 | gh v2.88.1 (MSI 安装) |
-| MIT License 添加 | ✅ 已完成 | 已推送到仓库 |
-| Topics 添加 | ⏳ 待执行 | 需手动在 GitHub 网页添加 |
+| 任务 1.1: Monorepo 初始化 | ✅ | pnpm workspace, turbo.json, packages/config |
+| 任务 1.2: Supabase 配置 | ✅ | 数据库迁移 0001-0006, RLS 策略，触发器 |
+| 任务 1.3: 存储桶配置 | ✅ | style-previews 存储桶已创建 |
+| 任务 1.4: 基础组件搭建 | ✅ | Shadcn UI, Layout, Header, Footer, 主题切换 |
+| 任务 1.5: 认证系统 | ✅ | 登录/注册/重置密码完整流程 |
+| 任务 1.6: 邮件服务集成 | ✅ | Resend + React Email 模板 |
+| 任务 1.7: 错误监控配置 | ⏳ | 待开始 |
+
+### 阶段 2：核心功能实现 ⏳ 待开始
+
+| 任务 | 状态 | 说明 |
+|------|------|------|
+| 任务 2.1: 数据库初始化 | ⏳ | 分类数据、风格导入脚本 |
+| 任务 2.2: 风格浏览功能 | ⏳ | 列表/网格视图 |
+| 任务 2.3: 风格详情功能 | ⏳ | 代码展示和复制 |
+| 任务 2.4: 搜索与筛选 | ⏳ | 搜索框、分类筛选 |
+| 任务 2.5: SEO 优化 | ⏳ | Metadata, sitemap |
+
+### 阶段 3：测试与部署 ⏳ 待开始
+
+| 任务 | 状态 | 说明 |
+|------|------|------|
+| 任务 3.1: 测试编写 | ⏳ | Vitest + Playwright |
+| 任务 3.2: 性能优化 | ⏳ | 缓存、图片优化 |
+| 任务 3.3: Vercel 部署 | ⏳ | 生产环境配置 |
+
+---
+
+## 已完成功能清单
+
+### 应用路由 (apps/web/app)
+
+| 路由 | 状态 | 说明 |
+|------|------|------|
+| `/` | ✅ | 首页 |
+| `/login` | ✅ | 登录页 |
+| `/register` | ✅ | 注册页 |
+| `/reset-password` | ✅ | 重置密码页 |
+| `/update-password` | ✅ | 更新密码页 |
+| `/auth/callback` | ✅ | Auth 回调处理 |
+| `/dashboard` | ✅ | 仪表板（受保护） |
+| `/unauthorized` | ✅ | 未授权页面 |
+
+### Server Actions (apps/web/actions)
+
+| Action | 状态 | 说明 |
+|--------|------|------|
+| `auth/login` | ✅ | 用户登录 |
+| `auth/register` | ✅ | 用户注册 |
+| `auth/logout` | ✅ | 用户登出 |
+| `auth/resetPassword` | ✅ | 重置密码 |
+| `auth/updatePassword` | ✅ | 更新密码 |
+| `email/sendVerificationEmail` | ✅ | 发送验证邮件 |
+| `email/sendPasswordResetEmail` | ✅ | 发送重置邮件 |
+| `email/sendWelcomeEmail` | ✅ | 发送欢迎邮件 |
+
+### React 组件 (apps/web/components)
+
+| 组件 | 状态 | 说明 |
+|------|------|------|
+| `Layout` | ✅ | 布局组件 |
+| `Header` | ✅ | 头部导航 |
+| `Footer` | ✅ | 页脚 |
+| `LoginForm` | ✅ | 登录表单 |
+| `RegisterForm` | ✅ | 注册表单 |
+| `ResetPasswordForm` | ✅ | 重置密码表单 |
+| `UpdatePasswordForm` | ✅ | 更新密码表单 |
+| `UserMenu` | ✅ | 用户菜单 |
+| `ThemeToggle` | ✅ | 主题切换 |
+| `Button, Card, Input, Label` | ✅ | Shadcn UI 基础组件 |
+
+### 邮件模板 (apps/web/emails)
+
+| 模板 | 状态 | 说明 |
+|------|------|------|
+| `VerificationEmail` | ✅ | 邮箱验证模板 |
+| `PasswordResetEmail` | ✅ | 密码重置模板 |
+
+### 数据库迁移 (supabase/migrations)
+
+| 迁移 | 状态 | 说明 |
+|------|------|------|
+| 0001 | ✅ | 初始 Schema |
+| 0002 | ✅ | Storage 存储桶 |
+| 0003 | ✅ | Auth 触发器 |
+| 0004 | ✅ | Profiles INSERT 策略 |
+| 0005 | ✅ | 修复 RLS 递归 |
+| 0006 | ✅ | 修复 search_path |
+
+### 工具库 (apps/web/lib)
+
+| 模块 | 状态 | 说明 |
+|------|------|------|
+| `supabase/client` | ✅ | 浏览器客户端 |
+| `supabase/server` | ✅ | 服务端客户端 |
+| `auth` | ✅ | Auth 工具函数 |
+| `email` | ✅ | Resend 客户端封装 |
+| `utils` | ✅ | cn() 工具 |
+
+### 状态管理 (apps/web/stores)
+
+| Store | 状态 | 说明 |
+|-------|------|------|
+| `theme-store` | ✅ | Zustand 主题状态 |
+
+### Hooks (apps/web/hooks)
+
+| Hook | 状态 | 说明 |
+|------|------|------|
+| `use-auth` | ✅ | Auth 状态 Hook |
+
+### 文档 (docs/)
+
+| 文档类型 | 数量 | 状态 |
+|----------|------|------|
+| 核心文档 | 6 篇 | ✅ PRD, IMPLEMENTATION_PLAN, APP_FLOW, TECH_STACK, FRONTEND_GUIDELINES, BACKEND_STRUCTURE, MULTI_AGENT_COLLABORATION |
+| 调研报告 | 5 篇 | ✅ 风格分类、鹰角 UI、邮件服务、组件库、Monorepo |
+| 技术栈调研 | 10 篇 | ✅ Next.js 16, Zustand, Supabase, Resend, Playwright 等 |
+| 配置指南 | 8 篇 | ✅ GitHub, pnpm, Supabase, Resend, CI/CD 等 |
+| 修复经验 | 1 篇 | ✅ Auth 触发器修复文档 |
+
+---
+
+## 待办任务
+
+### P0 剩余任务
+
+| 任务 | 优先级 | 说明 |
+|------|--------|------|
+| 任务 1.7: 错误监控配置 | P0 | Sentry 集成 |
+| 任务 2.1: 数据库初始化 | P0 | 风格分类数据、初始内容 |
+| 任务 2.2: 风格浏览功能 | P0 | 列表页、网格视图 |
+| 任务 2.3: 风格详情功能 | P0 | 详情页、代码复制 |
+| 任务 2.4: 搜索与筛选 | P0 | 搜索框、分类筛选器 |
+| 任务 2.5: SEO 优化 | P0 | Metadata、sitemap |
+
+### P1 任务（未来）
+
+- [ ] 社交功能（收藏、点赞、评论）
+- [ ] 个人中心
+- [ ] 高级筛选
+- [ ] 管理后台
+
+### P2 任务（未来）
+
+- [ ] 实时预览编辑器
+- [ ] 用户提交
+- [ ] 分享功能
+- [ ] 关注系统
+- [ ] 用户合集
+
+---
+
+## GitHub 仓库状态
+
+| 项目 | 状态 |
+|------|------|
+| 仓库 | https://github.com/JackSmith111977/StyleSnap |
+| 最新提交 | a315cc5 fix: 修复 Auth 触发器 search_path 问题 |
+| 提交数 | 10+ |
+| 状态 | 同步中 |
 
 **待用户操作**：
-在 GitHub 网页添加 Topics（访问 https://github.com/JackSmith111977/StyleSnap → Manage topics）：
-```
-nextjs, supabase, typescript, design-system, web-design, tailwind-css, shadcn-ui, open-source, developer-tools
-```
+- [ ] 添加 GitHub Topics（nextjs, supabase, typescript 等）
 
 ---
 
-## 工具问题日志
+## 数据库状态
 
-### WebSearch 问题（已解决）
+| 检查项 | 状态 |
+|--------|------|
+| 迁移版本 | 0001-0006 ✅ 已应用 |
+| 触发器 | create_profile_on_signup ✅ 启用 |
+| search_path | public ✅ 已设置 |
+| supabase_auth_admin 权限 | ALL ✅ 完整权限 |
+| RLS 策略 | 4 个 ✅ 正常 |
 
-**现象**: WebSearch  consistently 返回 "0 searches" 或 API 错误
-
-**解决状态**: ✅ 已修复 - 工具现已正常工作
-
-**当前状态**: 可用于网络调研任务
+**数据库状态：安全 ✅**
 
 ---
 
-## 错误修复经验记录
+## 已知问题
+
+| 问题 | 影响 | 解决方案 |
+|------|------|----------|
+| 邮箱验证 | 注册后需验证才能登录 | 开发环境可在 Dashboard 禁用 |
+| Resend 域名未验证 | 发件人显示问题 | 使用 resend.com 测试域名或验证 stylesnap.com |
+| 邮件链接 localhost | 开发环境正常 | 生产环境自动使用正确域名 |
+
+---
+
+## 错误修复经验
 
 ### Auth 触发器 "Database error saving new user"
 
 **日期**：2026-03-24
 
-**问题**：用户注册时报错 "Database error saving new user"
-
 **根本原因**：SECURITY DEFINER 函数没有显式设置 `search_path = public`
 
-**修复方案**：
-1. 创建迁移文件 `0006_fix_auth_trigger_search_path.sql`
-2. 在函数定义中添加 `SET search_path = public`
-3. 授予 `supabase_auth_admin` 完整权限
-4. 确保 RLS 策略允许 INSERT
-
-**详细文档**：`docs/guides/supabase-auth-trigger-fix.md`
+**修复文档**：`docs/guides/supabase-auth-trigger-fix.md`
 
 **教训**：
 - SECURITY DEFINER 函数必须显式设置 `search_path`
 - 授予表权限时同时需要授予 schema 使用权
 - 即使触发器使用 SECURITY DEFINER，RLS 策略仍需允许 INSERT
+
+---
+
+## 下一步
+
+1. **禁用邮箱验证**（开发环境）- 便于测试登录
+2. **任务 1.7: Sentry 配置** - 错误监控
+3. **任务 2.1: 数据库初始化** - 创建风格分类数据
+4. **任务 2.2: 风格浏览功能** - 列表页实现
 
 ---
