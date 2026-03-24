@@ -14,6 +14,7 @@
 6. **Next.js 16 文档查阅** - 编写代码前必须查阅 `docs/research/nextjs-16-technical-research.md`，确保使用最新 API 和最佳实践
 7. **每次询问限 5 问** - 进行用户询问时，每次最多展示 5 个问题，待用户确认后再继续下一批
 8. **TECH_STACK.md 规范** - 只包含技术栈版本锁定清单（包名、版本、用途）；各技术栈核心知识体系需分别调研并整合到独立文档（如 `docs/tech-stack-research/zustand-technical-research.md`）
+9. **分支开发流程** - 开发新功能前，先从 `main` 分支创建新分支（命名格式：`feature/功能名`），开发完成后合并回 `main` 分支
 
 ---
 
