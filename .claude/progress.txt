@@ -35,6 +35,8 @@ D:\WorkPlace\VibeCoding\Design Style\
 ├── .claude/
 │   ├── CLAUDE.md          # 会话规则
 │   ├── progress.txt       # 任务进度
+│   ├── knowledge/         # AI 知识库
+│   │   └── supabase-cli-knowledge.md  # Supabase CLI 快速参考
 │   └── agents/            # Sub-agents 配置
 │       ├── 01-architecture.md
 │       ├── 02-frontend.md
@@ -46,7 +48,8 @@ D:\WorkPlace\VibeCoding\Design Style\
 ├── docs/
 │   ├── PRD.md             # 产品需求文档（已补充调研结果）
 │   ├── tech-stack-research/  # 技术栈调研
-│   │   └── tech-stack-index.md  # 调研索引
+│   │   ├── tech-stack-index.md  # 调研索引
+│   │   └── supabase-cli-technical-research.md  # Supabase CLI 调研
 │   ├── research/          # 调研报告
 │   │   ├── 01-style-classification.md    # 风格分类体系
 │   │   ├── 02-hypergryph-ui-analysis.md  # 鹰角 UI 风格分析
@@ -129,6 +132,7 @@ D:\WorkPlace\VibeCoding\Design Style\
 | Sub-agents 配置 | 2026-03-22 | `.claude/agents/` 7 个 Agent 配置（架构师、前端、后端、数据库、测试、文档、部署） |
 | 任务 1.5: 认证系统 | 2026-03-24 | 完整认证流程（登录/注册/登出/重置密码） |
 | 任务 1.6: 邮件服务集成 | 2026-03-24 | Resend 集成、React Email 模板、配置指南 |
+| Supabase CLI 文档 | 2026-03-24 | 技术调研报告 + AI 知识库文档 |
 
 ---
 

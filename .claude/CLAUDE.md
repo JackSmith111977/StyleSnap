@@ -15,6 +15,7 @@
 7. **每次询问限 5 问** - 进行用户询问时，每次最多展示 5 个问题，待用户确认后再继续下一批
 8. **TECH_STACK.md 规范** - 只包含技术栈版本锁定清单（包名、版本、用途）；各技术栈核心知识体系需分别调研并整合到独立文档（如 `docs/tech-stack-research/zustand-technical-research.md`）
 9. **分支开发流程** - 开发新功能前，先从 `main` 分支创建新分支（命名格式：`feature/功能名`），开发完成后合并回 `main` 分支
+10. **Supabase CLI 使用** - 执行 Supabase 相关命令前必须查阅 `docs/tech-stack-research/supabase-cli-technical-research.md` 和 `.claude/knowledge/supabase-cli-knowledge.md`
 
 ---
 
@@ -27,14 +28,6 @@
   - 首先分析错误信息，尝试调整参数或方法重试
   - 如多次失败，向用户报告并请求指导
   - 不自行使用知识库内容替代工具调用结果
-
----
-
-## 约束条件
-
-- 不假设任何问题，有疑问先询问用户
-- 所有决策需基于已确认的框架
-- 代码质量要求：TypeScript strict 模式、ESLint、Prettier、测试覆盖
 
 ---
 
