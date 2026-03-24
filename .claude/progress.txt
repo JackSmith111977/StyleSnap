@@ -1,6 +1,6 @@
 # StyleSnap - 任务进度跟踪
 
-> 最后更新：2026-03-21（PRD 文档补充调研结果完成）
+> 最后更新：2026-03-24（任务 1.6 邮件服务集成完成）
 
 ---
 
@@ -47,12 +47,14 @@ D:\WorkPlace\VibeCoding\Design Style\
 │   ├── PRD.md             # 产品需求文档（已补充调研结果）
 │   ├── tech-stack-research/  # 技术栈调研
 │   │   └── tech-stack-index.md  # 调研索引
-│   └── research/          # 调研报告
-│       ├── 01-style-classification.md    # 风格分类体系
-│       ├── 02-hypergryph-ui-analysis.md  # 鹰角 UI 风格分析
-│       ├── 03-email-service-selection.md # 邮件服务选型
-│       ├── 04-component-library-selection.md # 组件库选型
-│       └── 05-monorepo-structure.md      # Monorepo 结构
+│   ├── research/          # 调研报告
+│   │   ├── 01-style-classification.md    # 风格分类体系
+│   │   ├── 02-hypergryph-ui-analysis.md  # 鹰角 UI 风格分析
+│   │   ├── 03-email-service-selection.md # 邮件服务选型
+│   │   ├── 04-component-library-selection.md # 组件库选型
+│   │   └── 05-monorepo-structure.md      # Monorepo 结构
+│   └── guides/            # 配置指南
+│       └── resend-email-guide.md         # Resend 配置指南
 └── (后续代码目录)
 ```
 
@@ -60,24 +62,20 @@ D:\WorkPlace\VibeCoding\Design Style\
 
 ## 当前任务
 
-**任务 1.5: 认证系统（登录/注册/重置密码）**
+**任务 1.6: 邮件服务集成（Resend）**
 - 开始时间：2026-03-24
 - 状态：已完成 ✅
 - 完成内容：
-  - [x] 安装 @supabase/ssr、@supabase/supabase-js
-  - [x] 创建 Supabase 客户端封装（server、browser）
-  - [x] 创建环境变量验证（env.ts）
-  - [x] 实现登录 Action（邮箱密码）
-  - [x] 实现注册 Action（含邮箱验证）
-  - [x] 实现登出 Action
-  - [x] 实现密码重置 Action
-  - [x] 创建 useAuth Hook
-  - [x] 创建认证路由中间件（middleware.ts）
-  - [x] 创建登录/注册/重置密码页面
-  - [x] 创建仪表板页面（受保护路由示例）
-  - [x] 创建未授权页面
+  - [x] 安装 resend、@react-email/components、react-email
+  - [x] 创建 Resend 客户端封装（lib/email.ts）
+  - [x] 创建验证邮件模板（emails/verification-email.tsx）
+  - [x] 创建密码重置邮件模板（emails/password-reset-email.tsx）
+  - [x] 实现邮件发送 Server Action（actions/email/index.ts）
+  - [x] 集成到认证系统（注册后发送验证邮件）
+  - [x] 更新 .env.example（添加 Resend 配置）
+  - [x] 创建配置指南文档（docs/guides/resend-email-guide.md）
 
-**下一步任务**：任务 1.6 - 邮件服务集成（Resend）或 任务 1.7 - 错误监控配置（Sentry）
+**下一步任务**：任务 1.7 - 错误监控配置（Sentry）或 项目初始化
 
 ---
 
@@ -102,6 +100,8 @@ D:\WorkPlace\VibeCoding\Design Style\
 - [x] Sub-agents 配置（✅ 已完成，`.claude/agents/` 7 个 Agent 配置文件）
 
 ### 开发任务
+- [x] 任务 1.5: 认证系统（登录/注册/重置密码）
+- [x] 任务 1.6: 邮件服务集成（Resend）
 - [ ] 项目初始化
 - [ ] 基础架构搭建
 - [ ] 核心功能实现
@@ -127,6 +127,8 @@ D:\WorkPlace\VibeCoding\Design Style\
 | MULTI_AGENT_COLLABORATION.md | 2026-03-22 | 多智能体协同方案 v1.4（完整重构：区分 Subagents 和 Agent Teams 两种模式、开启方法、选型对比） |
 | 技术栈调研索引 | 2026-03-22 | `docs/tech-stack-research/tech-stack-index.md`（按功效归类所有调研文档） |
 | Sub-agents 配置 | 2026-03-22 | `.claude/agents/` 7 个 Agent 配置（架构师、前端、后端、数据库、测试、文档、部署） |
+| 任务 1.5: 认证系统 | 2026-03-24 | 完整认证流程（登录/注册/登出/重置密码） |
+| 任务 1.6: 邮件服务集成 | 2026-03-24 | Resend 集成、React Email 模板、配置指南 |
 
 ---
 

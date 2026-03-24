@@ -3,6 +3,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
+import { env } from '@/env'
+import { sendRegistrationEmails } from '@/actions/email'
 
 export interface LoginResult {
   error?: string
@@ -82,6 +84,15 @@ export async function register(
       return { error: '注册失败' }
     }
 
+    // 发送验证邮件和欢迎邮件
+    if (data.user && !data.user.email_confirmed_at) {
+      await sendRegistrationEmails(
+        email,
+        username,
+        data.session?.access_token ? undefined : data.user.email_confirmed_at || undefined
+      )
+    }
+
     // 注意：用户需要验证邮箱后才能登录
     // create_profile_on_signup 触发器会自动创建 profile
     return { success: true }
@@ -108,6 +119,8 @@ export async function logout(): Promise<void> {
 
 /**
  * 发送密码重置邮件
+ * 注意：Supabase 会自动发送密码重置邮件
+ * 如需自定义邮件模板，请在 Supabase 后台 > Authentication > Email Templates 中配置
  */
 export async function resetPassword(
   email: string
