@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { env } from '@/env'
 import { sendRegistrationEmails } from '@/actions/email'
+import { captureActionError, setSentryUser } from '@/lib/sentry-capture'
 
 export interface LoginResult {
   error?: string
@@ -45,10 +46,19 @@ export async function login(
       return { error: '用户不存在' }
     }
 
+    // 设置 Sentry 用户上下文
+    setSentryUser({
+      id: data.user.id,
+      email: data.user.email,
+    })
+
     revalidatePath('/')
     redirect('/dashboard')
   } catch (error) {
-    console.error('登录异常:', error)
+    captureActionError(error, {
+      action: 'auth/login',
+      email,
+    })
     return { error: '服务器错误，请稍后重试' }
   }
 }
@@ -168,6 +178,11 @@ export async function register(
     // create_profile_on_signup 触发器会自动创建 profile
     return { success: true }
   } catch (error) {
+    captureActionError(error, {
+      action: 'auth/register',
+      email,
+      username,
+    })
     console.error('[注册] 注册异常:', {
       message: (error as Error).message,
       stack: (error as Error).stack,
@@ -183,10 +198,19 @@ export async function register(
 export async function logout(): Promise<void> {
   try {
     const supabase = await createClient()
+
+    // 清除 Sentry 用户上下文
+    import('@/lib/sentry-capture').then(({ clearSentryUser }) => {
+      clearSentryUser()
+    })
+
     await supabase.auth.signOut()
     revalidatePath('/')
     redirect('/')
   } catch (error) {
+    captureActionError(error, {
+      action: 'auth/logout',
+    })
     console.error('登出失败:', error)
     throw error
   }
@@ -214,6 +238,10 @@ export async function resetPassword(
 
     return { success: true }
   } catch (error) {
+    captureActionError(error, {
+      action: 'auth/resetPassword',
+      email,
+    })
     console.error('密码重置异常:', error)
     return { error: '服务器错误，请稍后重试' }
   }
@@ -239,6 +267,9 @@ export async function updatePassword(
 
     return { success: true }
   } catch (error) {
+    captureActionError(error, {
+      action: 'auth/updatePassword',
+    })
     console.error('密码更新异常:', error)
     return { error: '服务器错误，请稍后重试' }
   }
