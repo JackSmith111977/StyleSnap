@@ -1,6 +1,6 @@
 # StyleSnap - 任务进度跟踪
 
-> 最后更新：2026-03-24（任务 1.5 修复完成 + 任务 1.6 完成）
+> 最后更新：2026-03-24（任务 1.7 完成 - Sentry 错误监控集成 + 代码验证规则）
 
 ---
 
@@ -9,7 +9,7 @@
 
 **已完成里程碑**：
 - ✅ 需求定义与调研阶段（2026-03-20 ~ 2026-03-22）
-- ✅ P0 基础架构（部分完成）
+- ✅ P0 基础架构（任务 1.1-1.7 全部完成）
 
 ---
 
@@ -70,6 +70,19 @@ D:\WorkPlace\VibeCoding\Design Style\
 ---
 
 ## 当前任务
+
+### 代码验证和规则修复 ✅ 已完成
+
+- 时间：2026-03-24
+- 状态：✅ 已完成
+- 修复内容：
+  - [x] 修复 sentry-capture.ts Server Actions 必须是 async
+  - [x] 修复 auth actions 调用 async Server Actions 需要 await
+  - [x] 修复 next.config.js ES module 配置
+  - [x] 修复 ESLint 未使用变量/导入问题
+  - [x] 通过 pnpm typecheck / pnpm lint / pnpm build 验证
+  - [x] 添加 CLAUDE.md 第 12 条：提交前代码验证规范
+  - [x] 添加子 agent 验证流程规则
 
 ### 任务 1.7: 错误监控配置（Sentry）✅ 已完成
 
