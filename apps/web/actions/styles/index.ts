@@ -34,6 +34,7 @@ export interface Style {
     icon: string | null
   }
   tags?: string[]
+  style_tags?: unknown // 内部使用的中间表数据，返回前会设置为 undefined
 }
 
 export interface GetStylesOptions {
@@ -122,13 +123,15 @@ export const getStyles = cache(async (
   }
 
   // 转换数据格式 - 使用类型断言避免 Supabase 类型推断问题
-  const styles: Style[] = ((data as unknown[]) ?? []).map((item: Record<string, unknown>) => ({
-    ...item,
-    tags:
-      (item.style_tags as Array<{ tag: { name: string } }> | undefined)
-        ?.map((st) => st.tag.name) ?? [],
-    style_tags: undefined, // 移除中间表数据
-  })) as Style[]
+  const styles: Style[] = ((data as unknown[]) ?? []).map((item: unknown) => {
+    const typedItem = item as Record<string, unknown>
+    const styleTags = typedItem.style_tags as Array<{ tag: { name: string } }> | undefined
+    return {
+      ...typedItem,
+      tags: styleTags?.map((st) => st.tag.name) ?? [],
+      style_tags: undefined, // 移除中间表数据
+    }
+  }) as Style[]
 
   const totalPages = Math.ceil((count ?? 0) / limit)
 
@@ -168,7 +171,7 @@ export const getStyle = cache(async (id: string): Promise<Style | null> => {
     .single() as { data: Style | null; error: Error | null }
 
   if (error) {
-    if (error.code !== 'PGRST116') { // 没有找到记录
+    if ((error as Error & { code?: string }).code !== 'PGRST116') { // 没有找到记录
       console.error('获取风格详情失败:', error)
     }
     return null
@@ -177,7 +180,7 @@ export const getStyle = cache(async (id: string): Promise<Style | null> => {
   return {
     ...data!,
     tags:
-      (data!.style_tags as Array<{ tag: { name: string } }> | undefined)
+      (data!.style_tags as unknown as Array<{ tag: { name: string } }> | undefined)
         ?.map((st) => st.tag.name) ?? [],
     style_tags: undefined,
   }

@@ -13,7 +13,7 @@ export default async function DashboardPage() {
     .from('profiles')
     .select('*')
     .eq('id', user.id)
-    .single() as { data: { id: string; username: string; role: string; avatar_url?: string } | null; error: Error | null }
+    .single() as { data: { id: string; username: string; role: string; avatar_url?: string; favorites_count?: number; comments_count?: number } | null; error: Error | null }
 
   if (!profile) {
     redirect('/login')

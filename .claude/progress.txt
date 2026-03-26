@@ -1,6 +1,6 @@
 # StyleSnap - 任务进度跟踪
 
-> 最后更新：2026-03-26（任务 2.2 完成 - 风格浏览功能）
+> 最后更新：2026-03-26（ESLint P0/P1 规则添加完成）
 
 ---
 
@@ -68,28 +68,34 @@ D:\WorkPlace\VibeCoding\Design Style\
 
 ## 7.1 节 - ESLint 规则增强记录
 
-### 已添加规则
+### 已添加规则（✅ 已完成）
 
-| 规则 | 级别 | 说明 |
-|------|------|------|
-| `@typescript-eslint/no-explicit-any` | error | 禁止显式 any 类型，强制类型安全 |
-| `@typescript-eslint/no-unused-vars` | error | 未使用变量检查（忽略 _ 前缀） |
-| `@typescript-eslint/consistent-type-imports` | error | 强制类型导入使用 `import type` |
-| `react-hooks/rules-of-hooks` | error | React Hooks 规则 |
-| `react-hooks/exhaustive-deps` | warn | Hooks 依赖检查 |
+| 规则 | 级别 | 说明 | 添加日期 |
+|------|------|------|----------|
+| `@typescript-eslint/no-explicit-any` | error | 禁止显式 any 类型，强制类型安全 | 2026-03-26 |
+| `@typescript-eslint/no-floating-promises` | error | 禁止未处理的 Promise | 2026-03-26 |
+| `@typescript-eslint/no-unsafe-assignment` | warn | 禁止 any 类型值赋给有类型变量 | 2026-03-26 |
+| `@typescript-eslint/prefer-nullish-coalescing` | warn | 优先使用 ?? 而不是 || | 2026-03-26 |
+| `@typescript-eslint/prefer-optional-chain` | warn | 优先使用 ?. 可选链 | 2026-03-26 |
+| `@typescript-eslint/explicit-function-return-type` | warn | 函数返回类型显式声明 | 2026-03-26 |
+| `@typescript-eslint/array-type` | warn | 数组类型统一（简单类型用 T[]，复杂用 Array<T>） | 2026-03-26 |
+| `prefer-const` | error | 优先使用 const | 2026-03-26 |
+| `no-var` | error | 禁止使用 var | 2026-03-26 |
+| `@typescript-eslint/no-unused-vars` | error | 未使用变量检查（忽略 _ 前缀） | 已有 |
+| `@typescript-eslint/consistent-type-imports` | error | 强制类型导入使用 `import type` | 已有 |
+| `react-hooks/rules-of-hooks` | error | React Hooks 规则 | 已有 |
+| `react-hooks/exhaustive-deps` | warn | Hooks 依赖检查 | 已有 |
+| `@next/next/*` | error/warn | Next.js 推荐规则 | 已有 |
 
 ### 待添加规则（高质量规范）
 
-- [ ] `@typescript-eslint/explicit-function-return-type` - 函数返回类型显式声明
+**P3 严格模式**
 - [ ] `@typescript-eslint/strict-boolean-expressions` - 严格布尔表达式
-- [ ] `@typescript-eslint/no-floating-promises` - Promise 处理检查
 - [ ] `@typescript-eslint/no-unnecessary-condition` - 冗余条件检查
-- [ ] `@typescript-eslint/prefer-nullish-coalescing` - 优先使用空值合并
-- [ ] `@typescript-eslint/prefer-optional-chain` - 优先使用可选链
-- [ ] `@typescript-eslint/array-type` - 数组类型统一
 - [ ] `@typescript-eslint/prefer-readonly` - 优先只读
-- [ ] `prefer-const` - 优先 const
-- [ ] `no-var` - 禁止 var
+
+**P4 格式分离**
+- [ ] `eslint-config-prettier` - 禁用与 Prettier 冲突的格式规则
 
 ---
 

@@ -88,6 +88,34 @@ const config = [
       '@typescript-eslint/prefer-nullish-coalescing': 'warn',
       // 优先使用可选链操作符 ?.
       '@typescript-eslint/prefer-optional-chain': 'warn',
+
+      // P2 代码风格
+      // 函数返回类型显式声明（提高代码可读性和类型安全性）
+      '@typescript-eslint/explicit-function-return-type': [
+        'warn',
+        {
+          allowExpressions: true, // 允许箭头函数隐式返回
+          allowHigherOrderFunctions: true, // 允许高阶函数
+          allowTypedFunctionExpressions: true, // 允许有类型标注的函数表达式
+        },
+      ],
+      // 数组类型统一使用 T[] 语法（更简洁）
+      '@typescript-eslint/array-type': [
+        'warn',
+        {
+          default: 'array-simple', // 简单类型用 T[]，复杂类型用 Array<T>
+        },
+      ],
+      // 优先使用 const（不可变性优先）
+      'prefer-const': [
+        'error',
+        {
+          destructuring: 'all', // 解构赋值时只要有一个变量未重新赋值就使用 let
+          ignoreReadBeforeAssign: false,
+        },
+      ],
+      // 禁止使用 var（使用 let/const 替代）
+      'no-var': 'error',
     },
   },
 

@@ -12,7 +12,7 @@ interface PaginationProps {
 export function Pagination({ currentPage, totalPages, onPageChange }: PaginationProps) {
   // 生成页码列表（最多显示 7 个）
   const getPageNumbers = () => {
-    const pages: (number | string)[] = []
+    const pages: Array<number | string> = []
     const showPages = 7
 
     if (totalPages <= showPages) {
