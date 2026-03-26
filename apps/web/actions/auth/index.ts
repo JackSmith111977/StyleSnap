@@ -131,7 +131,7 @@ export async function register(
       .from('profiles')
       .select('*')
       .eq('id', data.user.id)
-      .single()
+      .single() as { data: { id: string; username: string; role: string; avatar_url?: string } | null; error: Error | null }
 
     if (profileError) {
       console.error('[注册] profile 查询失败:', profileError)

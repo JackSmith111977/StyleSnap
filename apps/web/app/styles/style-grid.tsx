@@ -24,8 +24,8 @@ export function StyleGrid({ initialStyles, totalPages, categories }: StyleGridPr
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
 
   const currentPage = Number(searchParams.get('page')) || 1
-  const currentCategory = searchParams.get('category') || ''
-  const sortBy = searchParams.get('sort') || 'newest'
+  const currentCategory = searchParams.get('category') ?? ''
+  const sortBy = searchParams.get('sort') ?? 'newest'
 
   const handleCategoryChange = (categoryId: string) => {
     startTransition(() => {

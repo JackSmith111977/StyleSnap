@@ -13,7 +13,7 @@ export default async function DashboardPage() {
     .from('profiles')
     .select('*')
     .eq('id', user.id)
-    .single()
+    .single() as { data: { id: string; username: string; role: string; avatar_url?: string } | null; error: Error | null }
 
   if (!profile) {
     redirect('/login')
@@ -55,11 +55,11 @@ export default async function DashboardPage() {
           <CardContent className="space-y-2">
             <div>
               <span className="text-sm text-muted-foreground">收藏风格</span>
-              <p className="text-2xl font-bold">{profile.favorites_count || 0}</p>
+              <p className="text-2xl font-bold">{profile.favorites_count ?? 0}</p>
             </div>
             <div>
               <span className="text-sm text-muted-foreground">评论</span>
-              <p className="text-2xl font-bold">{profile.comments_count || 0}</p>
+              <p className="text-2xl font-bold">{profile.comments_count ?? 0}</p>
             </div>
           </CardContent>
         </Card>

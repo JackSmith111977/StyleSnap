@@ -121,20 +121,20 @@ export const getStyles = cache(async (
     throw new Error('获取风格列表失败')
   }
 
-  // 转换数据格式
-  const styles: Style[] = (data || []).map((item) => ({
+  // 转换数据格式 - 使用类型断言避免 Supabase 类型推断问题
+  const styles: Style[] = ((data as unknown[]) ?? []).map((item: Record<string, unknown>) => ({
     ...item,
     tags:
       (item.style_tags as Array<{ tag: { name: string } }> | undefined)
-        ?.map((st) => st.tag.name) || [],
+        ?.map((st) => st.tag.name) ?? [],
     style_tags: undefined, // 移除中间表数据
-  }))
+  })) as Style[]
 
-  const totalPages = Math.ceil((count || 0) / limit)
+  const totalPages = Math.ceil((count ?? 0) / limit)
 
   return {
     styles,
-    total: count || 0,
+    total: count ?? 0,
     page,
     limit,
     totalPages,
@@ -165,7 +165,7 @@ export const getStyle = cache(async (id: string): Promise<Style | null> => {
     `)
     .eq('id', id)
     .eq('status', 'published')
-    .single()
+    .single() as { data: Style | null; error: Error | null }
 
   if (error) {
     if (error.code !== 'PGRST116') { // 没有找到记录
@@ -178,7 +178,7 @@ export const getStyle = cache(async (id: string): Promise<Style | null> => {
     ...data!,
     tags:
       (data!.style_tags as Array<{ tag: { name: string } }> | undefined)
-        ?.map((st) => st.tag.name) || [],
+        ?.map((st) => st.tag.name) ?? [],
     style_tags: undefined,
   }
 })

@@ -46,12 +46,12 @@ export function useAuth(): UseAuthReturn {
   }, [])
 
   useEffect(() => {
-    loadUser()
+    void loadUser()
 
     // 监听认证状态变化
     const supabase = createClient()
     const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
-      loadUser()
+      void loadUser()
     })
 
     return () => {

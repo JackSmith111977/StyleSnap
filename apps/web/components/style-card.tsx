@@ -11,7 +11,7 @@ interface StyleCardProps {
 
 export function StyleCard({ style, viewMode }: StyleCardProps) {
   // 获取主色
-  const primaryColor = style.color_palette?.primary || '#666666'
+  const primaryColor = style.color_palette?.primary ?? '#666666'
 
   // 网格视图
   if (viewMode === 'grid') {
@@ -27,7 +27,7 @@ export function StyleCard({ style, viewMode }: StyleCardProps) {
           {/* 分类标签 */}
           <div className="absolute left-2 top-2">
             <span className="bg-primary/90 text-primary-foreground rounded px-2 py-1 text-xs font-medium">
-              {style.category?.name || '未分类'}
+              {style.category?.name ?? '未分类'}
             </span>
           </div>
 
@@ -52,7 +52,7 @@ export function StyleCard({ style, viewMode }: StyleCardProps) {
         <CardHeader>
           <CardTitle className="line-clamp-1 text-lg">{style.title}</CardTitle>
           <CardDescription className="line-clamp-2">
-            {style.description || '暂无描述'}
+            {style.description ?? '暂无描述'}
           </CardDescription>
         </CardHeader>
 
@@ -81,11 +81,11 @@ export function StyleCard({ style, viewMode }: StyleCardProps) {
             <div className="flex items-center gap-3">
               <span className="flex items-center gap-1">
                 <Eye className="h-3 w-3" />
-                {style.view_count || 0}
+                {style.view_count ?? 0}
               </span>
               <span className="flex items-center gap-1">
                 <Heart className="h-3 w-3" />
-                {style.like_count || 0}
+                {style.like_count ?? 0}
               </span>
             </div>
             <Link href={`/styles/${style.id}`}>
@@ -113,7 +113,7 @@ export function StyleCard({ style, viewMode }: StyleCardProps) {
         >
           <div className="absolute left-2 top-2">
             <span className="bg-primary/90 text-primary-foreground rounded px-2 py-1 text-xs font-medium">
-              {style.category?.name || '未分类'}
+              {style.category?.name ?? '未分类'}
             </span>
           </div>
           <div className="flex h-full items-center justify-center">
@@ -128,7 +128,7 @@ export function StyleCard({ style, viewMode }: StyleCardProps) {
               <div>
                 <h3 className="text-lg font-semibold">{style.title}</h3>
                 <p className="text-muted-foreground text-sm">
-                  {style.category?.name || '未分类'}
+                  {style.category?.name ?? '未分类'}
                 </p>
               </div>
               <Link href={`/styles/${style.id}`}>
@@ -136,7 +136,7 @@ export function StyleCard({ style, viewMode }: StyleCardProps) {
               </Link>
             </div>
             <p className="text-muted-foreground line-clamp-2 text-sm">
-              {style.description || '暂无描述'}
+              {style.description ?? '暂无描述'}
             </p>
           </div>
 
@@ -159,11 +159,11 @@ export function StyleCard({ style, viewMode }: StyleCardProps) {
             <div className="flex items-center gap-4 text-xs text-muted-foreground">
               <span className="flex items-center gap-1">
                 <Eye className="h-3 w-3" />
-                {style.view_count || 0}
+                {style.view_count ?? 0}
               </span>
               <span className="flex items-center gap-1">
                 <Heart className="h-3 w-3" />
-                {style.like_count || 0}
+                {style.like_count ?? 0}
               </span>
             </div>
           </div>

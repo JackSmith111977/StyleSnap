@@ -36,7 +36,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
   render() {
     if (this.state.hasError) {
-      return this.props.fallback || (
+      return this.props.fallback ?? (
         <div className="p-4 text-center text-red-600">
           <h2>出错了</h2>
           <p>请刷新页面重试</p>

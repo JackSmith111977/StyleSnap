@@ -18,8 +18,8 @@ interface StylesPageProps {
 export default async function StylesPage({ searchParams }: StylesPageProps) {
   const params = await searchParams
   const page = Number(params.page) || 1
-  const category = params.category || ''
-  const sort = params.sort || 'newest'
+  const category = params.category ?? ''
+  const sort = params.sort ?? 'newest'
 
   // 并行获取数据和分类
   const [stylesData, categories] = await Promise.all([

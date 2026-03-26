@@ -75,6 +75,19 @@ const config = [
           fixToUnknown: false, // 不自动替换为 unknown
         },
       ],
+      // 禁止未处理的 Promise（防止异步错误被忽略）
+      '@typescript-eslint/no-floating-promises': [
+        'error',
+        {
+          ignoreVoid: true, // 允许 void 操作符显式忽略
+        },
+      ],
+      // 禁止将 any 类型值赋给有类型的变量
+      '@typescript-eslint/no-unsafe-assignment': 'warn',
+      // 优先使用空值合并运算符 ?? 而不是 ||
+      '@typescript-eslint/prefer-nullish-coalescing': 'warn',
+      // 优先使用可选链操作符 ?.
+      '@typescript-eslint/prefer-optional-chain': 'warn',
     },
   },
 
