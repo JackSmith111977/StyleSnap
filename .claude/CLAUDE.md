@@ -11,11 +11,11 @@
 3. **生产级质量** - 类型安全、测试覆盖、代码规范
 4. **工具调用失败处理** - 如工具调用失败，优先排查失败原因并尝试解决，不自行使用知识库替代
 5. **网络搜索首选** - 需要搜索网络信息时，优先使用 `mcp__WebSearch__bailian_web_search` 工具
-6. **Next.js 16 文档查阅** - 编写代码前必须查阅 `docs/research/nextjs-16-technical-research.md`，确保使用最新 API 和最佳实践
+6. **Next.js 16 文档查阅** - 编写代码前必须查阅 `docs/knowledge-base/Next.js 核心知识体系.md`，确保使用最新 API 和最佳实践
 7. **每次询问限 5 问** - 进行用户询问时，每次最多展示 5 个问题，待用户确认后再继续下一批
-8. **TECH_STACK.md 规范** - 只包含技术栈版本锁定清单（包名、版本、用途）；各技术栈核心知识体系需分别调研并整合到独立文档（如 `docs/tech-stack-research/zustand-technical-research.md`）
+8. **TECH_STACK.md 规范** - 只包含技术栈版本锁定清单（包名、版本、用途）；各技术栈核心知识体系需分别调研并整合到独立文档（如 `docs/knowledge-base/Zustand 核心知识体系.md`）
 9. **分支开发流程** - 开发新功能前，先从 `main` 分支创建新分支（命名格式：`feature/功能名`），开发完成后合并回 `main` 分支
-10. **Supabase CLI 使用** - 执行 Supabase 相关命令前必须查阅 `docs/tech-stack-research/supabase-cli-technical-research.md` 和 `.claude/knowledge/supabase-cli-knowledge.md`
+10. **Supabase CLI 使用** - 执行 Supabase 相关命令前必须查阅 `docs/knowledge-base/Supabase CLI 指南.md` 和 `.claude/knowledge/supabase-cli-knowledge.md`
 
 11. **进度跟踪规范** - 任务开始前/完成时主动更新 `.claude/progress.txt`：
     - **任务开始前**：标记任务为 🔄 进行中，记录开始时间
@@ -79,13 +79,11 @@ D:\WorkPlace\VibeCoding\Design Style\
 ├── .claude/
 │   ├── CLAUDE.md          # 会话规则（本文件）
 │   └── progress.txt       # 任务进度跟踪
-├── docs/                   # 项目规范文档
-│   ├── PRD.md
-│   ├── IMPLEMENTATION_PLAN.md
-│   ├── APP_FLOW.md
-│   ├── TECH_STACK.md
-│   ├── FRONTEND_GUIDELINES.md
-│   └── BACKEND_STRUCTURE.md
+├── docs/                   # 项目文档
+│   ├── main/              # 核心文档（PRD、APP_FLOW 等）
+│   ├── research/          # 调研报告（技术选型、风格分析）
+│   ├── knowledge-base/    # 知识库（技术栈核心知识、指南）
+│   └── reference/         # Agent 参考（API 速查、最佳实践）
 ```
 
 ---

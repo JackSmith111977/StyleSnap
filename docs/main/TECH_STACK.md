@@ -10,14 +10,14 @@
 
 本文档仅包含技术栈版本锁定清单。各技术栈的核心知识体系、最佳实践、集成指南详见独立调研文档：
 
-**完整索引**：[`docs/tech-stack-research/tech-stack-index.md`](./tech-stack-research/tech-stack-index.md)
+**完整索引**：[`docs/knowledge-base/技术栈索引.md`](../knowledge-base/技术栈索引.md)
 
 | 技术栈 | 调研文档 | 状态 |
 |--------|----------|------|
-| Next.js 16 | `docs/tech-stack-research/nextjs-16-technical-research.md` | ✅ 已完成 |
-| Zustand | `docs/tech-stack-research/zustand-technical-research.md` | ✅ 已完成 |
-| TanStack Query | `docs/tech-stack-research/tanstack-query-vs-swr.md` | ✅ 已完成 |
-| T3 Env | `docs/tech-stack-research/t3-env-technical-research.md` | ✅ 已完成 |
+| Next.js 16 | `docs/knowledge-base/Next.js 核心知识体系.md` | ✅ 已完成 |
+| Zustand | `docs/knowledge-base/Zustand 核心知识体系.md` | ✅ 已完成 |
+| TanStack Query | `docs/knowledge-base/TanStack Query 核心知识体系.md` | ✅ 已完成 |
+| T3 Env | `docs/knowledge-base/T3 Env 核心知识体系.md` | ✅ 已完成 |
 | UI 组件库 | `docs/research/04-component-library-selection.md` | ✅ 已完成 |
 | Monorepo | `docs/research/05-monorepo-structure.md` | ✅ 已完成 |
 

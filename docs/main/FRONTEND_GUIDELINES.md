@@ -1831,7 +1831,387 @@ export default async function HomePage({
 
 ---
 
-## 文档修订历史
+## 11. 性能优化指南
+
+### 11.1 CSS 性能优化
+
+#### box-shadow 替代方案
+
+**问题**：大范围 box-shadow（扩散半径>10px）在滚动时会造成掉帧
+
+```css
+/* ❌ 避免：大阴影性能问题 */
+.card {
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+/* ✅ 推荐：transform + 小阴影组合 */
+.card {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 150ms ease-out;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
+}
+```
+
+#### backdrop-filter 使用规范
+
+**问题**：backdrop-blur 在多层叠加时性能开销大
+
+```css
+/* ❌ 避免：多层 blur 叠加 */
+.header {
+  backdrop-filter: blur(12px);
+}
+.card {
+  backdrop-filter: blur(8px); /* 第二层 */
+}
+.modal {
+  backdrop-filter: blur(16px); /* 第三层 */
+}
+
+/* ✅ 推荐：单页面不超过 3 处 blur */
+/* 只在关键 UI 元素使用（导航栏、模态框） */
+.header {
+  backdrop-filter: blur(12px);
+}
+/* 卡片使用纯色背景替代 */
+.card {
+  background: hsl(var(--card) / 0.95);
+}
+```
+
+#### clip-path 性能监控
+
+**说明**：鹰角风格特色的几何切割效果使用 clip-path，需监控 FPS 影响
+
+```css
+/* 鹰角风格切割效果 */
+.diagonal-cut {
+  clip-path: polygon(0 0, 100% 0, 95% 100%, 5% 100%);
+}
+
+/* 动画时注意性能 */
+.animated-clip {
+  transition: clip-path 300ms ease-out;
+  /* 大元素动画考虑使用 transform 替代 */
+}
+```
+
+---
+
+### 11.2 图片优化规范
+
+#### 使用 next/image
+
+```tsx
+/* ✅ 推荐：next/image 自动优化 */
+import Image from 'next/image'
+
+<Image
+  src={style.previewUrl}
+  alt={style.name}
+  width={800}
+  height={600}
+  loading="lazy"
+  sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 25vw"
+  className="object-cover"
+/>
+
+/* ❌ 避免：原生 img 标签 */
+<img src={style.previewUrl} alt={style.name} />
+```
+
+#### 响应式图片尺寸
+
+```tsx
+// 根据视口提供不同尺寸
+<Image
+  src={previewUrl}
+  alt="预览图"
+  fill
+  sizes="
+    (max-width: 640px) 100vw,
+    (max-width: 1024px) 50vw,
+    (max-width: 1280px) 33vw,
+    25vw
+  "
+  priority={index < 4} // 首屏图片预加载
+/>
+```
+
+#### 图片格式优先级
+
+```
+AVIF > WebP > JPEG/PNG
+```
+
+Next.js 会自动协商最佳格式，确保源图片提供多格式版本。
+
+---
+
+### 11.3 列表虚拟化方案
+
+#### 何时启用虚拟化
+
+| 项目数量 | 渲染策略 | 说明 |
+|----------|----------|------|
+| < 20 个 | 正常渲染 | 无需虚拟化 |
+| 20-100 个 | 虚拟化 | 使用 @tanstack/react-virtual |
+| > 100 个 | 虚拟化 + 分页 | 结合服务端分页 |
+
+#### 虚拟化实现
+
+```tsx
+import { useVirtualizer } from '@tanstack/react-virtual'
+
+export function VirtualStyleGrid({ styles }) {
+  const parentRef = useRef<HTMLDivElement>(null)
+
+  const virtualizer = useVirtualizer({
+    count: styles.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 300, // 估算卡片高度
+    overscan: 2, // 预渲染前后各 2 个
+  })
+
+  return (
+    <div ref={parentRef} className="h-[600px] overflow-auto">
+      <div
+        style={{
+          height: `${virtualizer.getTotalSize()}px`,
+          position: 'relative',
+        }}
+      >
+        {virtualizer.getVirtualItems().map((virtualRow) => (
+          <div
+            key={virtualRow.key}
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              transform: `translateY(${virtualRow.start}px)`,
+            }}
+          >
+            <StyleCard style={styles[virtualRow.index]} />
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+```
+
+---
+
+### 11.4 组件重渲染优化
+
+#### useMemo - 计算密集型派生值
+
+```tsx
+/* ✅ 推荐：缓存过滤/排序结果 */
+const filteredStyles = useMemo(() => {
+  return styles.filter(s => s.category === selectedCategory)
+}, [styles, selectedCategory])
+
+/* ❌ 避免：每次渲染都重新计算 */
+const filteredStyles = styles.filter(s => s.category === selectedCategory)
+```
+
+#### useCallback - 传递给子组件的回调
+
+```tsx
+/* ✅ 推荐：稳定函数引用 */
+const handleStyleClick = useCallback((id: string) => {
+  router.push(`/styles/${id}`)
+}, [router])
+
+return (
+  <StyleGrid>
+    {styles.map(style => (
+      <StyleCard
+        key={style.id}
+        style={style}
+        onClick={handleStyleClick} // 稳定引用避免子组件重渲染
+      />
+    ))}
+  </StyleGrid>
+)
+
+/* ❌ 避免：内联函数 */
+<StyleCard onClick={() => router.push(`/styles/${style.id}`)} />
+```
+
+#### React.memo - 纯展示型组件
+
+```tsx
+/* ✅ 推荐：纯展示组件 */
+export const StyleCard = React.memo(({ style, onClick }: StyleCardProps) => {
+  return (
+    <Card onClick={() => onClick(style.id)}>
+      {/* 内容 */}
+    </Card>
+  )
+})
+
+/* 子组件 props 不变时跳过重渲染 */
+```
+
+#### 避免内联对象
+
+```tsx
+/* ❌ 避免：每次渲染创建新对象 */
+<div style={{ transform: `translateY(${offset}px)` }} />
+
+/* ✅ 推荐：useRef 缓存 */
+const styleRef = useRef({})
+styleRef.current = { transform: `translateY(${offset}px)` }
+<div style={styleRef.current} />
+```
+
+---
+
+### 11.5 Next.js 16 缓存优化
+
+#### Cache Components
+
+```tsx
+import { unstable_cache } from 'next/cache'
+
+// 缓存数据获取
+const getStyles = unstable_cache(
+  async (page: number) => {
+    const { data } = await supabase
+      .from('styles')
+      .select('*')
+      .range((page - 1) * 20, page * 20 - 1)
+    return data
+  },
+  ['styles'],
+  { revalidate: 3600 } // 1 小时重验证
+)
+```
+
+#### Turbopack 文件系统缓存
+
+```json filename="package.json"
+{
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build"
+  }
+}
+```
+
+```javascript filename="next.config.js"
+module.exports = {
+  experimental: {
+    turbo: {
+      // 配置缓存目录
+      overrideAndDefine: {
+        'process.env.TURBOPACK_CACHE_DIR': '.turbo',
+      },
+    },
+  },
+}
+```
+
+#### 服务端缓存策略
+
+```tsx
+import { revalidateTag, revalidatePath } from 'next/cache'
+
+// Server Action 中更新缓存
+export async function updateStyle(data) {
+  await supabase.from('styles').update(data).eq('id', id)
+
+  // 标签式重验证
+  revalidateTag('styles')
+  // 或路径重验证
+  revalidatePath('/styles')
+}
+```
+
+---
+
+### 11.6 middleware.ts → proxy.ts 迁移
+
+**背景**：Next.js 16 弃用 middleware.ts，改用 proxy.ts 实现更轻量的路由拦截
+
+```ts filename="apps/web/proxy.ts"
+export default function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl
+
+  // 受保护路由
+  const protectedPaths = ['/dashboard', '/profile', '/favorites']
+  const isAdminPath = pathname.startsWith('/admin')
+
+  // 简化认证检查
+  const token = request.cookies.get('auth-token')
+
+  if (protectedPaths.some(p => pathname.startsWith(p)) && !token) {
+    return NextResponse.redirect(new URL('/login', request.url))
+  }
+
+  return NextResponse.next()
+}
+
+export const config = {
+  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
+}
+```
+
+**迁移检查清单**：
+- [ ] 将 middleware.ts 重命名为 proxy.ts
+- [ ] 简化认证逻辑（移入 Server Actions）
+- [ ] 验证路由保护正常工作
+- [ ] 性能对比测试
+
+---
+
+### 11.7 性能监控指标
+
+| 指标 | 目标值 | 测量工具 |
+|------|--------|----------|
+| **FCP** (First Contentful Paint) | ≤ 1.8s | Lighthouse, Sentry |
+| **TTI** (Time to Interactive) | ≤ 3.9s | Lighthouse |
+| **FPS** (Frames Per Second) | 60 | Chrome DevTools |
+| **LCP** (Largest Contentful Paint) | ≤ 2.5s | Lighthouse |
+| **CLS** (Cumulative Layout Shift) | ≤ 0.1 | Lighthouse |
+| **TBT** (Total Blocking Time) | ≤ 200ms | Lighthouse |
+
+#### Lighthouse CI 集成
+
+```yaml filename=".github/workflows/lighthouse.yml"
+name: Lighthouse CI
+
+on: [push, pull_request]
+
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+      - run: pnpm install
+      - run: pnpm build
+      - name: Lighthouse
+        uses: treosh/lighthouse-ci-action@v11
+        with:
+          urls: |
+            http://localhost:3000/
+            http://localhost:3000/login
+          uploadArtifacts: true
+          temporaryPublicStorage: true
+```
+
+---
+
+## 12. 文档修订历史
 
 | 版本 | 日期 | 作者 | 变更说明 |
 |------|------|------|----------|

@@ -57,11 +57,9 @@ D:\WorkPlace\VibeCoding\Design Style\
 │   ├── config-eslint/     # ESLint 配置
 │   └── config-prettier/   # Prettier 配置
 ├── docs/
-│   ├── PRD.md             # 产品需求文档
-│   ├── IMPLEMENTATION_PLAN.md  # 实现计划
-│   ├── tech-stack-research/    # 技术栈调研 (10 篇)
-│   ├── research/          # 调研报告 (5 篇)
-│   └── guides/            # 配置指南 (8 篇)
+│   ├── main/              # 核心文档（8 篇）
+│   ├── research/          # 调研报告（5 篇）
+│   └── knowledge-base/    # 知识库（24 篇）
 └── supabase/
     ├── migrations/        # 数据库迁移 (0001-0006)
     └── config.toml
@@ -70,6 +68,17 @@ D:\WorkPlace\VibeCoding\Design Style\
 ---
 
 ## 当前任务
+
+### 性能优化文档编写 ✅ 已完成
+
+- 时间：2026-03-24
+- 状态：✅ 已完成
+- 完成内容：
+  - [x] 扫描项目性能瓶颈（CSS 性能、组件重渲染、列表虚拟化需求）
+  - [x] 调研 Next.js 16 性能优化方案
+  - [x] 更新 IMPLEMENTATION_PLAN.md 任务 3.2（详细性能优化计划）
+  - [x] 更新 FRONTEND_GUIDELINES.md 第 11 章（性能优化指南）
+  - [x] 文档涵盖：CSS 优化、图片优化、虚拟化、重渲染优化、缓存策略、middleware 迁移
 
 ### 代码验证和规则修复 ✅ 已完成
 
@@ -97,7 +106,7 @@ D:\WorkPlace\VibeCoding\Design Style\
   - [x] 更新 layout.tsx 添加错误边界
   - [x] 更新 auth actions 添加错误捕获
   - [x] 配置 next.config.js（生产环境启用）
-  - [x] 创建配置指南文档（docs/guides/sentry-setup-guide.md）
+  - [x] 创建配置指南文档（docs/knowledge-base/Sentry 配置指南.md）
 
 ### P0 剩余任务
 
@@ -217,11 +226,10 @@ D:\WorkPlace\VibeCoding\Design Style\
 
 | 文档类型 | 数量 | 状态 |
 |----------|------|------|
-| 核心文档 | 6 篇 | ✅ PRD, IMPLEMENTATION_PLAN, APP_FLOW, TECH_STACK, FRONTEND_GUIDELINES, BACKEND_STRUCTURE, MULTI_AGENT_COLLABORATION |
-| 调研报告 | 5 篇 | ✅ 风格分类、鹰角 UI、邮件服务、组件库、Monorepo |
-| 技术栈调研 | 10 篇 | ✅ Next.js 16, Zustand, Supabase, Resend, Playwright 等 |
-| 配置指南 | 8 篇 | ✅ GitHub, pnpm, Supabase, Resend, CI/CD 等 |
-| 修复经验 | 1 篇 | ✅ Auth 触发器修复文档 |
+| 核心文档 | 8 篇 | ✅ main/ 目录：PRD, IMPLEMENTATION_PLAN, APP_FLOW, TECH_STACK, FRONTEND_GUIDELINES, BACKEND_STRUCTURE, MULTI_AGENT_COLLABORATION, database-schema |
+| 调研报告 | 5 篇 | ✅ research/：风格分类、鹰角 UI、邮件服务、组件库、Monorepo |
+| 知识库 | 24 篇 | ✅ knowledge-base/：技术栈核心知识体系、集成指南、配置指南 |
+| Agent 参考 | 5 篇 | ✅ reference/：AGENT_REFERENCE, Supabase, TanStack Query, T3 Env, React Hook Form + Zod |
 
 ---
 
@@ -301,7 +309,7 @@ D:\WorkPlace\VibeCoding\Design Style\
 
 **根本原因**：SECURITY DEFINER 函数没有显式设置 `search_path = public`
 
-**修复文档**：`docs/guides/supabase-auth-trigger-fix.md`
+**修复文档**：`docs/knowledge-base/Supabase Auth Trigger 问题修复.md`
 
 **教训**：
 - SECURITY DEFINER 函数必须显式设置 `search_path`

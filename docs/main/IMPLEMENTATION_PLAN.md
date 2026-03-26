@@ -266,10 +266,43 @@ P0 阶段采用多智能体并行开发模式，任务分配如下：
 - [ ] 编写 E2E 测试（核心流程）
 
 **任务 3.2: 性能优化**
-- [ ] 配置 Next.js 缓存（unstable_cache）
-- [ ] 实现图片优化（next/image）
-- [ ] 代码分割优化
-- [ ] Lighthouse 性能测试（目标 >90）
+
+### CSS 性能优化
+- [ ] **box-shadow 替换** - 将大范围阴影（扩散半径>10px）替换为 `transform: translateY()` + 小阴影组合
+- [ ] **backdrop-blur 优化** - 减少同时使用的 blur 层数，单页面不超过 3 处
+- [ ] **clip-path 性能监控** - 鹰角风格特色元素，需监控 FPS 影响
+
+### 图片优化
+- [ ] **使用 next/image** - 所有图片必须使用 `next/image` 组件
+- [ ] **懒加载** - 视口外图片启用 `loading="lazy"`
+- [ ] **响应式图片** - 使用 `sizes` 属性提供多尺寸源
+- [ ] **WebP/AVIF 格式** - 优先使用现代图片格式
+
+### 列表虚拟化
+- [ ] **@tanstack/react-virtual** - 当列表项目>20 个时启用虚拟化
+- [ ] **动态行高** - 支持不同高度的卡片
+- [ ] **滚动位置保持** - 路由切换后恢复滚动位置
+
+### 组件重渲染优化
+- [ ] **useMemo** - 用于计算密集型派生值
+- [ ] **useCallback** - 用于传递给子组件的回调函数
+- [ ] **React.memo** - 用于纯展示型组件
+- [ ] **避免内联对象** - 大对象使用 useRef 缓存
+
+### Next.js 16 缓存优化
+- [ ] **Cache Components** - 使用 `unstable_cache` 缓存数据获取
+- [ ] **Turbopack 文件系统缓存** - 配置 `.turbo` 目录
+- [ ] **服务端缓存策略** - `revalidateTags` / `revalidatePath`
+
+### middleware.ts → proxy.ts 迁移
+- [ ] **迁移到 Next.js 16 新方案** - middleware.ts 改为 proxy.ts
+- [ ] **路由保护逻辑** - 在 `proxy.ts` 中实现认证检查
+- [ ] **性能对比测试** - 验证迁移后的性能提升
+
+### 性能监控
+- [ ] **Lighthouse CI** - 集成到 CI/CD 流程
+- [ ] **Sentry Performance** - 配置性能追踪
+- [ ] **Core Web Vitals** - FCP ≤1.8s、TTI ≤3.9s、FPS 60
 
 **任务 3.3: Vercel 部署**
 - [ ] 配置 Vercel 项目
