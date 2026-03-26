@@ -68,6 +68,13 @@ const config = [
           fixStyle: 'inline-type-imports',
         },
       ],
+      // 禁止显式 any 类型（强制类型安全）
+      '@typescript-eslint/no-explicit-any': [
+        'error',
+        {
+          fixToUnknown: false, // 不自动替换为 unknown
+        },
+      ],
     },
   },
 
