@@ -12,6 +12,7 @@ interface StylesPageProps {
     page?: string
     category?: string
     sort?: string
+    search?: string
   }>
 }
 
@@ -20,6 +21,7 @@ export default async function StylesPage({ searchParams }: StylesPageProps) {
   const page = Number(params.page) || 1
   const category = params.category ?? ''
   const sort = params.sort ?? 'newest'
+  const search = params.search ?? ''
 
   // 并行获取数据和分类
   const [stylesData, categories] = await Promise.all([
@@ -28,6 +30,7 @@ export default async function StylesPage({ searchParams }: StylesPageProps) {
       limit: 12,
       category: category || undefined,
       sortBy: sort as 'newest' | 'popular' | 'oldest',
+      search: search || undefined,
     }),
     getCategories(),
   ])
