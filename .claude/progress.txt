@@ -1,6 +1,6 @@
 # StyleSnap - 任务进度跟踪
 
-> 最后更新：2026-03-26（任务 2.1 完成 - 数据库初始化）
+> 最后更新：2026-03-26（任务 2.2 完成 - 风格浏览功能）
 
 ---
 
@@ -63,11 +63,51 @@ D:\WorkPlace\VibeCoding\Design Style\
 └── supabase/
     ├── migrations/        # 数据库迁移 (0001-0008)
     └── config.toml
-```
+
+---
+
+## 7.1 节 - ESLint 规则增强记录
+
+### 已添加规则
+
+| 规则 | 级别 | 说明 |
+|------|------|------|
+| `@typescript-eslint/no-explicit-any` | error | 禁止显式 any 类型，强制类型安全 |
+| `@typescript-eslint/no-unused-vars` | error | 未使用变量检查（忽略 _ 前缀） |
+| `@typescript-eslint/consistent-type-imports` | error | 强制类型导入使用 `import type` |
+| `react-hooks/rules-of-hooks` | error | React Hooks 规则 |
+| `react-hooks/exhaustive-deps` | warn | Hooks 依赖检查 |
+
+### 待添加规则（高质量规范）
+
+- [ ] `@typescript-eslint/explicit-function-return-type` - 函数返回类型显式声明
+- [ ] `@typescript-eslint/strict-boolean-expressions` - 严格布尔表达式
+- [ ] `@typescript-eslint/no-floating-promises` - Promise 处理检查
+- [ ] `@typescript-eslint/no-unnecessary-condition` - 冗余条件检查
+- [ ] `@typescript-eslint/prefer-nullish-coalescing` - 优先使用空值合并
+- [ ] `@typescript-eslint/prefer-optional-chain` - 优先使用可选链
+- [ ] `@typescript-eslint/array-type` - 数组类型统一
+- [ ] `@typescript-eslint/prefer-readonly` - 优先只读
+- [ ] `prefer-const` - 优先 const
+- [ ] `no-var` - 禁止 var
 
 ---
 
 ## 历史完成记录
+
+### 任务 2.2: 风格浏览功能 ✅ 已完成
+
+- 时间：2026-03-26
+- 状态：✅ 已完成
+- 完成内容：
+  - [x] 实现 getStyles/getCategories Server Actions
+  - [x] 创建风格列表页 `/styles`
+  - [x] 支持列表/网格视图切换
+  - [x] 实现分类筛选、排序功能
+  - [x] 实现 URL 同步分页
+  - [x] 创建风格卡片、空状态、分页组件
+  - [x] 添加 @typescript-eslint/no-explicit-any ESLint 规则
+  - [x] 通过 typecheck / lint / build 验证
 
 ### 任务 2.1: 数据库初始化 ✅ 已完成
 
@@ -88,19 +128,7 @@ D:\WorkPlace\VibeCoding\Design Style\
 
 ## 当前任务
 
-### 任务 2.2: 风格浏览功能 🔄 进行中
-
-- 时间：2026-03-26
-- 状态：🔄 进行中
-- 进度：
-  - [x] 实现 getStyles/getCategories Server Action
-  - [x] 创建风格列表页 `/styles`（支持列表/网格视图切换）
-  - [x] 实现分页（URL 同步）
-  - [x] 创建风格卡片组件
-  - [x] 实现空状态处理
-  - [x] 通过类型检查和 ESLint 验证
-  - [x] 通过生产构建验证
-  - [ ] 提交代码
+### 任务 2.3: 风格详情功能 ⏳ 待开始
 
 ### 性能优化文档编写 ✅ 已完成
 
@@ -147,7 +175,7 @@ D:\WorkPlace\VibeCoding\Design Style\
 |------|--------|------|
 | 任务 1.7: 错误监控配置 | ✅ 已完成 | Sentry 集成 |
 | 任务 2.1: 数据库初始化 | ✅ 已完成 | 风格分类数据、初始内容 |
-| 任务 2.2: 风格浏览功能 | ⏳ 待开始 | 列表页、网格视图 |
+| 任务 2.2: 风格浏览功能 | ✅ 已完成 | 列表页、网格视图 |
 | 任务 2.3: 风格详情功能 | ⏳ 待开始 | 详情页、代码复制 |
 | 任务 2.4: 搜索与筛选 | ⏳ 待开始 | 搜索框、分类筛选器 |
 | 任务 2.5: SEO 优化 | ⏳ 待开始 | Metadata、sitemap |
@@ -157,7 +185,7 @@ D:\WorkPlace\VibeCoding\Design Style\
 | 任务 | 状态 | 说明 |
 |------|------|------|
 | 任务 2.1: 数据库初始化 | ✅ 已完成 | 分类数据、风格导入脚本 |
-| 任务 2.2: 风格浏览功能 | ⏳ 待开始 | 列表/网格视图 |
+| 任务 2.2: 风格浏览功能 | ✅ 已完成 | 列表/网格视图 |
 | 任务 2.3: 风格详情功能 | ⏳ 待开始 | 代码展示和复制 |
 | 任务 2.4: 搜索与筛选 | ⏳ 待开始 | 搜索框、分类筛选 |
 | 任务 2.5: SEO 优化 | ⏳ 待开始 | Metadata, sitemap |
