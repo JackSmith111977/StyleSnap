@@ -27,6 +27,7 @@
     "clsx": "^2.1.1",
     "lucide-react": "^0.577.0",
     "next": "^16.0.0",
+    "prismjs": "^1.30.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-email": "^5.2.10",
@@ -44,6 +45,7 @@
     "@stylesnap/config-typescript": "workspace:*",
     "@types/bcryptjs": "^3.0.0",
     "@types/node": "^22.10.5",
+    "@types/prismjs": "^1.26.6",
     "@types/react": "^19.0.3",
     "@types/react-dom": "^19.0.2",
     "typescript": "^5.7.2"
