@@ -1,6 +1,6 @@
 # StyleSnap - 任务进度跟踪
 
-> 最后更新：2026-03-26（风格详情功能完成）
+> 最后更新：2026-03-26（搜索与筛选功能完成）
 
 ---
 
@@ -101,6 +101,18 @@ D:\WorkPlace\VibeCoding\Design Style\
 
 ## 历史完成记录
 
+### 任务 2.4: 搜索与筛选功能 ✅ 已完成
+
+- 时间：2026-03-26
+- 状态：✅ 已完成
+- 完成内容：
+  - [x] 验证 getStyles Server Action 支持 search 参数（已存在）
+  - [x] 创建 SearchBox 搜索框组件（支持防抖和 URL 同步）
+  - [x] 更新 StyleGrid 组件添加搜索框支持
+  - [x] 更新 styles/page.tsx 传递 search 参数
+  - [x] 优化空状态显示搜索反馈
+  - [x] 通过 pnpm typecheck / pnpm lint / pnpm build 验证
+
 ### 任务 2.3: 风格详情功能 ✅ 已完成
 
 - 时间：2026-03-26
@@ -147,17 +159,18 @@ D:\WorkPlace\VibeCoding\Design Style\
 
 ## 当前任务
 
-### 任务 2.4: 搜索与筛选功能 ✅ 已完成
+### 任务 2.5: SEO 优化功能 ✅ 已完成
 
-- 时间：2026-03-26
+- 时间：2026-03-27
 - 状态：✅ 已完成
 - 完成内容：
-  - [x] 验证 getStyles Server Action 支持 search 参数（已存在）
-  - [x] 创建 SearchBox 搜索框组件（支持防抖和 URL 同步）
-  - [x] 更新 StyleGrid 组件添加搜索框支持
-  - [x] 更新 styles/page.tsx 传递 search 参数
-  - [x] 优化空状态显示搜索反馈
-  - [x] 通过 pnpm typecheck / pnpm lint / pnpm build 验证
+  - [x] 创建 sitemap.ts（5 个路由）
+  - [x] 创建 robots.txt（配置搜索引擎规则）
+  - [x] 优化 layout.tsx metadata（title template、Open Graph、Twitter Card、themeColor）
+  - [x] 优化首页 metadata（keywords、openGraph、twitter）
+  - [x] 优化风格列表页 metadata（动态 title 和 description）
+  - [x] 优化风格详情页 metadata（动态 title、description、openGraph）
+  - [x] 通过 pnpm typecheck / pnpm build 验证
 
 ### 性能优化文档编写 ✅ 已完成
 

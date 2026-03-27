@@ -15,16 +15,51 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'StyleSnap - 网页设计风格参考平台',
+  title: {
+    default: 'StyleSnap - 网页设计风格参考平台',
+    template: '%s - StyleSnap',
+  },
   description: '帮助前端开发者快速选择、理解和应用网页开发的视觉风格',
-  keywords: ['网页设计', '视觉风格', '前端开发', '设计系统', 'UI 设计'],
+  keywords: ['网页设计', '视觉风格', '前端开发', '设计系统', 'UI 设计', 'CSS', 'React', 'Tailwind'],
   authors: [{ name: 'StyleSnap Team' }],
   creator: 'StyleSnap',
   publisher: 'StyleSnap',
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://stylesnap.com'),
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
   },
+  openGraph: {
+    type: 'website',
+    locale: 'zh_CN',
+    siteName: 'StyleSnap',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    site: '@stylesnap',
+    creator: '@stylesnap',
+  },
+  icons: {
+    icon: '/favicon.ico',
+    shortcut: '/favicon-16x16.png',
+    apple: '/apple-touch-icon.png',
+  },
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+    { media: '(prefers-color-scheme: dark)', color: '#09090b' },
+  ],
 };
 
 export default function RootLayout({

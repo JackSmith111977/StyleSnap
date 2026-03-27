@@ -4,11 +4,38 @@ import { StyleDetail } from '@/components/style-detail'
 import { CodeBlock } from '@/components/code-block'
 import Link from 'next/link'
 import { ArrowLeft, Code, Eye, Heart, Calendar } from 'lucide-react'
+import { type Metadata } from 'next'
 
 interface StyleDetailPageProps {
   params: Promise<{
     id: string
   }>
+}
+
+export async function generateMetadata({ params }: StyleDetailPageProps): Promise<Metadata> {
+  const { id } = await params
+  const style = await getStyle(id)
+
+  if (!style) {
+    return {
+      title: '风格不存在 - StyleSnap',
+    }
+  }
+
+  return {
+    title: `${style.title} - StyleSnap`,
+    description: style.description ?? `查看${style.title}的设计风格案例和代码示例`,
+    openGraph: {
+      title: style.title,
+      description: style.description ?? '查看设计风格案例和代码示例',
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: style.title,
+      description: style.description ?? '查看设计风格案例和代码示例',
+    },
+  }
 }
 
 // 强制动态渲染

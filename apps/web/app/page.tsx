@@ -1,7 +1,25 @@
-import Link from 'next/link';
-import { ArrowRight, Palette, Code, Zap } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { type Metadata } from 'next'
+import Link from 'next/link'
+import { ArrowRight, Palette, Code, Zap } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+
+export const metadata: Metadata = {
+  title: 'StyleSnap - 网页设计风格参考平台',
+  description: '帮助前端开发者快速选择、理解和应用网页开发的视觉风格，涵盖极简主义、赛博朋克、新拟态等 10+ 种主流设计风格',
+  keywords: ['网页设计', '视觉风格', '前端开发', '设计系统', 'UI 设计', 'CSS', 'React', 'Tailwind'],
+  openGraph: {
+    title: 'StyleSnap - 网页设计风格参考平台',
+    description: '帮助前端开发者快速选择、理解和应用网页开发的视觉风格',
+    type: 'website',
+    locale: 'zh_CN',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'StyleSnap - 网页设计风格参考平台',
+    description: '帮助前端开发者快速选择、理解和应用网页开发的视觉风格',
+  },
+}
 
 export default function HomePage() {
   return (
@@ -138,5 +156,5 @@ export default function HomePage() {
         </div>
       </section>
     </div>
-  );
+  )
 }

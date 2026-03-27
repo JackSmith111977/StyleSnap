@@ -2,11 +2,6 @@ import { type Metadata } from 'next'
 import { getStyles, getCategories } from '@/actions/styles'
 import { StyleGrid } from './style-grid'
 
-export const metadata: Metadata = {
-  title: '浏览风格 - StyleSnap',
-  description: '探索各种网页设计风格，包括极简主义、赛博朋克、玻璃拟态等',
-}
-
 interface StylesPageProps {
   searchParams: Promise<{
     page?: string
@@ -14,6 +9,33 @@ interface StylesPageProps {
     sort?: string
     search?: string
   }>
+}
+
+export async function generateMetadata({ searchParams }: StylesPageProps): Promise<Metadata> {
+  const params = await searchParams
+  const category = params.category ?? ''
+  const search = params.search ?? ''
+
+  let title = '浏览风格 - StyleSnap'
+  let description = '探索各种网页设计风格，包括极简主义、赛博朋克、玻璃拟态等'
+
+  if (category) {
+    title = `${category} - StyleSnap`
+    description = `浏览${category}风格的网页设计案例和代码示例`
+  } else if (search) {
+    title = `搜索 "${search}" - StyleSnap`
+    description = `搜索与"${search}"相关的网页设计风格`
+  }
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: 'website',
+    },
+  }
 }
 
 export default async function StylesPage({ searchParams }: StylesPageProps) {
