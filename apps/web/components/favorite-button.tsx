@@ -55,20 +55,18 @@ export function FavoriteButton({
       disabled={isPending}
       onClick={handleClick}
       className={cn(
-        'transition-colors',
-        isFavorite && 'text-red-500 hover:text-red-600'
+        'transition-colors hover:bg-accent/50',
+        isFavorite && 'text-red-500 hover:text-red-600',
+        !isFavorite && 'text-muted-foreground hover:text-red-400'
       )}
       title={isFavorite ? '取消收藏' : '收藏'}
     >
       <Heart
         className={cn(
-          'h-4 w-4',
-          isFavorite && 'fill-current'
+          'h-5 w-5',
+          isFavorite && 'fill-current animate-pulse'
         )}
       />
-      {size !== 'icon' && (
-        <span className="ml-1">{count}</span>
-      )}
     </Button>
   )
 }

@@ -46,6 +46,7 @@
   - [x] 集成 FavoriteButton 到 StyleCard 组件
   - [x] 实现卡片整体可点击（Link 覆盖整个卡片）
   - [x] 通过 pnpm typecheck / pnpm lint / pnpm build 验证
+- Git 提交：bc40eec feat(p1): 实现收藏功能 ✅ 已推送
 
 ### P0 网页功能调试检测 ✅ 已完成
 

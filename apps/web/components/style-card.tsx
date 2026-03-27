@@ -96,7 +96,7 @@ export function StyleCard({ style, viewMode }: StyleCardProps) {
                 initialCount={style.favorite_count ?? 0}
                 size="icon"
                 variant="ghost"
-                className="relative z-10"
+                className="relative z-10 pointer-events-auto"
               />
               <Link href={`/styles/${style.id}`}>
                 <Button variant="ghost" size="sm" className="h-7 px-2 text-xs">
@@ -108,18 +108,11 @@ export function StyleCard({ style, viewMode }: StyleCardProps) {
           </div>
         </CardContent>
 
-        {/* 整个卡片可点击 - 不覆盖按钮 */}
+        {/* 整个卡片可点击 - 使用 pointer-events-none 让按钮点击穿透 */}
         <Link
           href={`/styles/${style.id}`}
-          className="absolute inset-0 z-0"
+          className="absolute inset-0 z-0 pointer-events-none"
           aria-label={`查看 ${style.title} 详情`}
-          onClick={(e) => {
-            // 如果点击的是按钮区域，不触发跳转
-            const target = e.target as HTMLElement
-            if (target.closest('button')) {
-              e.preventDefault()
-            }
-          }}
         />
       </Card>
     )
@@ -163,7 +156,7 @@ export function StyleCard({ style, viewMode }: StyleCardProps) {
                   initialCount={style.favorite_count ?? 0}
                   size="icon"
                   variant="ghost"
-                  className="relative z-10"
+                  className="relative z-10 pointer-events-auto"
                 />
                 <Link href={`/styles/${style.id}`}>
                   <Button size="sm">查看代码</Button>
@@ -205,18 +198,11 @@ export function StyleCard({ style, viewMode }: StyleCardProps) {
         </div>
       </div>
 
-      {/* 整个卡片可点击 - 不覆盖按钮 */}
+      {/* 整个卡片可点击 - 使用 pointer-events-none 让按钮点击穿透 */}
       <Link
         href={`/styles/${style.id}`}
-        className="absolute inset-0 z-0"
+        className="absolute inset-0 z-0 pointer-events-none"
         aria-label={`查看 ${style.title} 详情`}
-        onClick={(e) => {
-          // 如果点击的是按钮区域，不触发跳转
-          const target = e.target as HTMLElement
-          if (target.closest('button')) {
-            e.preventDefault()
-          }
-        }}
       />
     </Card>
   )
