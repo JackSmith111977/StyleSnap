@@ -30,6 +30,26 @@
     - **Sentry 配置注意**：生产环境才启用 Sentry 插件，开发环境只输出到控制台
     - **Server Actions**：必须是 async 函数，调用其他 Server Action 时需要 await
 
+13. **阶段调试与修复流程** - 每个阶段子任务结束后必须执行：
+    - **步骤 1：构建验证** - 运行 `pnpm build` 确保编译成功
+    - **步骤 2：MCP 浏览器调试** - 使用 Next.js MCP 工具检测问题：
+      - 启动开发服务器：`pnpm dev`
+      - 使用 `next-devtools-mcp` 获取错误、日志、路由信息
+      - 使用 `playwright-mcp` 进行页面功能测试
+      - 使用 `browser_eval console_messages` 获取控制台错误
+    - **步骤 3：问题记录与修复** - 创建或更新调试修复文档：
+      - 文档位置：`docs/main/P[阶段]_DEBUG_FIX.md`
+      - 记录问题描述、影响范围、错误信息、修复方案、修复状态
+    - **步骤 4：修复验证** - 重新运行 `pnpm build` 并确认所有问题已解决
+    - **步骤 5：提交推送** - 所有问题修复完成后才能 push 到远程仓库
+    - **参考文档**：`docs/guide/agent-browser-debug-tools.md`
+
+14. **MCP 浏览器调试** - 进行网页调试时优先使用 MCP 工具：
+    - **Next.js 应用调试**：使用 `next-devtools-mcp`（错误检测、路由查询、日志访问）
+    - **E2E 测试/自动化**：使用 `playwright-mcp`（导航、点击、截图、表单填写）
+    - **控制台/网络分析**：使用 `browser-tools-mcp`（console 输出、网络请求、Lighthouse 审计）
+    - **参考文档**：`docs/guide/agent-browser-debug-tools.md`
+
 ---
 
 ## 约束条件

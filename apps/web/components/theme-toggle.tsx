@@ -1,24 +1,23 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Moon, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useThemeStore } from '@/stores/theme-store';
+import { useThemeStore, initializeTheme } from '@/stores/theme-store';
 
 /**
  * 主题切换按钮
  * 支持深色/浅色模式切换
  */
 export function ThemeToggle() {
-  const { theme, toggleTheme } = useThemeStore();
-  const [mounted, setMounted] = useState(false);
+  const { theme, toggleTheme, initialized } = useThemeStore();
 
-  // 避免 hydration mismatch，客户端挂载后再渲染
+  // 初始化主题
   useEffect(() => {
-    setMounted(true);
+    initializeTheme();
   }, []);
 
-  if (!mounted) {
+  if (!initialized) {
     return (
       <Button variant="ghost" size="icon" aria-label="切换主题" disabled>
         <Sun className="h-5 w-5" />

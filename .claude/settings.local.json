@@ -5,7 +5,10 @@
       "mcp__WebSearch__bailian_web_search",
       "Bash(pnpm lint:*)",
       "Bash(pnpm build:*)",
-      "Bash(pnpm typecheck:*)"
+      "Bash(pnpm typecheck:*)",
+      "mcp__next-devtools__nextjs_index",
+      "mcp__next-devtools__nextjs_call",
+      "mcp__next-devtools__browser_eval"
     ]
   }
 }

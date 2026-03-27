@@ -12,6 +12,7 @@ interface ThemeState {
   theme: Theme;
   setTheme: (theme: Theme) => void;
   toggleTheme: () => void;
+  initialized: boolean;
 }
 
 /**
@@ -23,13 +24,14 @@ export const useThemeStore = create<ThemeState>()(
   persist(
     (set, get) => ({
       theme: 'light',
+      initialized: false,
 
       setTheme: (theme: Theme) => {
         // 更新 DOM 属性
         if (typeof window !== 'undefined') {
           document.documentElement.setAttribute('data-theme', theme);
         }
-        set({ theme });
+        set({ theme, initialized: true });
       },
 
       toggleTheme: () => {
@@ -39,8 +41,8 @@ export const useThemeStore = create<ThemeState>()(
     }),
     {
       name: 'theme-storage',
-      // 仅在客户端初始化
-      skipHydration: true,
+      // 在客户端初始化时从 localStorage 读取
+      skipHydration: false,
     }
   )
 );
@@ -57,14 +59,18 @@ export function initializeTheme() {
     try {
       const { state } = JSON.parse(stored) as { state: { theme: Theme } };
       document.documentElement.setAttribute('data-theme', state.theme);
+      // 更新 store 的初始化状态
+      useThemeStore.setState({ theme: state.theme, initialized: true });
     } catch {
       // 解析失败，使用默认主题
       document.documentElement.setAttribute('data-theme', 'light');
+      useThemeStore.setState({ theme: 'light', initialized: true });
     }
   } else {
     // 检查系统偏好
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     const initialTheme = prefersDark ? 'dark' : 'light';
     document.documentElement.setAttribute('data-theme', initialTheme);
+    useThemeStore.setState({ theme: initialTheme, initialized: true });
   }
 }

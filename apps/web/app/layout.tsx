@@ -17,7 +17,7 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: {
     default: 'StyleSnap - 网页设计风格参考平台',
-    template: '%s - StyleSnap',
+    template: '%s',
   },
   description: '帮助前端开发者快速选择、理解和应用网页开发的视觉风格',
   keywords: ['网页设计', '视觉风格', '前端开发', '设计系统', 'UI 设计', 'CSS', 'React', 'Tailwind'],
@@ -50,11 +50,6 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     site: '@stylesnap',
     creator: '@stylesnap',
-  },
-  icons: {
-    icon: '/favicon.ico',
-    shortcut: '/favicon-16x16.png',
-    apple: '/apple-touch-icon.png',
   },
 };
 

@@ -1,6 +1,6 @@
 # StyleSnap - 任务进度跟踪
 
-> 最后更新：2026-03-27（Next.js 16 兼容性警告修复完成）
+> 最后更新：2026-03-27（P0 阶段调试与修复完成）
 
 ---
 
@@ -12,6 +12,8 @@
 - ✅ P0 基础架构（任务 1.1-1.7 全部完成）
 - ✅ P0 核心功能（任务 2.1-2.5 全部完成）
 - ✅ Next.js 16 兼容性警告修复（2026-03-27）
+- ✅ MCP 调试文档更新（2026-03-27）
+- ✅ P0 阶段问题修复（2026-03-27）
 
 ---
 
@@ -28,7 +30,57 @@
 
 ---
 
-## 任务管理规范
+## 当前任务
+
+### MCP 调试文档调研与规则更新 ✅ 已完成
+
+- 时间：2026-03-27
+- 状态：✅ 已完成
+- 完成内容：
+  - [x] 调研 Playwright MCP（微软官方出品）
+  - [x] 调研 BrowserTools MCP（Chrome 扩展 + 控制台监控）
+  - [x] 调研 Vibium（AI Agent 优先设计）
+  - [x] 调研 Next.js DevTools MCP（Next.js 官方）
+  - [x] 发现已有完整文档 `docs/guide/agent-browser-debug-tools.md`
+  - [x] 更新 `docs/reference/AGENT_REFERENCE.md` 添加 Guide 和 Reference 索引
+  - [x] 更新 `.claude/CLAUDE.md` 添加第 13 条：MCP 浏览器调试规则
+
+### P0 网页功能调试检测 ✅ 已完成
+
+- 时间：2026-03-27
+- 状态：✅ 已完成
+- 检测工具：Next.js DevTools MCP + Playwright MCP
+- 完成内容：
+  - [x] 启动 Next.js 开发服务器（端口 3001）
+  - [x] 检测首页 `/` - 发现 favicon 404 错误
+  - [x] 检测风格列表页 `/styles` - 功能正常
+  - [x] 检测风格详情页 `/styles/[id]` - 功能正常
+  - [x] 检测登录页 `/login` - 发现 hydration 错误
+  - [x] 创建问题报告 `docs/main/P0_DEBUG_REPORT.md`
+
+**发现问题汇总**：
+- 🔴 高优先级：favicon 缺失、登录页 hydration 错误、主题切换按钮状态异常
+- 🟡 中优先级：7 个缺失页面、风格计数为 0、认证流程待测试
+- 🟢 低优先级：无障碍性改进、SEO title 重复
+
+### P0 阶段问题修复 ✅ 已完成
+
+- 时间：2026-03-27
+- 状态：✅ 已完成
+- 修复内容：
+  - [x] **favicon 缺失** - 创建 favicon.ico.tsx 占位组件
+  - [x] **SEO title 重复** - 修改 layout.tsx template 从 '%s - StyleSnap' 改为 '%s'
+  - [x] **登录页 hydration 错误** - 添加 autocomplete 属性到 Input
+  - [x] **主题切换按钮状态** - 修改 useThemeStore 使用 initialized 状态
+  - [x] **缺失占位页面** - 创建 /about, /privacy, /terms, /categories 页面
+  - [x] **dashboard Link 警告** - 替换 `<a>` 为 `<Link>`
+- 验证结果：
+  - ✅ pnpm typecheck 通过
+  - ✅ pnpm build 成功（17 个页面编译完成）
+
+---
+
+## 历史完成记录
 
 1. **任务开始前** - 在 `progress.txt` 中添加本次任务到【当前任务】区块
 2. **任务进行中** - 更新进度状态，记录关键节点
@@ -160,6 +212,18 @@ D:\WorkPlace\VibeCoding\Design Style\
 ---
 
 ## 当前任务
+
+### Agent 浏览器调试工具调研 ✅ 已完成
+
+- 时间：2026-03-27
+- 状态：✅ 已完成
+- 完成内容：
+  - [x] 调研 Playwright MCP（微软官方出品）
+  - [x] 调研 BrowserTools MCP（Chrome 扩展 + 控制台监控）
+  - [x] 调研 Vibium（AI Agent 优先设计）
+  - [x] 调研 Next.js DevTools MCP（Next.js 官方）
+  - [x] 创建指南文档（docs/guide/agent-browser-debug-tools.md）
+  - [x] 提供 StyleSnap 项目推荐配置
 
 ### 任务 2.5: SEO 优化功能 ✅ 已完成
 

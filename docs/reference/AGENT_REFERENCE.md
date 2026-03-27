@@ -269,6 +269,17 @@ async function createUser(formData: FormData) {
 - `knowledge-base/guides/*` - 开发指南
 - `knowledge-base/tech-stack/*` - 技术栈详细调研
 
+### Guide 文档（操作指南）
+- `guide/agent-browser-debug-tools.md` - AI Agent 浏览器调试工具指南（MCP）
+
+### Reference 文档（API 速查）
+- `reference/nextjs-api-reference.md` - Next.js API 引用
+- `reference/supabase-reference.md` - Supabase API 引用
+- `reference/tanstack-query-reference.md` - TanStack Query 引用
+- `reference/t3-env-reference.md` - T3 Env 引用
+- `reference/react-hook-form-zod-reference.md` - React Hook Form + Zod 引用
+- `reference/sentry-api-reference.md` - Sentry API 引用
+
 ---
 
 ## 修订历史

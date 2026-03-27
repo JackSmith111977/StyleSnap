@@ -1,9 +1,10 @@
 import { redirect } from 'next/navigation'
+import Link from 'next/link'
 import { requireAuth } from '@/lib/auth'
 import { createClient } from '@/lib/supabase/server'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
-export default async function DashboardPage() {
+export default async function DashboardPage(): Promise<React.JSX.Element> {
   // 要求登录
   const user = await requireAuth()
 
@@ -71,24 +72,24 @@ export default async function DashboardPage() {
             <CardDescription>常用功能入口</CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
-            <a
+            <Link
               href="/styles"
               className="block text-sm text-primary hover:underline"
             >
               浏览风格库
-            </a>
-            <a
+            </Link>
+            <Link
               href="/favorites"
               className="block text-sm text-primary hover:underline"
             >
               查看收藏
-            </a>
-            <a
+            </Link>
+            <Link
               href="/profile"
               className="block text-sm text-primary hover:underline"
             >
               编辑资料
-            </a>
+            </Link>
           </CardContent>
         </Card>
       </div>
