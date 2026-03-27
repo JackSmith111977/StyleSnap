@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { Palette, Code, Heart, Eye } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { FavoriteButton } from '@/components/favorite-button'
 import type { Style } from '@/actions/styles'
 
 interface StyleCardProps {
@@ -85,24 +86,40 @@ export function StyleCard({ style, viewMode }: StyleCardProps) {
               </span>
               <span className="flex items-center gap-1">
                 <Heart className="h-3 w-3" />
-                {style.like_count ?? 0}
+                {style.favorite_count ?? 0}
               </span>
             </div>
-            <Link href={`/styles/${style.id}`}>
-              <Button variant="ghost" size="sm" className="h-7 px-2 text-xs">
-                <Code className="mr-1 h-3 w-3" />
-                查看代码
-              </Button>
-            </Link>
+            <div className="flex items-center gap-2">
+              <FavoriteButton
+                styleId={style.id}
+                initialIsFavorite={false}
+                initialCount={style.favorite_count ?? 0}
+                size="icon"
+                variant="ghost"
+              />
+              <Link href={`/styles/${style.id}`}>
+                <Button variant="ghost" size="sm" className="h-7 px-2 text-xs">
+                  <Code className="mr-1 h-3 w-3" />
+                  查看代码
+                </Button>
+              </Link>
+            </div>
           </div>
         </CardContent>
+
+        {/* 整个卡片可点击 */}
+        <Link
+          href={`/styles/${style.id}`}
+          className="absolute inset-0 z-0"
+          aria-label={`查看 ${style.title} 详情`}
+        />
       </Card>
     )
   }
 
   // 列表视图
   return (
-    <Card className="hypergryph-card group overflow-hidden transition-all duration-300 hover:shadow-md">
+    <Card className="hypergryph-card group overflow-hidden transition-all duration-300 hover:shadow-md relative">
       <div className="flex flex-col md:flex-row">
         {/* 预览区域 */}
         <div
@@ -131,9 +148,18 @@ export function StyleCard({ style, viewMode }: StyleCardProps) {
                   {style.category?.name ?? '未分类'}
                 </p>
               </div>
-              <Link href={`/styles/${style.id}`}>
-                <Button size="sm">查看代码</Button>
-              </Link>
+              <div className="flex items-center gap-2">
+                <FavoriteButton
+                  styleId={style.id}
+                  initialIsFavorite={false}
+                  initialCount={style.favorite_count ?? 0}
+                  size="icon"
+                  variant="ghost"
+                />
+                <Link href={`/styles/${style.id}`}>
+                  <Button size="sm">查看代码</Button>
+                </Link>
+              </div>
             </div>
             <p className="text-muted-foreground line-clamp-2 text-sm">
               {style.description ?? '暂无描述'}
@@ -163,12 +189,19 @@ export function StyleCard({ style, viewMode }: StyleCardProps) {
               </span>
               <span className="flex items-center gap-1">
                 <Heart className="h-3 w-3" />
-                {style.like_count ?? 0}
+                {style.favorite_count ?? 0}
               </span>
             </div>
           </div>
         </div>
       </div>
+
+      {/* 整个卡片可点击 */}
+      <Link
+        href={`/styles/${style.id}`}
+        className="absolute inset-0 z-0"
+        aria-label={`查看 ${style.title} 详情`}
+      />
     </Card>
   )
 }

@@ -32,7 +32,22 @@
 
 ## 当前任务
 
-### MCP 调试文档调研与规则更新 ✅ 已完成
+### P1-5.1 收藏功能开发 ✅ 已完成
+
+- 时间：2026-03-27
+- 状态：✅ 已完成
+- 完成内容：
+  - [x] 验证 favorites 表及 RLS 策略（已存在）
+  - [x] 实现 toggleFavorite Server Action
+  - [x] 实现 getMyFavorites Server Action（获取用户收藏列表）
+  - [x] 实现 checkIsFavorite Server Action（检查收藏状态）
+  - [x] 创建 FavoriteButton 组件（支持乐观更新）
+  - [x] 创建 /favorites 页面（用户收藏列表页）
+  - [x] 集成 FavoriteButton 到 StyleCard 组件
+  - [x] 实现卡片整体可点击（Link 覆盖整个卡片）
+  - [x] 通过 pnpm typecheck / pnpm lint / pnpm build 验证
+
+### P0 网页功能调试检测 ✅ 已完成
 
 - 时间：2026-03-27
 - 状态：✅ 已完成
@@ -66,7 +81,7 @@
 ### P0 阶段问题修复 ✅ 已完成
 
 - 时间：2026-03-27
-- 状态：✅ 已完成
+- 状态：✅ 已完成（已推送到远程仓库）
 - 修复内容：
   - [x] **favicon 缺失** - 创建 favicon.ico.tsx 占位组件
   - [x] **SEO title 重复** - 修改 layout.tsx template 从 '%s - StyleSnap' 改为 '%s'
@@ -77,6 +92,7 @@
 - 验证结果：
   - ✅ pnpm typecheck 通过
   - ✅ pnpm build 成功（17 个页面编译完成）
+- Git 提交：305084b fix: P0 阶段网页功能调试与修复
 
 ---
 
