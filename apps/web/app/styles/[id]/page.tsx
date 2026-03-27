@@ -38,8 +38,7 @@ export async function generateMetadata({ params }: StyleDetailPageProps): Promis
   }
 }
 
-// 强制动态渲染
-export const dynamic = 'force-dynamic'
+// 此页面动态获取风格数据
 
 export default async function StyleDetailPage({ params }: StyleDetailPageProps) {
   const { id } = await params
