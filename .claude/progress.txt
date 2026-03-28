@@ -32,6 +32,41 @@
 
 ## 当前任务
 
+### P1-5.4 用户资料功能开发 ✅ 已完成
+
+- 时间：2026-03-28
+- 状态：✅ 已完成
+- 完成内容：
+  - [x] 验证 user-avatars 存储桶及 RLS 策略（已存在于 0002_create_storage_buckets.sql）
+  - [x] 实现 getCurrentProfile Server Action（获取当前用户资料）
+  - [x] 实现 getUserProfile Server Action（获取其他用户公开资料）
+  - [x] 实现 updateProfile Server Action（更新用户名、昵称、简介，带验证）
+  - [x] 实现 uploadAvatar Server Action（上传头像到 Supabase Storage）
+  - [x] 实现 deleteAvatar Server Action（删除头像）
+  - [x] 创建 ProfileForm 组件（头像上传/删除、表单编辑）
+  - [x] 创建 /profile 页面（用户信息卡片 + 编辑表单）
+  - [x] 修复 lint 错误（移除未使用的导入）
+  - [x] 通过 pnpm typecheck / pnpm lint / pnpm build 验证
+  - [x] MCP 浏览器调试验证（认证重定向正常、路由注册正确）
+- Git 提交：待提交
+
+### P1-5.3 评论功能开发 ✅ 已完成
+
+- 时间：2026-03-28
+- 状态：✅ 已完成
+- 完成内容：
+  - [x] 验证 comments 表及 RLS 策略（已存在于 0001_initial_schema.sql）
+  - [x] 实现 getComments Server Action（获取评论列表，支持嵌套回复）
+  - [x] 实现 createComment Server Action（发表评论/回复）
+  - [x] 实现 deleteComment Server Action（软删除评论）
+  - [x] 创建 CommentList 组件（评论列表展示，支持多层嵌套回复）
+  - [x] 创建 CommentForm 组件（评论表单）
+  - [x] 创建 Textarea UI 组件
+  - [x] 集成到风格详情页 `/styles/[id]`
+  - [x] 安装 date-fns 用于时间格式化
+  - [x] 通过 pnpm typecheck / pnpm lint / pnpm build 验证
+- Git 提交：1f07267 feat(p1): 实现评论功能 ✅ 已推送
+
 ### P1-5.2 点赞功能开发 ✅ 已完成
 
 - 时间：2026-03-28
@@ -42,9 +77,10 @@
   - [x] 创建 LikeButton 组件（支持乐观更新和失败回滚）
   - [x] 集成到风格详情页 `/styles/[id]`
   - [x] 修复 TypeScript 类型错误（ComponentProps 类型定义）
+  - [x] 修复 favorites 页面 lint 错误
   - [x] 通过 pnpm typecheck / pnpm lint / pnpm build 验证
   - [x] MCP 浏览器调试验证（点赞按钮可点击，未登录时正确回滚）
-- Git 提交：待提交
+- Git 提交：b1fb1a0 feat(p1): 实现点赞功能 ✅ 已推送
 
 ### P1-5.1 收藏功能开发 ✅ 已完成
 
