@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import { getStyle } from '@/actions/styles'
 import { StyleDetail } from '@/components/style-detail'
 import { CodeBlock } from '@/components/code-block'
+import { LikeButton } from '@/components/like-button'
 import Link from 'next/link'
 import { ArrowLeft, Code, Eye, Heart, Calendar } from 'lucide-react'
 import { type Metadata } from 'next'
@@ -83,6 +84,14 @@ export default async function StyleDetailPage({ params }: StyleDetailPageProps) 
               <Calendar className="h-4 w-4" />
               {new Date(style.created_at).toLocaleDateString('zh-CN')}
             </span>
+            {/* 点赞按钮 */}
+            <LikeButton
+              styleId={style.id}
+              initialIsLiked={false}
+              initialCount={style.like_count ?? 0}
+              size="sm"
+              variant="outline"
+            />
           </div>
         </div>
 

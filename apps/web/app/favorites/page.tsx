@@ -12,7 +12,7 @@ export default async function FavoritesPage({
   searchParams: { page?: string }
 }): Promise<React.JSX.Element> {
   // 要求登录
-  const user = await requireAuth()
+  await requireAuth()
 
   const page = parseInt(searchParams.page ?? '1', 10)
   const limit = 12

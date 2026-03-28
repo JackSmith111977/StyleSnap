@@ -32,6 +32,20 @@
 
 ## 当前任务
 
+### P1-5.2 点赞功能开发 ✅ 已完成
+
+- 时间：2026-03-28
+- 状态：✅ 已完成
+- 完成内容：
+  - [x] 验证 likes 表及 RLS 策略（已存在于 0001_initial_schema.sql）
+  - [x] 实现 toggleLike Server Action（含 checkIsLiked）
+  - [x] 创建 LikeButton 组件（支持乐观更新和失败回滚）
+  - [x] 集成到风格详情页 `/styles/[id]`
+  - [x] 修复 TypeScript 类型错误（ComponentProps 类型定义）
+  - [x] 通过 pnpm typecheck / pnpm lint / pnpm build 验证
+  - [x] MCP 浏览器调试验证（点赞按钮可点击，未登录时正确回滚）
+- Git 提交：待提交
+
 ### P1-5.1 收藏功能开发 ✅ 已完成
 
 - 时间：2026-03-27
