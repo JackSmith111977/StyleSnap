@@ -18,6 +18,7 @@
 - ✅ Playwright MCP 知识文档（2026-04-01）
 - ✅ 登录 Cookie 修复（2026-04-01）
 - ✅ 风格详情页登录后错误修复（2026-04-01）
+- ✅ 评论系统扁平化改造（2026-04-01）
 
 ---
 
@@ -69,7 +70,7 @@
 
 ### P1-5.3 评论功能开发 ✅ 已完成
 
-- 时间：2026-03-28
+- 时间：2026-03-28（初始实现）/ 2026-04-01（扁平化改造）
 - 状态：✅ 已完成
 - 完成内容：
   - [x] 验证 comments 表及 RLS 策略（已存在于 0001_initial_schema.sql）
@@ -82,7 +83,15 @@
   - [x] 集成到风格详情页 `/styles/[id]`
   - [x] 安装 date-fns 用于时间格式化
   - [x] 通过 pnpm typecheck / pnpm lint / pnpm build 验证
+  - [x] **评论系统扁平化改造**：
+    - [x] 将所有三级回复当成二级回复处理
+    - [x] 回复二级回复时自动添加 "回复 @用户名" 前缀
+    - [x] 修改 replyTo 状态为对象类型 { commentId, username }
+    - [x] CommentForm 添加 replyToUser 属性
+    - [x] handleReplySuccess 支持传递 replyToUsername
+  - [x] 通过 pnpm typecheck / pnpm build 验证
 - Git 提交：1f07267 feat(p1): 实现评论功能 ✅ 已推送
+- Git 提交：[待提交] refactor: 评论系统扁平化改造
 
 ### P1-5.2 点赞功能开发 ✅ 已完成
 

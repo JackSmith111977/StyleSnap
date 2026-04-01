@@ -10,14 +10,16 @@ import type { Comment } from '@/actions/comments'
 interface CommentFormProps {
   styleId: string
   parentId?: string
+  replyToUser?: string // 被回复者的用户名（用于回复二级回复时显示）
   placeholder?: string
-  onSuccess?: (comment: Comment) => void
+  onSuccess?: (comment: Comment, parentId?: string, replyToUsername?: string) => void
   onCancel?: () => void
 }
 
 export function CommentForm({
   styleId,
   parentId,
+  replyToUser,
   placeholder = '发表评论...',
   onSuccess,
   onCancel,
@@ -29,17 +31,24 @@ export function CommentForm({
   const handleSubmit = () => {
     setError(null)
 
-    if (!content.trim()) {
+    let finalContent = content.trim()
+    if (!finalContent) {
       setError('评论内容不能为空')
       return
     }
 
+    // 如果是回复二级回复，添加 "回复 @用户名" 前缀
+    if (replyToUser && parentId) {
+      finalContent = `回复 @${replyToUser}: ${finalContent}`
+    }
+
     startTransition(async () => {
-      const result = await createComment(styleId, content, parentId)
+      const result = await createComment(styleId, finalContent, parentId)
 
       if (result.success && result.data) {
         setContent('')
-        onSuccess?.(result.data.comment)
+        // 传递 replyToUser 给 onSuccess 回调
+        onSuccess?.(result.data.comment, parentId, replyToUser)
       } else {
         setError(result.error || '发表评论失败')
       }
@@ -58,7 +67,7 @@ export function CommentForm({
         <Textarea
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          placeholder={placeholder}
+          placeholder={replyToUser ? `回复 @${replyToUser}...` : placeholder}
           rows={3}
           className="resize-none"
           disabled={isPending}
