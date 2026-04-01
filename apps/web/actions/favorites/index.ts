@@ -36,64 +36,17 @@ export async function toggleFavorite(
       email: user.email ?? undefined,
     })
 
-    // 检查风格是否存在
-    const { data: style, error: styleError } = await supabase
-      .from('styles')
-      .select('id, favorite_count')
-      .eq('id', validatedData.styleId)
-      .single()
+    // 使用数据库 RPC 函数实现原子更新
+    const { data, error } = await supabase.rpc('toggle_favorite_atomic', {
+      p_style_id: validatedData.styleId,
+      p_user_id: user.id,
+    })
 
-    if (styleError || !style) {
-      return { success: false, error: '风格不存在' }
+    if (error) {
+      throw error
     }
 
-    // 检查是否已收藏
-    const { data: existing } = await supabase
-      .from('favorites')
-      .select('id')
-      .eq('user_id', user.id)
-      .eq('style_id', validatedData.styleId)
-      .single()
-
-    let isFavorite: boolean
-    let count: number
-
-    if (existing) {
-      // 取消收藏
-      const { error: deleteError } = await supabase
-        .from('favorites')
-        .delete()
-        .eq('user_id', user.id)
-        .eq('style_id', validatedData.styleId)
-
-      if (deleteError) {
-        throw deleteError
-      }
-
-      isFavorite = false
-      count = Math.max(style.favorite_count - 1, 0)
-    } else {
-      // 添加收藏
-      const { error: insertError } = await supabase
-        .from('favorites')
-        .insert({
-          user_id: user.id,
-          style_id: validatedData.styleId,
-        })
-
-      if (insertError) {
-        throw insertError
-      }
-
-      isFavorite = true
-      count = (style.favorite_count ?? 0) + 1
-    }
-
-    // 更新收藏计数
-    await supabase
-      .from('styles')
-      .update({ favorite_count: count })
-      .eq('id', validatedData.styleId)
+    const result = data as { is_favorite: boolean; count: number }
 
     // 清除缓存 - 使用精确的 tag 而非全局 revalidate
     revalidateTag(`style-${validatedData.styleId}`, 'max')
@@ -102,7 +55,7 @@ export async function toggleFavorite(
 
     return {
       success: true,
-      data: { isFavorite, count },
+      data: { isFavorite: result.is_favorite, count: result.count },
     }
   } catch (error) {
     await captureActionError(error, {

@@ -4,7 +4,38 @@ import { env } from '@/env'
 export const resend = new Resend(env.RESEND_API_KEY)
 
 /**
- * 发送邮箱验证邮件
+ * 带重试的邮件发送辅助函数
+ * 使用指数退避策略：1s, 2s, 4s, 8s...
+ */
+async function sendEmailWithRetry<T>(
+  sendFn: () => Promise<T>,
+  maxRetries: number = 3
+): Promise<T> {
+  let lastError: Error | null = null
+
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      return await sendFn()
+    } catch (error) {
+      lastError = error as Error
+
+      // 最后一次尝试失败后直接抛出
+      if (attempt === maxRetries - 1) {
+        throw lastError
+      }
+
+      // 指数退避：1s, 2s, 4s...
+      const delayMs = Math.min(1000 * Math.pow(2, attempt), 8000)
+      console.log(`邮件发送失败，${delayMs / 1000}s 后重试 (第 ${attempt + 1}/${maxRetries} 次)`)
+      await new Promise(resolve => setTimeout(resolve, delayMs))
+    }
+  }
+
+  throw lastError
+}
+
+/**
+ * 发送邮箱验证邮件（带重试机制）
  */
 export async function sendVerificationEmail(
   email: string,
@@ -13,7 +44,7 @@ export async function sendVerificationEmail(
   try {
     const verificationUrl = `${env.NEXT_PUBLIC_SITE_URL}/auth/callback?token=${token}`
 
-    const { data, error } = await resend.emails.send({
+    const { data, error } = await sendEmailWithRetry(() => resend.emails.send({
       from: 'StyleSnap <noreply@stylesnap.com>',
       to: email,
       subject: '验证您的邮箱 - StyleSnap',
@@ -40,7 +71,7 @@ export async function sendVerificationEmail(
           </body>
         </html>
       `,
-    })
+    }))
 
     if (error) {
       console.error('发送验证邮件失败:', error)
@@ -56,7 +87,7 @@ export async function sendVerificationEmail(
 }
 
 /**
- * 发送密码重置邮件
+ * 发送密码重置邮件（带重试机制）
  */
 export async function sendPasswordResetEmail(
   email: string,
@@ -65,7 +96,7 @@ export async function sendPasswordResetEmail(
   try {
     const resetUrl = `${env.NEXT_PUBLIC_SITE_URL}/auth/reset-password?token=${token}`
 
-    const { data, error } = await resend.emails.send({
+    const { data, error } = await sendEmailWithRetry(() => resend.emails.send({
       from: 'StyleSnap <noreply@stylesnap.com>',
       to: email,
       subject: '重置密码 - StyleSnap',
@@ -92,7 +123,7 @@ export async function sendPasswordResetEmail(
           </body>
         </html>
       `,
-    })
+    }))
 
     if (error) {
       console.error('发送密码重置邮件失败:', error)
@@ -108,14 +139,14 @@ export async function sendPasswordResetEmail(
 }
 
 /**
- * 发送欢迎邮件（可选）
+ * 发送欢迎邮件（带重试机制）
  */
 export async function sendWelcomeEmail(
   email: string,
   username: string
 ): Promise<{ error?: string; success?: boolean }> {
   try {
-    const { data, error } = await resend.emails.send({
+    const { data, error } = await sendEmailWithRetry(() => resend.emails.send({
       from: 'StyleSnap <noreply@stylesnap.com>',
       to: email,
       subject: '欢迎加入 StyleSnap！',
@@ -145,7 +176,7 @@ export async function sendWelcomeEmail(
           </body>
         </html>
       `,
-    })
+    }))
 
     if (error) {
       console.error('发送欢迎邮件失败:', error)
