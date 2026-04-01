@@ -53,8 +53,14 @@ export async function login(
     })
 
     revalidatePath('/')
-    redirect('/dashboard')
+
+    // 返回成功标志，让前端组件处理重定向
+    return { success: true }
   } catch (error) {
+    // 检查是否是 NEXT_REDIRECT 异常（如果是则重新抛出）
+    if ((error as any).digest?.startsWith('NEXT_REDIRECT')) {
+      throw error
+    }
     await captureActionError(error, {
       action: 'auth/login',
       email,

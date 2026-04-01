@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { login } from '@/actions/auth'
 import { Button } from '@/components/ui/button'
@@ -9,6 +10,7 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 
 export function LoginForm() {
+  const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string>()
 
@@ -25,8 +27,11 @@ export function LoginForm() {
       const result = await login(email, password)
       if (result.error) {
         setError(result.error)
+      } else if (result.success) {
+        // 登录成功，重定向到 dashboard
+        router.push('/dashboard')
+        router.refresh()
       }
-      // 成功时会 redirect，不需要额外处理
     } catch {
       setError('登录失败，请稍后重试')
     } finally {
