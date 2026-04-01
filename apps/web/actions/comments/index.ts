@@ -3,7 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { getCurrentUser } from '@/lib/auth'
 import { captureActionError, setSentryUser } from '@/lib/sentry-capture'
-import { revalidatePath } from 'next/cache'
+import { revalidatePath, revalidateTag } from 'next/cache'
 import { validateOrThrow, createCommentSchema, deleteCommentSchema, styleIdSchema } from '@/lib/schemas'
 
 export interface Comment {
@@ -141,15 +141,29 @@ export async function createComment(
 
     // 如果是回复评论，检查父评论是否存在
     if (validatedData.parentId) {
-      const { data: parentComment } = await supabase
+      const { data: parentComment, error: parentError } = await supabase
         .from('comments')
-        .select('id')
+        .select('id, parent_id')
         .eq('id', validatedData.parentId)
         .eq('style_id', validatedData.styleId)
         .single()
 
-      if (!parentComment) {
+      if (parentError || !parentComment) {
         return { success: false, error: '父评论不存在' }
+      }
+
+      // 检查嵌套层级（最多支持 2 级：评论 -> 回复 -> 回复的回复）
+      if (parentComment.parent_id !== null) {
+        // 父评论本身也是回复，检查爷爷评论是否存在
+        const { data: grandparentComment } = await supabase
+          .from('comments')
+          .select('parent_id')
+          .eq('id', parentComment.parent_id)
+          .single()
+
+        if (grandparentComment && grandparentComment.parent_id !== null) {
+          return { success: false, error: '评论嵌套层级过深，最多支持 2 级回复' }
+        }
       }
     }
 
@@ -183,8 +197,9 @@ export async function createComment(
       replies: [],
     }
 
-    // 清除缓存
-    revalidatePath(`/styles/${validatedData.styleId}`)
+    // 清除缓存 - 使用精确的 tag 而非全局 revalidate
+    revalidateTag(`comments-${validatedData.styleId}`, 'max')
+    revalidatePath(`/styles/${validatedData.styleId}`, 'page')
 
     return {
       success: true,
@@ -263,8 +278,9 @@ export async function deleteComment(
       throw updateError
     }
 
-    // 清除缓存
-    revalidatePath(`/styles/${comment.style_id}`)
+    // 清除缓存 - 使用精确的 tag 而非全局 revalidate
+    revalidateTag(`comments-${comment.style_id}`, 'max')
+    revalidatePath(`/styles/${comment.style_id}`, 'page')
 
     return {
       success: true,

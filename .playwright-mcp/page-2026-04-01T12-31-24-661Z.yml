@@ -1,0 +1,111 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - link "StyleSnap" [ref=e5] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e8]: StyleSnap
+        - navigation [ref=e10]:
+          - link "风格库" [ref=e11] [cursor=pointer]:
+            - /url: /styles
+          - link "分类" [ref=e12] [cursor=pointer]:
+            - /url: /categories
+          - link "关于" [ref=e13] [cursor=pointer]:
+            - /url: /about
+        - generic [ref=e14]:
+          - button "切换到深色模式" [ref=e15] [cursor=pointer]:
+            - img
+          - button [ref=e17] [cursor=pointer]:
+            - img
+    - main [ref=e18]:
+      - generic [ref=e19]:
+        - heading "仪表板" [level=1] [ref=e20]
+        - generic [ref=e21]:
+          - generic [ref=e22]:
+            - generic [ref=e23]:
+              - generic [ref=e24]: 账户信息
+              - generic [ref=e25]: 你的个人资料信息
+            - generic [ref=e26]:
+              - generic [ref=e27]:
+                - text: 用户名
+                - paragraph [ref=e28]: "3526547131"
+              - generic [ref=e29]:
+                - text: 邮箱
+                - paragraph [ref=e30]: 3526547131@qq.com
+              - generic [ref=e31]:
+                - text: 角色
+                - paragraph [ref=e32]: user
+          - generic [ref=e33]:
+            - generic [ref=e34]:
+              - generic [ref=e35]: 统计
+              - generic [ref=e36]: 你的活动数据
+            - generic [ref=e37]:
+              - generic [ref=e38]:
+                - text: 收藏风格
+                - paragraph [ref=e39]: "0"
+              - generic [ref=e40]:
+                - text: 评论
+                - paragraph [ref=e41]: "0"
+          - generic [ref=e42]:
+            - generic [ref=e43]:
+              - generic [ref=e44]: 快速操作
+              - generic [ref=e45]: 常用功能入口
+            - generic [ref=e46]:
+              - link "浏览风格库" [ref=e47] [cursor=pointer]:
+                - /url: /styles
+              - link "查看收藏" [ref=e48] [cursor=pointer]:
+                - /url: /favorites
+              - link "编辑资料" [ref=e49] [cursor=pointer]:
+                - /url: /profile
+    - contentinfo [ref=e50]:
+      - generic [ref=e51]:
+        - generic [ref=e52]:
+          - generic [ref=e53]:
+            - generic [ref=e55]: StyleSnap
+            - paragraph [ref=e57]: 帮助前端开发者快速选择、理解和应用网页开发的视觉风格
+          - generic [ref=e59]:
+            - heading "快速链接" [level=4] [ref=e60]
+            - list [ref=e61]:
+              - listitem [ref=e62]:
+                - link "风格库" [ref=e63] [cursor=pointer]:
+                  - /url: /styles
+              - listitem [ref=e64]:
+                - link "分类" [ref=e65] [cursor=pointer]:
+                  - /url: /categories
+              - listitem [ref=e66]:
+                - link "关于" [ref=e67] [cursor=pointer]:
+                  - /url: /about
+          - generic [ref=e68]:
+            - heading "资源" [level=4] [ref=e69]
+            - list [ref=e70]:
+              - listitem [ref=e71]:
+                - link "文档" [ref=e72] [cursor=pointer]:
+                  - /url: /docs
+              - listitem [ref=e73]:
+                - link "博客" [ref=e74] [cursor=pointer]:
+                  - /url: /blog
+              - listitem [ref=e75]:
+                - link "更新日志" [ref=e76] [cursor=pointer]:
+                  - /url: /changelog
+          - generic [ref=e77]:
+            - heading "关注我们" [level=4] [ref=e78]
+            - generic [ref=e79]:
+              - link "GitHub" [ref=e80] [cursor=pointer]:
+                - /url: https://github.com
+                - img [ref=e81]
+              - link "Twitter" [ref=e84] [cursor=pointer]:
+                - /url: https://twitter.com
+                - img [ref=e85]
+        - generic [ref=e87]:
+          - paragraph [ref=e88]:
+            - text: © 2026 StyleSnap. Made with
+            - img [ref=e89]
+            - text: by StyleSnap Team
+          - generic [ref=e91]:
+            - link "隐私政策" [ref=e92] [cursor=pointer]:
+              - /url: /privacy
+            - link "服务条款" [ref=e93] [cursor=pointer]:
+              - /url: /terms
+  - button "Open Next.js Dev Tools" [ref=e99] [cursor=pointer]:
+    - img [ref=e100]
+  - alert [ref=e103]

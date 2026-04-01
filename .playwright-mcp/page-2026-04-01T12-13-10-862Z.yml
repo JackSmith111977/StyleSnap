@@ -1,0 +1,373 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - link "StyleSnap" [ref=e5] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e8]: StyleSnap
+        - navigation [ref=e10]:
+          - link "风格库" [ref=e11] [cursor=pointer]:
+            - /url: /styles
+          - link "分类" [ref=e12] [cursor=pointer]:
+            - /url: /categories
+          - link "关于" [ref=e13] [cursor=pointer]:
+            - /url: /about
+        - generic [ref=e14]:
+          - button "切换到深色模式" [ref=e390] [cursor=pointer]:
+            - img
+          - generic [ref=e15]:
+            - link "登录" [ref=e16] [cursor=pointer]:
+              - /url: /login
+              - button "登录" [ref=e17]
+            - link "注册" [ref=e18] [cursor=pointer]:
+              - /url: /register
+              - button "注册" [ref=e19]
+    - main [ref=e20]:
+      - generic [ref=e21]:
+        - link "返回列表" [ref=e24] [cursor=pointer]:
+          - /url: /styles
+          - img [ref=e25]
+          - text: 返回列表
+        - generic [ref=e27]:
+          - generic [ref=e28]:
+            - heading "Clean SaaS Landing" [level=1] [ref=e29]
+            - paragraph [ref=e30]: 一个极简主义的 SaaS 产品落地页，强调清晰的信息层次和大量的留白空间。适合现代软件产品官网。
+            - generic [ref=e31]:
+              - generic [ref=e32]:
+                - img [ref=e33]
+                - text: 0 次浏览
+              - generic [ref=e36]:
+                - img [ref=e37]
+                - text: 0 次点赞
+              - generic [ref=e39]:
+                - img [ref=e40]
+                - text: 2026/3/26
+              - button "-1" [ref=e391] [cursor=pointer]:
+                - img
+                - generic [ref=e43]: "-1"
+          - generic [ref=e44]:
+            - generic [ref=e45]:
+              - generic [ref=e46]:
+                - generic [ref=e47]: Clean SaaS Landing
+                - generic [ref=e48]: 一个极简主义的 SaaS 产品落地页，强调清晰的信息层次和大量的留白空间。适合现代软件产品官网。
+              - generic [ref=e51]: 极简主义
+            - generic [ref=e52]:
+              - generic [ref=e53]:
+                - generic [ref=e54]:
+                  - img [ref=e55]
+                  - text: 配色方案
+                - generic [ref=e61]: 主色、辅色及语义化颜色
+              - generic [ref=e63]:
+                - generic [ref=e66]:
+                  - generic [ref=e67]: accent
+                  - generic [ref=e68]: "#0066FF"
+                - generic [ref=e71]:
+                  - generic [ref=e72]: primary
+                  - generic [ref=e73]: "#000000"
+                - generic [ref=e76]:
+                  - generic [ref=e77]: surface
+                  - generic [ref=e78]: "#F5F5F5"
+                - generic [ref=e81]:
+                  - generic [ref=e82]: secondary
+                  - generic [ref=e83]: "#666666"
+                - generic [ref=e86]:
+                  - generic [ref=e87]: background
+                  - generic [ref=e88]: "#FFFFFF"
+            - generic [ref=e89]:
+              - generic [ref=e90]:
+                - generic [ref=e91]:
+                  - img [ref=e92]
+                  - text: 字体设置
+                - generic [ref=e94]: 字体家族及字号规范
+              - generic [ref=e96]:
+                - generic [ref=e97]:
+                  - generic [ref=e98]:
+                    - generic [ref=e99]: body
+                    - generic [ref=e100]: Inter, system-ui, sans-serif
+                  - paragraph [ref=e101]: The quick brown fox jumps over the lazy dog.
+                - generic [ref=e102]:
+                  - generic [ref=e103]:
+                    - generic [ref=e104]: heading
+                    - generic [ref=e105]: Inter, system-ui, sans-serif
+                  - paragraph [ref=e106]: The quick brown fox jumps over the lazy dog.
+                - generic [ref=e107]:
+                  - generic [ref=e108]:
+                    - generic [ref=e109]: bodySize
+                    - generic [ref=e110]: 1rem
+                  - paragraph [ref=e111]: The quick brown fox jumps over the lazy dog.
+                - generic [ref=e112]:
+                  - generic [ref=e113]:
+                    - generic [ref=e114]: lineHeight
+                    - generic [ref=e115]: "1.6"
+                  - paragraph [ref=e116]: The quick brown fox jumps over the lazy dog.
+                - generic [ref=e117]:
+                  - generic [ref=e118]:
+                    - generic [ref=e119]: headingSize
+                    - generic [ref=e120]: clamp(2rem, 5vw, 4rem)
+                  - paragraph [ref=e121]: The quick brown fox jumps over the lazy dog.
+            - generic [ref=e122]:
+              - generic [ref=e123]:
+                - generic [ref=e124]:
+                  - img [ref=e125]
+                  - text: 间距系统
+                - generic [ref=e131]: 统一的间距规范
+              - generic [ref=e133]:
+                - generic [ref=e135]:
+                  - generic [ref=e136]: base
+                  - generic [ref=e137]: 8px
+                - generic [ref=e140]:
+                  - generic [ref=e141]: scale
+                  - generic [ref=e142]: "1.5"
+                - generic [ref=e145]:
+                  - generic [ref=e146]: section
+                  - generic [ref=e147]: clamp(64px, 10vw, 128px)
+            - generic [ref=e149]:
+              - generic [ref=e150]:
+                - generic [ref=e151]:
+                  - img [ref=e152]
+                  - text: 圆角规范
+                - generic [ref=e154]: 边角圆润程度
+              - generic [ref=e156]:
+                - generic [ref=e159]:
+                  - generic [ref=e160]: lg
+                  - generic [ref=e161]: 12px
+                - generic [ref=e164]:
+                  - generic [ref=e165]: md
+                  - generic [ref=e166]: 8px
+                - generic [ref=e169]:
+                  - generic [ref=e170]: sm
+                  - generic [ref=e171]: 4px
+            - generic [ref=e172]:
+              - generic [ref=e173]:
+                - generic [ref=e174]:
+                  - img [ref=e175]
+                  - text: 阴影效果
+                - generic [ref=e177]: 深度及层次感
+              - generic [ref=e179]:
+                - generic [ref=e181]:
+                  - generic [ref=e182]: lg
+                  - generic [ref=e183]: 0 16px 48px rgba(0,0,0,0.15)
+                - generic [ref=e186]:
+                  - generic [ref=e187]: md
+                  - generic [ref=e188]: 0 4px 12px rgba(0,0,0,0.1)
+                - generic [ref=e191]:
+                  - generic [ref=e192]: sm
+                  - generic [ref=e193]: 0 1px 2px rgba(0,0,0,0.05)
+          - generic [ref=e195]:
+            - heading "代码示例" [level=2] [ref=e196]:
+              - img [ref=e197]
+              - text: 代码示例
+            - generic [ref=e200]:
+              - generic [ref=e201]:
+                - generic [ref=e202]: HTML
+                - button "复制" [ref=e203] [cursor=pointer]:
+                  - img
+                  - text: 复制
+              - generic [ref=e205]:
+                - generic [ref=e206]:
+                  - generic [ref=e207]: "1"
+                  - generic [ref=e208]: "2"
+                  - generic [ref=e209]: "3"
+                  - generic [ref=e210]: "4"
+                  - generic [ref=e211]: "5"
+                  - generic [ref=e212]: "6"
+                  - generic [ref=e213]: "7"
+                  - generic [ref=e214]: "8"
+                  - generic [ref=e215]: "9"
+                  - generic [ref=e216]: "10"
+                - code [ref=e218]:
+                  - generic [ref=e392]:
+                    - generic [ref=e393]: <section
+                    - text: class
+                    - generic [ref=e394]: ="hero"
+                    - text: ">"
+                  - generic [ref=e395]:
+                    - generic [ref=e396]: <div
+                    - text: class
+                    - generic [ref=e397]: ="container"
+                    - text: ">"
+                  - generic [ref=e398]:
+                    - generic [ref=e399]: <h1
+                    - text: ">"
+                  - text: 构建更智能的工作流程
+                  - generic [ref=e400]:
+                    - generic [ref=e401]: </h1
+                    - text: ">"
+                  - generic [ref=e402]:
+                    - generic [ref=e403]: <p
+                    - text: class
+                    - generic [ref=e404]: ="subtitle"
+                    - text: ">"
+                  - text: 一体化平台，让团队协作更高效
+                  - generic [ref=e405]:
+                    - generic [ref=e406]: </p
+                    - text: ">"
+                  - generic [ref=e407]:
+                    - generic [ref=e408]: <div
+                    - text: class
+                    - generic [ref=e409]: ="actions"
+                    - text: ">"
+                  - generic [ref=e410]:
+                    - generic [ref=e411]: <button
+                    - text: class
+                    - generic [ref=e412]: ="btn-primary"
+                    - text: ">"
+                  - text: 免费开始
+                  - generic [ref=e413]:
+                    - generic [ref=e414]: </button
+                    - text: ">"
+                  - generic [ref=e415]:
+                    - generic [ref=e416]: <button
+                    - text: class
+                    - generic [ref=e417]: ="btn-secondary"
+                    - text: ">"
+                  - text: 观看演示
+                  - generic [ref=e418]:
+                    - generic [ref=e419]: </button
+                    - text: ">"
+                  - generic [ref=e420]:
+                    - generic [ref=e421]: </div
+                    - text: ">"
+                  - generic [ref=e422]:
+                    - generic [ref=e423]: </div
+                    - text: ">"
+                  - generic [ref=e424]:
+                    - generic [ref=e425]: </section
+                    - text: ">"
+            - generic [ref=e253]:
+              - generic [ref=e254]:
+                - generic [ref=e255]: CSS
+                - button "复制" [ref=e256] [cursor=pointer]:
+                  - img
+                  - text: 复制
+              - generic [ref=e258]:
+                - generic [ref=e259]:
+                  - generic [ref=e260]: "1"
+                  - generic [ref=e261]: "2"
+                  - generic [ref=e262]: "3"
+                  - generic [ref=e263]: "4"
+                  - generic [ref=e264]: "5"
+                  - generic [ref=e265]: "6"
+                  - generic [ref=e266]: "7"
+                  - generic [ref=e267]: "8"
+                  - generic [ref=e268]: "9"
+                  - generic [ref=e269]: "10"
+                  - generic [ref=e270]: "11"
+                  - generic [ref=e271]: "12"
+                  - generic [ref=e272]: "13"
+                  - generic [ref=e273]: "14"
+                  - generic [ref=e274]: "15"
+                  - generic [ref=e275]: "16"
+                  - generic [ref=e276]: "17"
+                  - generic [ref=e277]: "18"
+                  - generic [ref=e278]: "19"
+                  - generic [ref=e279]: "20"
+                  - generic [ref=e280]: "21"
+                  - generic [ref=e281]: "22"
+                  - generic [ref=e282]: "23"
+                  - generic [ref=e283]: "24"
+                  - generic [ref=e284]: "25"
+                  - generic [ref=e285]: "26"
+                  - generic [ref=e286]: "27"
+                  - generic [ref=e287]: "28"
+                  - generic [ref=e288]: "29"
+                  - generic [ref=e289]: "30"
+                  - generic [ref=e290]: "31"
+                  - generic [ref=e291]: "32"
+                  - generic [ref=e292]: "33"
+                  - generic [ref=e293]: "34"
+                  - generic [ref=e294]: "35"
+                  - generic [ref=e295]: "36"
+                  - generic [ref=e296]: "37"
+                  - generic [ref=e297]: "38"
+                  - generic [ref=e298]: "39"
+                  - generic [ref=e299]: "40"
+                  - generic [ref=e300]: "41"
+                  - generic [ref=e301]: "42"
+                  - generic [ref=e302]: "43"
+                  - generic [ref=e303]: "44"
+                - code [ref=e305]: ".hero { padding: clamp(64px, 10vw, 128px) 0; text-align: center; background: #FFFFFF; } .hero h1 { font-size: clamp(2rem, 5vw, 4rem); font-weight: 700; letter-spacing: -0.02em; margin-bottom: 16px; color: #000000; } .subtitle { font-size: 1.25rem; color: #666666; max-width: 540px; margin: 0 auto 32px; } .actions { display: flex; gap: 12px; justify-content: center; } .btn-primary { background: #000000; color: #FFFFFF; padding: 12px 24px; border-radius: 8px; border: none; font-weight: 500; } .btn-secondary { background: transparent; color: #000000; padding: 12px 24px; border-radius: 8px; border: 1px solid #E0E0E0; font-weight: 500; }"
+          - generic [ref=e306]:
+            - heading "评论" [level=2] [ref=e307]:
+              - img [ref=e308]
+              - text: 评论
+            - paragraph [ref=e311]:
+              - text: 请
+              - link "登录" [ref=e312] [cursor=pointer]:
+                - /url: /login
+              - text: 后发表评论
+            - generic [ref=e317]:
+              - img "3526547131" [ref=e320]
+              - generic [ref=e321]:
+                - generic [ref=e322]:
+                  - generic [ref=e323]: "3526547131"
+                  - generic [ref=e324]: 16 分钟前
+                - paragraph [ref=e325]: 你好
+                - generic [ref=e328]:
+                  - img "3526547131" [ref=e331]
+                  - generic [ref=e332]:
+                    - generic [ref=e333]:
+                      - generic [ref=e334]: "3526547131"
+                      - generic [ref=e335]: 15 分钟前
+                    - paragraph [ref=e336]: 你好
+    - contentinfo [ref=e337]:
+      - generic [ref=e338]:
+        - generic [ref=e339]:
+          - generic [ref=e340]:
+            - generic [ref=e342]: StyleSnap
+            - paragraph [ref=e344]: 帮助前端开发者快速选择、理解和应用网页开发的视觉风格
+          - generic [ref=e346]:
+            - heading "快速链接" [level=4] [ref=e347]
+            - list [ref=e348]:
+              - listitem [ref=e349]:
+                - link "风格库" [ref=e350] [cursor=pointer]:
+                  - /url: /styles
+              - listitem [ref=e351]:
+                - link "分类" [ref=e352] [cursor=pointer]:
+                  - /url: /categories
+              - listitem [ref=e353]:
+                - link "关于" [ref=e354] [cursor=pointer]:
+                  - /url: /about
+          - generic [ref=e355]:
+            - heading "资源" [level=4] [ref=e356]
+            - list [ref=e357]:
+              - listitem [ref=e358]:
+                - link "文档" [ref=e359] [cursor=pointer]:
+                  - /url: /docs
+              - listitem [ref=e360]:
+                - link "博客" [ref=e361] [cursor=pointer]:
+                  - /url: /blog
+              - listitem [ref=e362]:
+                - link "更新日志" [ref=e363] [cursor=pointer]:
+                  - /url: /changelog
+          - generic [ref=e364]:
+            - heading "关注我们" [level=4] [ref=e365]
+            - generic [ref=e366]:
+              - link "GitHub" [ref=e367] [cursor=pointer]:
+                - /url: https://github.com
+                - img [ref=e368]
+              - link "Twitter" [ref=e371] [cursor=pointer]:
+                - /url: https://twitter.com
+                - img [ref=e372]
+        - generic [ref=e374]:
+          - paragraph [ref=e375]:
+            - text: © 2026 StyleSnap. Made with
+            - img [ref=e376]
+            - text: by StyleSnap Team
+          - generic [ref=e378]:
+            - link "隐私政策" [ref=e379] [cursor=pointer]:
+              - /url: /privacy
+            - link "服务条款" [ref=e380] [cursor=pointer]:
+              - /url: /terms
+  - generic [ref=e385] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e386]:
+      - img [ref=e387]
+    - generic [ref=e426]:
+      - button "Open issues overlay" [ref=e427]:
+        - generic [ref=e428]:
+          - generic [ref=e429]: "0"
+          - generic [ref=e430]: "1"
+        - generic [ref=e431]: Issue
+      - button "Collapse issues badge" [ref=e432]:
+        - img [ref=e433]
+  - alert [ref=e435]

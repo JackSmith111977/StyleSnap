@@ -1,0 +1,98 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - link "StyleSnap" [ref=e5] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e8]: StyleSnap
+        - navigation [ref=e10]:
+          - link "风格库" [ref=e11] [cursor=pointer]:
+            - /url: /styles
+          - link "分类" [ref=e12] [cursor=pointer]:
+            - /url: /categories
+          - link "关于" [ref=e13] [cursor=pointer]:
+            - /url: /about
+        - generic [ref=e14]:
+          - button "切换到深色模式" [ref=e15] [cursor=pointer]:
+            - img
+          - generic [ref=e16]:
+            - link "登录" [ref=e17] [cursor=pointer]:
+              - /url: /login
+              - button "登录" [ref=e18]
+            - link "注册" [ref=e19] [cursor=pointer]:
+              - /url: /register
+              - button "注册" [ref=e20]
+    - main [ref=e21]:
+      - generic [ref=e23]:
+        - generic [ref=e24]:
+          - generic [ref=e25]: 登录
+          - generic [ref=e26]: 使用邮箱和密码登录账户
+        - generic [ref=e27]:
+          - generic [ref=e28]:
+            - generic [ref=e29]:
+              - generic [ref=e30]: 邮箱
+              - textbox "邮箱" [ref=e31]:
+                - /placeholder: your@email.com
+            - generic [ref=e32]:
+              - generic [ref=e33]: 密码
+              - textbox "密码" [ref=e34]
+            - link "忘记密码？" [ref=e36] [cursor=pointer]:
+              - /url: /reset-password
+          - generic [ref=e37]:
+            - button "登录" [ref=e38] [cursor=pointer]
+            - paragraph [ref=e39]:
+              - text: 还没有账户？
+              - link "立即注册" [ref=e40] [cursor=pointer]:
+                - /url: /register
+    - contentinfo [ref=e41]:
+      - generic [ref=e42]:
+        - generic [ref=e43]:
+          - generic [ref=e44]:
+            - generic [ref=e46]: StyleSnap
+            - paragraph [ref=e48]: 帮助前端开发者快速选择、理解和应用网页开发的视觉风格
+          - generic [ref=e50]:
+            - heading "快速链接" [level=4] [ref=e51]
+            - list [ref=e52]:
+              - listitem [ref=e53]:
+                - link "风格库" [ref=e54] [cursor=pointer]:
+                  - /url: /styles
+              - listitem [ref=e55]:
+                - link "分类" [ref=e56] [cursor=pointer]:
+                  - /url: /categories
+              - listitem [ref=e57]:
+                - link "关于" [ref=e58] [cursor=pointer]:
+                  - /url: /about
+          - generic [ref=e59]:
+            - heading "资源" [level=4] [ref=e60]
+            - list [ref=e61]:
+              - listitem [ref=e62]:
+                - link "文档" [ref=e63] [cursor=pointer]:
+                  - /url: /docs
+              - listitem [ref=e64]:
+                - link "博客" [ref=e65] [cursor=pointer]:
+                  - /url: /blog
+              - listitem [ref=e66]:
+                - link "更新日志" [ref=e67] [cursor=pointer]:
+                  - /url: /changelog
+          - generic [ref=e68]:
+            - heading "关注我们" [level=4] [ref=e69]
+            - generic [ref=e70]:
+              - link "GitHub" [ref=e71] [cursor=pointer]:
+                - /url: https://github.com
+                - img [ref=e72]
+              - link "Twitter" [ref=e75] [cursor=pointer]:
+                - /url: https://twitter.com
+                - img [ref=e76]
+        - generic [ref=e78]:
+          - paragraph [ref=e79]:
+            - text: © 2026 StyleSnap. Made with
+            - img [ref=e80]
+            - text: by StyleSnap Team
+          - generic [ref=e82]:
+            - link "隐私政策" [ref=e83] [cursor=pointer]:
+              - /url: /privacy
+            - link "服务条款" [ref=e84] [cursor=pointer]:
+              - /url: /terms
+  - button "Open Next.js Dev Tools" [ref=e90] [cursor=pointer]:
+    - img [ref=e91]
+  - alert [ref=e94]
