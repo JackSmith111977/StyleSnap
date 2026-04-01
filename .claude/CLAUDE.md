@@ -15,7 +15,7 @@
 7. **每次询问限 5 问** - 进行用户询问时，每次最多展示 5 个问题，待用户确认后再继续下一批
 8. **TECH_STACK.md 规范** - 只包含技术栈版本锁定清单（包名、版本、用途）；各技术栈核心知识体系需分别调研并整合到独立文档（如 `docs/knowledge-base/Zustand 核心知识体系.md`）
 9. **分支开发流程** - 开发新功能前，先从 `main` 分支创建新分支（命名格式：`feature/功能名`），开发完成后合并回 `main` 分支
-10. **Supabase CLI 使用** - 执行 Supabase 相关命令前必须查阅 `docs/knowledge-base/Supabase CLI 指南.md` 和 `.claude/knowledge/supabase-cli-knowledge.md`
+10. **Supabase CLI 使用** - 执行 Supabase 相关命令必须使用 `npx supabase` 命令（不是 `pnpm supabase`），命令前必须查阅 `docs/knowledge-base/Supabase CLI 指南.md` 和 `.claude/knowledge/supabase-cli-knowledge.md`
 
 11. **进度跟踪规范** - 任务开始前/完成时主动更新 `.claude/progress.txt`：
     - **任务开始前**：标记任务为 🔄 进行中，记录开始时间
