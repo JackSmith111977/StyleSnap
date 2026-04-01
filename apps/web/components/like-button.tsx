@@ -35,10 +35,10 @@ export function LikeButton({
       // 调用 Server Action
       const result = await toggleLike(styleId)
 
-      // 如果失败，回滚
+      // 如果失败，回滚到初始状态
       if (!result.success) {
-        setIsLiked(!newIsLiked)
-        setCount(newIsLiked ? count - 1 : count + 1)
+        setIsLiked(isLiked)
+        setCount(count)
       } else if (result.data) {
         // 使用服务器返回的准确值
         setIsLiked(result.data.isLiked)
