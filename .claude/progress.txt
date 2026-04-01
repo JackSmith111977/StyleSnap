@@ -14,6 +14,7 @@
 - ✅ P1 社交功能（任务 5.1-5.4 全部完成）
 - ✅ BMad Method Core v6.2.2 集成（2026-04-01）
 - ✅ P0 安全增强（2026-04-01）- 输入验证、日志脱敏
+- ✅ P0 质量优化（2026-04-01）- 评论嵌套限制、缓存优化
 
 ---
 
@@ -34,7 +35,20 @@
     - [x] 更新 `comments/index.ts` - getComments, createComment, deleteComment
   - [x] 修复 ESLint 错误（移除未使用的 router 变量）
   - [x] 通过 pnpm typecheck / pnpm lint / pnpm build 验证
-- Git 提交：[待提交] fix: P0 安全增强 - 输入验证和日志脱敏
+- Git 提交：796221b fix: P0 安全增强 - 输入验证和日志脱敏 ✅ 已推送
+
+### P0 质量优化修复 ✅ 已完成
+
+- 时间：2026-04-01
+- 状态：✅ 已完成
+- 修复内容：
+  - [x] **问题 5：评论嵌套层级限制** - 添加最多 2 级回复限制，防止无限嵌套
+  - [x] **问题 8：Cache Revalidation 优化** - 使用 revalidateTag 精确控制缓存失效
+    - [x] 添加 `revalidateTag('style-[id]', 'max')` 用于点赞/收藏
+    - [x] 添加 `revalidateTag('comments-[id]', 'max')` 用于评论
+    - [x] 使用 stale-while-revalidate 语义
+  - [x] 通过 pnpm typecheck / pnpm lint / pnpm build 验证
+- Git 提交：e160897 fix: 评论嵌套层级限制和 Cache Revalidation 优化 ✅ 已推送
 
 ---
 
