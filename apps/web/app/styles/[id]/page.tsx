@@ -158,13 +158,7 @@ export default async function StyleDetailPage({ params }: StyleDetailPageProps) 
           {/* 评论表单 */}
           {user ? (
             <div className="mb-6">
-              <CommentForm
-                styleId={style.id}
-                onSuccess={() => {
-                  // 刷新页面以显示新评论
-                  // 或者可以使用乐观更新
-                }}
-              />
+              <CommentForm styleId={style.id} />
             </div>
           ) : (
             <div className="mb-6 p-4 bg-muted rounded-md">
