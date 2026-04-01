@@ -1,74 +1,91 @@
-'use client'
+'use client';
 
-import { useEffect, useState, useCallback } from 'react'
-import { createClient } from '@/lib/supabase/client'
-import type { User } from '@supabase/supabase-js'
+import { useEffect, useState, useCallback } from 'react';
+import { createClient } from '@/lib/supabase/client';
+import type { User } from '@supabase/supabase-js';
 
 interface UseAuthReturn {
-  user: User | null
-  loading: boolean
-  isAdmin: boolean
-  isSuperAdmin: boolean
-  signOut: () => Promise<void>
-  refreshUser: () => Promise<void>
+  user: User | null;
+  loading: boolean;
+  isAdmin: boolean;
+  isSuperAdmin: boolean;
+  signOut: () => Promise<void>;
+  refreshUser: () => Promise<void>;
 }
 
 export function useAuth(): UseAuthReturn {
-  const [user, setUser] = useState<User | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [adminRole, setAdminRole] = useState<'user' | 'admin' | 'super_admin'>('user')
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [adminRole, setAdminRole] = useState<'user' | 'admin' | 'super_admin'>('user');
 
   const loadUser = useCallback(async () => {
     try {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      setUser(user ?? null)
+      const supabase = createClient();
+
+      // 使用 getSession() 从 cookie 同步 session（修复登录后导航栏状态不同步问题）
+      console.log('[useAuth] 开始加载用户，cookie 长度:', document.cookie.length);
+      console.log('[useAuth] 调用 getSession() 前');
+      const {
+        data: { session },
+        error,
+      } = await supabase.auth.getSession();
+      console.log('[useAuth] getSession() 返回:', {
+        hasSession: !!session,
+        user: session?.user?.email,
+        error: error?.message,
+        cookieAfter: document.cookie.length,
+      });
+      setUser(session?.user ?? null);
 
       // 获取用户角色
-      if (user) {
+      if (session?.user) {
         const { data: profile } = await supabase
           .from('profiles')
           .select('role')
-          .eq('id', user.id)
-          .single()
+          .eq('id', session.user.id)
+          .single();
 
-        setAdminRole(profile?.role ?? 'user')
+        setAdminRole(profile?.role ?? 'user');
       } else {
-        setAdminRole('user')
+        setAdminRole('user');
       }
     } catch (error) {
-      console.error('加载用户失败:', error)
-      setUser(null)
-      setAdminRole('user')
+      console.error('加载用户失败:', error);
+      setUser(null);
+      setAdminRole('user');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
-    void loadUser()
+    console.log('[useAuth] useEffect 执行，开始加载用户');
+    void loadUser();
 
     // 监听认证状态变化
-    const supabase = createClient()
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
-      void loadUser()
-    })
+    const supabase = createClient();
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('[useAuth] onAuthStateChange 事件:', event, { hasSession: !!session });
+      void loadUser();
+    });
 
     return () => {
-      subscription.unsubscribe()
-    }
-  }, [loadUser])
+      subscription.unsubscribe();
+    };
+  }, [loadUser]);
 
   const signOut = useCallback(async () => {
-    const supabase = createClient()
-    await supabase.auth.signOut()
-    setUser(null)
-    setAdminRole('user')
-  }, [])
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    setUser(null);
+    setAdminRole('user');
+  }, []);
 
   const refreshUser = useCallback(async () => {
-    await loadUser()
-  }, [loadUser])
+    await loadUser();
+  }, [loadUser]);
 
   return {
     user,
@@ -77,5 +94,5 @@ export function useAuth(): UseAuthReturn {
     isSuperAdmin: adminRole === 'super_admin',
     signOut,
     refreshUser,
-  }
+  };
 }

@@ -28,9 +28,8 @@ export function LoginForm() {
       if (result.error) {
         setError(result.error)
       } else if (result.success) {
-        // 登录成功，重定向到 dashboard
-        router.push('/dashboard')
-        router.refresh()
+        // 登录成功，使用硬导航确保 cookie 被携带
+        window.location.href = '/dashboard'
       }
     } catch {
       setError('登录失败，请稍后重试')

@@ -50,6 +50,20 @@
     - **控制台/网络分析**：使用 `browser-tools-mcp`（console 输出、网络请求、Lighthouse 审计）
     - **参考文档**：`docs/guide/agent-browser-debug-tools.md`
 
+15. **Next.js 16 Proxy 规范** - Next.js 16 中 `middleware.ts` 已重命名为 `proxy.ts`：
+    - **文件位置**：项目根目录或 `src/` 下，与 `app/` 同级
+    - **运行时**：Node.js 运行时（非 Edge）
+    - **使用场景**：乐观认证检查、程序化重定向、修改请求头
+    - **限制**：不在 Proxy 中做慢数据查询或完整授权验证
+    - **参考文档**：`docs/knowledge-base/Next.js 核心知识体系.md` 第 11 章
+
+16. **Supabase 认证状态同步** - Client Component 认证状态同步规范：
+    - **问题**：Server Action 登录后，Cookie 已设置但 localStorage 为空
+    - **原因**：Server Action 不会自动同步 session 到浏览器 localStorage
+    - **解决方案**：`useAuth` Hook 使用 `supabase.auth.getSession()` 从 cookie 读取
+    - **禁止**：不要在 Client Component 中依赖 `getUser()` 获取初始状态
+    - **参考文档**：`docs/main/P1_AUTH_SYNC_ANALYSIS.md`
+
 ---
 
 ## 约束条件

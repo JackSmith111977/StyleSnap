@@ -291,15 +291,92 @@ export async function markNotificationRead() {
 
 ### 3.6 `proxy.ts` (原 `middleware.ts`)
 
-**变化**：`middleware.ts` → `proxy.ts`，明确网络边界。
+**重要变化（Next.js 16）**：`middleware.ts` 正式重命名为 `proxy.ts`，以更好地反映其用途——明确网络边界。功能保持不变。
+
+**文件约定**：
+- 文件名：`proxy.ts` 或 `proxy.js`
+- 位置：项目根目录或 `src/` 目录下（与 `app/` 或 `pages/` 同级）
+- 导出方式：命名导出 `proxy` 或默认导出
 
 ```ts filename="proxy.ts"
-export default function proxy(request: NextRequest) {
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
+
+// 命名导出
+export function proxy(request: NextRequest) {
   return NextResponse.redirect(new URL('/home', request.url))
+}
+
+// 或默认导出
+// export default function proxy(request: NextRequest) { ... }
+
+export const config = {
+  matcher: '/about/:path*',
 }
 ```
 
-**Edge Runtime**：`proxy.ts` 运行在 Node.js 运行时，`middleware.ts` 用于 Edge 场景（已弃用）。
+**Matcher 配置语法**：
+
+```ts
+export const config = {
+  matcher: [
+    '/about/:path*',           // 通配符
+    '/dashboard/:path+',       // 一个或多个
+    '/user/:id',               // 动态参数
+    '/(api|admin)/:path*',     // 分组
+    '/user/:id/(profile|settings)', // 多参数
+    '/:path+/page',            // 嵌套路由
+    // 排除静态资源
+    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.png$).*)'
+  ],
+}
+```
+
+**运行时**：
+- `proxy.ts` 运行在 **Node.js 运行时**
+- 如果需要使用 Edge Runtime，创建单独的 `middleware.ts` 文件（但官方不推荐）
+
+**使用场景**：
+| 场景 | 说明 | 示例 |
+|------|------|------|
+| **修改请求头** | 为所有页面添加安全头 | `request.headers.set()` |
+| **A/B 测试** | 根据实验重定向用户 | 基于 cookie 分流 |
+| **程序化重定向** | 基于请求属性重定向 | 地理位置、登录状态 |
+| **认证检查** | 乐观权限检查（推荐） | 从 cookie 读取 session |
+| **国际化** | 根据语言重定向 | `/en/*` → `/fr/*` |
+
+**不适用场景**：
+- ❌ 慢数据查询（会拖慢所有请求）
+- ❌ 完整的 session 管理或授权（应该在 Data Access Layer 做）
+- ❌ 使用 `fetch` 的 `cache`、`revalidate`、`tags` 选项（在 Proxy 中无效）
+
+**最佳实践**：
+
+```ts
+// ✅ 推荐：乐观检查 + 快速失败
+export default async function proxy(req: NextRequest) {
+  const cookie = req.cookies.get('session')?.value
+  const session = await decrypt(cookie)
+  
+  // 快速检查，不做数据库查询
+  if (!session?.userId) {
+    return NextResponse.redirect(new URL('/login', req.url))
+  }
+  
+  return NextResponse.next()
+}
+
+// ❌ 不推荐：在 Proxy 中做数据库查询
+export default async function proxy(req: NextRequest) {
+  const session = await db.sessions.findUnique(...) // 会拖慢所有请求！
+  return NextResponse.next()
+}
+```
+
+**与 Server Actions 配合**：
+- Proxy 处理路由级别的乐观检查
+- Server Actions 处理数据变更前的安全验证
+- Data Access Layer (DAL) 集中处理授权逻辑
 
 ### 3.7 React 19.2 特性
 
@@ -309,6 +386,292 @@ export default function proxy(request: NextRequest) {
 | **`useEffectEvent`** | 提取非响应式逻辑 | Effects 中可复用函数 |
 | **`<Activity>`** | 后台活动 | 隐藏 UI 但保持状态 |
 | **`use` API** | 读取 Promise | Client Component 流式数据 |
+
+---
+
+## 11. 认证与授权指南
+
+### 11.1 认证架构概述
+
+Next.js 16 中的认证包含三个核心概念：
+
+| 概念 | 说明 | 实现位置 |
+|------|------|----------|
+| **认证 (Authentication)** | 验证用户身份 | Server Actions + Auth Provider |
+| **会话管理 (Session Management)** | 跨请求跟踪用户状态 | Cookie + `@supabase/ssr` |
+| **授权 (Authorization)** | 决定用户访问权限 | Data Access Layer (DAL) + Proxy |
+
+**推荐架构流程**：
+
+```
+用户登录 → Server Action → Supabase Auth → 设置 Cookie
+                              ↓
+用户访问页面 → Proxy (乐观检查) → 读取 Cookie → 重定向
+                              ↓
+Server Component → DAL (安全检查) → 读取 Cookie → 返回用户数据
+                              ↓
+Client Component → useAuth Hook → 显示用户菜单
+```
+
+### 11.2 Supabase Auth 集成方案
+
+#### 11.2.1 安装依赖
+
+```bash
+pnpm add @supabase/ssr @supabase/supabase-js
+```
+
+#### 11.2.2 创建 Supabase 客户端
+
+**服务器端客户端** (用于 Server Components 和 Server Actions)：
+
+```ts
+// lib/supabase/server.ts
+import { createServerClient } from '@supabase/ssr'
+import { cookies } from 'next/headers'
+
+export async function createClient() {
+  const cookieStore = await cookies()
+
+  return createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll()
+        },
+        setAll(cookiesToSet) {
+          try {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            )
+          } catch {
+            // Server Component 中忽略
+          }
+        },
+      },
+    }
+  )
+}
+```
+
+**浏览器客户端** (用于 Client Components)：
+
+```ts
+// lib/supabase/client.ts
+import { createBrowserClient } from '@supabase/ssr'
+
+export function createClient() {
+  return createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
+}
+```
+
+#### 11.2.3 实现登录 Server Action
+
+```ts
+// actions/auth/login.ts
+'use server'
+
+import { createClient } from '@/lib/supabase/server'
+import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
+
+export async function login(email: string, password: string) {
+  const supabase = await createClient()
+
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  })
+
+  if (error) {
+    return { error: error.message }
+  }
+
+  // 关键：revalidatePath 触发缓存失效，但不刷新浏览器端状态
+  revalidatePath('/')
+
+  // 重定向到仪表板
+  redirect('/dashboard')
+}
+```
+
+#### 11.2.4 实现 Proxy (乐观检查)
+
+```ts
+// proxy.ts
+import { createServerClient } from '@supabase/ssr'
+import { NextResponse, type NextRequest } from 'next/server'
+
+export default async function proxy(request: NextRequest) {
+  let supabaseResponse = NextResponse.next({ request })
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() { return request.cookies.getAll() },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            request.cookies.set(name, value)
+            supabaseResponse.cookies.set(name, value, options)
+          })
+        },
+      },
+    }
+  )
+
+  // 关键：调用 getSession() 刷新/验证 session
+  // 这会触发 Supabase 刷新 cookie，但不会同步到 localStorage
+  await supabase.auth.getSession()
+
+  // 定义保护的路由
+  const protectedRoutes = ['/dashboard', '/profile', '/favorites']
+  const isProtectedRoute = protectedRoutes.some(route => 
+    request.nextUrl.pathname.startsWith(route)
+  )
+
+  if (isProtectedRoute) {
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session) {
+      return NextResponse.redirect(new URL('/login', request.url))
+    }
+  }
+
+  return supabaseResponse
+}
+
+export const config = {
+  matcher: ['/((?!api|_next/static|_next/image|favicon.ico|.*\\.png$).*)'],
+}
+```
+
+#### 11.2.5 实现 Data Access Layer (安全检查)
+
+```ts
+// lib/dal.ts
+import 'server-only'
+import { cache } from 'react'
+import { createClient } from '@/lib/supabase/server'
+import { redirect } from 'next/navigation'
+
+export const verifySession = cache(async () => {
+  const supabase = await createClient()
+  const { data: { session } } = await supabase.auth.getUser()
+
+  if (!session) {
+    redirect('/login')
+  }
+
+  return { isAuth: true, userId: session.user.id }
+})
+
+export const getUser = cache(async () => {
+  const session = await verifySession()
+  const supabase = await createClient()
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', session.userId)
+    .single()
+
+  return profile
+})
+```
+
+#### 11.2.6 实现 useAuth Hook (Client Component)
+
+```ts
+// hooks/use-auth.ts
+'use client'
+
+import { useEffect, useState, useCallback } from 'react'
+import { createClient } from '@/lib/supabase/client'
+import type { User } from '@supabase/supabase-js'
+
+export function useAuth() {
+  const [user, setUser] = useState<User | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  const loadUser = useCallback(async () => {
+    const supabase = createClient()
+    
+    // 关键：显式调用 getSession() 从 cookie 同步
+    const { data: { session } } = await supabase.auth.getSession()
+    setUser(session?.user ?? null)
+
+    if (session?.user) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', session.user.id)
+        .single()
+      // 设置角色...
+    }
+
+    setLoading(false)
+  }, [])
+
+  useEffect(() => {
+    void loadUser()
+
+    const supabase = createClient()
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setUser(session?.user ?? null)
+        setLoading(false)
+      }
+    )
+
+    return () => subscription.unsubscribe()
+  }, [loadUser])
+
+  return { user, loading, signOut: async () => { ... } }
+}
+```
+
+### 11.3 认证状态同步问题
+
+#### 问题描述
+
+Server Action 登录成功后：
+- Cookie 已设置 ✅
+- Server Component 能读取用户 ✅
+- Client Component 的 localStorage 为空 ❌
+
+#### 根本原因
+
+| 组件类型 | 数据来源 | 登录后的状态 |
+|---------|---------|------------|
+| Server Component | Cookie | ✅ 正确 |
+| Client Component (`useAuth`) | localStorage | ❌ null |
+
+Server Action 中的登录不会自动更新浏览器端的 localStorage。
+
+#### 解决方案对比
+
+| 方案 | 说明 | 优点 | 缺点 |
+|------|------|------|------|
+| **Proxy + getSession()** | Proxy 中调用 `getSession()` 刷新 cookie | 全局生效，官方推荐 | 每请求增加一次调用 |
+| **useAuth 显式同步** | Hook 中调用 `getSession()` 从 cookie 读取 | 精确控制 | 可能重复调用 |
+| **router.refresh()** | 登录后调用 `router.refresh()` | 简单 | 刷新整个页面 |
+| **AuthProvider 包装** | 根目录包装器统一处理 | 集中管理 | 需要修改 layout |
+
+#### 推荐方案：长期修复
+
+结合 Proxy + useAuth 显式同步：
+
+**步骤 1**：创建 `proxy.ts` 刷新 session
+
+**步骤 2**：修改 `useAuth` Hook 显式调用 `getSession()`
+
+**步骤 3**：登录成功后调用 `router.refresh()` 触发服务器重新渲染
 
 ---
 
