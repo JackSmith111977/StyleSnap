@@ -1,24 +1,40 @@
 # StyleSnap - 任务进度跟踪
 
-> 最后更新：2026-04-01（登录 Cookie 修复完成）
+> 最后更新：2026-04-01（P0 安全增强完成）
 
 ---
 
 ## 当前阶段
-**P1 阶段 - 社交功能** ✅ 已完成
+**P0 阶段完成总结 - 2026-04-01**
 
 **已完成里程碑**：
 - ✅ 需求定义与调研阶段（2026-03-20 ~ 2026-03-22）
 - ✅ P0 基础架构（任务 1.1-1.7 全部完成）
 - ✅ P0 核心功能（任务 2.1-2.5 全部完成）
-- ✅ Next.js 16 兼容性警告修复（2026-03-27）
-- ✅ MCP 调试文档更新（2026-03-27）
-- ✅ P0 阶段问题修复（2026-03-27）
 - ✅ P1 社交功能（任务 5.1-5.4 全部完成）
-- ✅ Playwright MCP 知识文档（2026-04-01）
-- ✅ 登录 Cookie 修复（2026-04-01）
-- ✅ 风格详情页登录后错误修复（2026-04-01）
-- ✅ 评论系统扁平化改造（2026-04-01）
+- ✅ BMad Method Core v6.2.2 集成（2026-04-01）
+- ✅ P0 安全增强（2026-04-01）- 输入验证、日志脱敏
+
+---
+
+## 当前任务
+
+### P0 安全增强修复 ✅ 已完成
+
+- 时间：2026-04-01
+- 状态：✅ 已完成
+- 修复内容：
+  - [x] **问题 1：Profile 创建重复风险** - 代码中已有检查逻辑，无需修复
+  - [x] **问题 7：错误日志脱敏** - 移除 auth actions 中的 PII 信息（email, username）记录
+  - [x] **问题 14：输入验证** - 创建 Zod schemas 验证所有 Server Action 输入
+    - [x] 创建 `apps/web/lib/schemas.ts` 包含所有验证 schema
+    - [x] 更新 `auth/index.ts` - login, register, resetPassword, updatePassword
+    - [x] 更新 `favorites/index.ts` - toggleFavorite, checkIsFavorite
+    - [x] 更新 `likes/index.ts` - toggleLike, checkIsLiked
+    - [x] 更新 `comments/index.ts` - getComments, createComment, deleteComment
+  - [x] 修复 ESLint 错误（移除未使用的 router 变量）
+  - [x] 通过 pnpm typecheck / pnpm lint / pnpm build 验证
+- Git 提交：[待提交] fix: P0 安全增强 - 输入验证和日志脱敏
 
 ---
 

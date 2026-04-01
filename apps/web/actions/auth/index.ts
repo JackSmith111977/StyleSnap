@@ -6,6 +6,7 @@ import { redirect } from 'next/navigation'
 import { env } from '@/env'
 import { sendRegistrationEmails } from '@/actions/email'
 import { captureActionError, setSentryUser } from '@/lib/sentry-capture'
+import { validateOrThrow, loginSchema, registerSchema, resetPasswordSchema, passwordSchema } from '@/lib/schemas'
 
 export interface LoginResult {
   error?: string
@@ -30,11 +31,14 @@ export async function login(
   password: string
 ): Promise<LoginResult> {
   try {
+    // 验证输入参数
+    const validatedData = validateOrThrow(loginSchema, { email, password })
+
     const supabase = await createClient()
 
     const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
+      email: validatedData.email,
+      password: validatedData.password,
     })
 
     if (error) {
@@ -58,12 +62,12 @@ export async function login(
     return { success: true }
   } catch (error) {
     // 检查是否是 NEXT_REDIRECT 异常（如果是则重新抛出）
-    if ((error as any).digest?.startsWith('NEXT_REDIRECT')) {
+    const nextError = error as { digest?: string }
+    if (nextError.digest?.startsWith('NEXT_REDIRECT')) {
       throw error
     }
     await captureActionError(error, {
       action: 'auth/login',
-      email,
     })
     return { error: '服务器错误，请稍后重试' }
   }
@@ -78,7 +82,10 @@ export async function register(
   username: string
 ): Promise<RegisterResult> {
   try {
-    console.log('[注册] 开始注册流程', { email, username })
+    // 验证输入参数
+    const validatedData = validateOrThrow(registerSchema, { email, password, username })
+
+    console.log('[注册] 开始注册流程', { username: validatedData.username })
 
     const supabase = await createClient()
 
@@ -98,11 +105,11 @@ export async function register(
     // 步骤 2: 执行注册
     console.log('[注册] 步骤 2: 调用 supabase.auth.signUp')
     const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
+      email: validatedData.email,
+      password: validatedData.password,
       options: {
         data: {
-          username,
+          username: validatedData.username,
         },
         emailRedirectTo: `${env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
       },
@@ -116,12 +123,9 @@ export async function register(
     })
 
     if (error) {
-      console.error('[注册] 注册失败详情:', {
+      console.error('[注册] 注册失败:', {
         message: error.message,
-        status: error.status,
         code: error.code,
-        name: error.name,
-        stack: error.stack,
       })
       return { error: `注册失败：${error.message}` }
     }
@@ -150,8 +154,8 @@ export async function register(
       console.log('[注册] 步骤 4: profile 不存在，尝试手动创建')
       const { error: insertError } = await supabase.from('profiles').insert({
         id: data.user.id,
-        username: username,
-        avatar_url: `https://avatar.vercel.sh/${email}`,
+        username: validatedData.username,
+        avatar_url: `https://avatar.vercel.sh/${validatedData.email}`,
         role: 'user',
       })
 
@@ -171,7 +175,7 @@ export async function register(
     console.log('[注册] 步骤 5: 发送邮件')
     if (data.user && !data.user.email_confirmed_at) {
       try {
-        await sendRegistrationEmails(email, username)
+        await sendRegistrationEmails(validatedData.email, validatedData.username)
         console.log('[注册] 邮件发送完成')
       } catch (emailError) {
         console.error('[注册] 邮件发送失败:', emailError)
@@ -186,12 +190,9 @@ export async function register(
   } catch (error) {
     await captureActionError(error, {
       action: 'auth/register',
-      email,
-      username,
     })
     console.error('[注册] 注册异常:', {
       message: (error as Error).message,
-      stack: (error as Error).stack,
       name: (error as Error).name,
     })
     return { error: `服务器错误：${(error as Error).message}` }
@@ -222,16 +223,17 @@ export async function logout(): Promise<void> {
 
 /**
  * 发送密码重置邮件
- * 注意：Supabase 会自动发送密码重置邮件
- * 如需自定义邮件模板，请在 Supabase 后台 > Authentication > Email Templates 中配置
  */
 export async function resetPassword(
   email: string
 ): Promise<ResetPasswordResult> {
   try {
+    // 验证输入参数
+    const validatedData = validateOrThrow(resetPasswordSchema, { email })
+
     const supabase = await createClient()
 
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    const { error } = await supabase.auth.resetPasswordForEmail(validatedData.email, {
       redirectTo: `${env.NEXT_PUBLIC_SITE_URL}/auth/reset-password`,
     })
 
@@ -244,7 +246,6 @@ export async function resetPassword(
   } catch (error) {
     await captureActionError(error, {
       action: 'auth/resetPassword',
-      email,
     })
     console.error('密码重置异常:', error)
     return { error: '服务器错误，请稍后重试' }
@@ -258,10 +259,13 @@ export async function updatePassword(
   newPassword: string
 ): Promise<{ error?: string; success?: boolean }> {
   try {
+    // 验证输入参数
+    const validatedPassword = passwordSchema.parse(newPassword)
+
     const supabase = await createClient()
 
     const { error } = await supabase.auth.updateUser({
-      password: newPassword,
+      password: validatedPassword,
     })
 
     if (error) {

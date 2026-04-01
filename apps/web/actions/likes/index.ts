@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { getCurrentUser } from '@/lib/auth'
 import { captureActionError, setSentryUser } from '@/lib/sentry-capture'
 import { revalidatePath } from 'next/cache'
+import { validateOrThrow, toggleLikeSchema, styleIdSchema } from '@/lib/schemas'
 
 export interface ToggleLikeResult {
   isLiked: boolean
@@ -16,7 +17,12 @@ export interface ToggleLikeResult {
 export async function toggleLike(
   styleId: string
 ): Promise<{ success: boolean; data?: ToggleLikeResult; error?: string }> {
+  let validatedData: { styleId: string } | undefined
+
   try {
+    // 验证输入参数
+    validatedData = validateOrThrow(toggleLikeSchema, { styleId })
+
     const supabase = await createClient()
     const user = await getCurrentUser()
 
@@ -34,7 +40,7 @@ export async function toggleLike(
     const { data: style, error: styleError } = await supabase
       .from('styles')
       .select('id, like_count')
-      .eq('id', styleId)
+      .eq('id', validatedData.styleId)
       .single()
 
     if (styleError || !style) {
@@ -46,7 +52,7 @@ export async function toggleLike(
       .from('likes')
       .select('id')
       .eq('user_id', user.id)
-      .eq('style_id', styleId)
+      .eq('style_id', validatedData.styleId)
       .single()
 
     let isLiked: boolean
@@ -58,7 +64,7 @@ export async function toggleLike(
         .from('likes')
         .delete()
         .eq('user_id', user.id)
-        .eq('style_id', styleId)
+        .eq('style_id', validatedData.styleId)
 
       if (deleteError) {
         throw deleteError
@@ -72,7 +78,7 @@ export async function toggleLike(
         .from('likes')
         .insert({
           user_id: user.id,
-          style_id: styleId,
+          style_id: validatedData.styleId,
         })
 
       if (insertError) {
@@ -87,10 +93,10 @@ export async function toggleLike(
     await supabase
       .from('styles')
       .update({ like_count: count })
-      .eq('id', styleId)
+      .eq('id', validatedData.styleId)
 
     // 清除缓存
-    revalidatePath(`/styles/${styleId}`)
+    revalidatePath(`/styles/${validatedData.styleId}`)
     revalidatePath('/styles')
 
     return {
@@ -100,7 +106,7 @@ export async function toggleLike(
   } catch (error) {
     await captureActionError(error, {
       action: 'toggleLike',
-      styleId,
+      styleId: validatedData?.styleId ?? styleId,
     })
     return { success: false, error: '操作失败，请重试' }
   }
@@ -112,7 +118,12 @@ export async function toggleLike(
 export async function checkIsLiked(
   styleId: string
 ): Promise<{ success: boolean; data?: { isLiked: boolean }; error?: string }> {
+  let validatedData: string | undefined
+
   try {
+    // 验证输入参数
+    validatedData = validateOrThrow(styleIdSchema, styleId)
+
     const supabase = await createClient()
     const user = await getCurrentUser()
 
@@ -124,7 +135,7 @@ export async function checkIsLiked(
       .from('likes')
       .select('id')
       .eq('user_id', user.id)
-      .eq('style_id', styleId)
+      .eq('style_id', validatedData)
       .single()
 
     if (error && error.code !== 'PGRST116') {
@@ -138,7 +149,7 @@ export async function checkIsLiked(
   } catch (error) {
     await captureActionError(error, {
       action: 'checkIsLiked',
-      styleId,
+      styleId: validatedData ?? styleId,
     })
     return { success: false, error: '检查点赞状态失败' }
   }
