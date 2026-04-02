@@ -21,6 +21,24 @@
 
 ## 当前任务
 
+### 🚀 偏离修复进度 (2026-04-02)
+
+**已完成修复**：
+- ✅ **Story 1.1 - 注册字段级错误** (fix: 3d8d730) - 邮箱已注册时显示字段级错误
+- ✅ **Story 2.3 - 搜索词长度验证** (fix: 787dba4) - 至少输入 2 个字符验证
+- ✅ **Story 3.4 - 代码复制失败回退** (fix: 59e7c66) - Clipboard API 失败回退方案
+
+**待修复**：
+- ⏳ **Story 2.6 - 无限滚动** (中度偏离) - 工作量：中 (4-6 小时)
+- ⏳ **Story 5.2 - 回复评论 UI 优化** (轻微偏离) - 基本符合要求，可选优化
+
+**修复统计**：
+- 高优先级修复：2/2 完成 ✅
+- 中优先级修复：1/2 完成
+- 轻微偏离：1/1 验证通过（基本符合要求）
+
+---
+
 ### BMad Method Core v6.2.2 集成 ✅ 已完成
 
 - 时间：2026-04-02
@@ -43,6 +61,78 @@
   - **文档工具**: bmad-document-project, bmad-generate-project-context
   - **调研工具**: bmad-technical-research, bmad-domain-research, bmad-market-research
   - **模块工具**: bmad-bmb-setup, bmad-module-builder, bmad-workflow-builder
+
+### BMad Step 03/04 - Epics & Stories 创建 ✅ 已完成
+
+- 时间：2026-04-02
+- 状态：✅ 已完成
+- 完成内容：
+  - [x] **Step 03: Create Stories** - 为 6 个 Epics 创建 33 个 User Stories
+    - Epic 1 (用户认证与账户管理): 8 stories (1.1-1.8)
+    - Epic 2 (风格浏览与发现): 6 stories (2.1-2.6)
+    - Epic 3 (风格详情与代码使用): 5 stories (3.1-3.5)
+    - Epic 4 (社交互动 - 收藏与点赞): 3 stories (4.1-4.3)
+    - Epic 5 (社交互动 - 评论系统): 4 stories (5.1-5.4)
+    - Epic 6 (高级功能与增强): 7 stories (6.1-6.7)
+  - [x] **Step 04: Final Validation** - 完成最终验证
+    - FR 覆盖率验证：17/17 = 100%
+    - Story 质量验证：33 个 Story 全部通过
+    - 依赖关系验证：无向前依赖
+    - NFR 覆盖验证：性能/安全/可访问性全部覆盖
+  - [x] 更新 epics.md v1.2 - 添加 Epic 6 Stories 和修订历史
+  - [x] 创建 step-04-validation-report.md - 完整验证报告
+
+- 输出文档：
+  - [x] `_bmad-output/planning-artifacts/epics.md` v1.2
+  - [x] `_bmad-output/planning-artifacts/step-04-validation-report.md`
+
+### BMad Architecture 架构文档创建 ✅ 已完成
+
+- 时间：2026-04-02
+- 状态：✅ 已完成
+- 完成内容：
+  - [x] 读取源文档（PRD, TECH_STACK, BACKEND_STRUCTURE, FRONTEND_GUIDELINES, epics.md）
+  - [x] 创建架构决策文档 `architecture.md` v1.0
+  - [x] 记录 14 章完整架构内容：
+    - 技术栈决策（核心框架、数据库、UI、状态管理、表单验证、邮件、测试、监控）
+    - 架构分层（整体架构图、项目目录结构）
+    - 数据库设计（ER 图、表结构、迁移文件）
+    - Server Actions 规范（基础结构、返回格式、缓存失效）
+    - 认证系统（认证方式、流程、状态同步）
+    - 前端架构（设计系统、组件分层、状态管理策略）
+    - 缓存策略（Next.js 缓存、TanStack Query、失效策略）
+    - 安全策略（RLS、输入验证、日志脱敏）
+    - 性能优化（关键指标、优化策略）
+    - 监控与日志（Sentry 集成）
+    - 部署策略（Vercel、环境变量）
+    - 架构决策记录（4 个 ADR）
+  - [x] 记录 4 个关键架构决策：
+    - ADR-001: 使用 Server Actions 而非 REST API
+    - ADR-002: 不使用 ORM，直接调用 Supabase
+    - ADR-003: 混合样式方案 (Tailwind + CSS Modules)
+    - ADR-004: 评论系统扁平化设计（最多 2 级）
+
+- 输出文档：
+  - [x] `_bmad-output/planning-artifacts/architecture.md` v1.0
+
+### BMad Sprint Planning - Sprint 状态跟踪创建 ✅ 已完成
+
+- 时间：2026-04-02
+- 状态：✅ 已完成
+- 完成内容：
+  - [x] 读取 epics.md 提取所有 Epics 和 Stories
+  - [x] 创建 sprint-status.yaml 状态跟踪文件
+  - [x] 记录 6 个 Epics、33 个 Stories、6 个 Retrospectives
+  - [x] 所有 Story 初始状态为 backlog
+
+- Sprint 状态摘要：
+  - **总 Epics**: 6
+  - **总 Stories**: 33
+  - **总 Retrospectives**: 6 (optional)
+  - **当前状态**: 所有 Epics 和 Stories 均为 backlog
+
+- 输出文件：
+  - [x] `_bmad-output/implementation-artifacts/sprint-status.yaml`
 
 ---
 
