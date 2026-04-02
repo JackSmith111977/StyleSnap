@@ -36,23 +36,26 @@ ALTER TABLE likes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE comments ENABLE ROW LEVEL SECURITY;
 
 -- ===========================================
--- 3. 验证函数 - 检查 RLS 策略配置
+-- 3. 验证函数 - 检查 RLS 策略配置（简化版）
 -- ===========================================
 
--- 创建验证函数（仅供管理员使用）
+-- 删除旧函数（如果存在）
+DROP FUNCTION IF EXISTS verify_rls_policies();
+
+-- 创建简化版验证函数
 CREATE OR REPLACE FUNCTION verify_rls_policies()
 RETURNS TABLE (
   table_name TEXT,
   rls_enabled BOOLEAN,
-  policy_count INTEGER,
+  policy_count BIGINT,
   policies JSONB
 ) AS $$
 BEGIN
   RETURN QUERY
   SELECT
     t.table_name::TEXT,
-    (SELECT relrowsecurity FROM pg_class WHERE oid = (t.table_schema || '.' || t.table_name)::regclass) AS rls_enabled,
-    COUNT(p.policyname)::INTEGER AS policy_count,
+    c.relrowsecurity AS rls_enabled,
+    COUNT(p.policyname) AS policy_count,
     COALESCE(
       jsonb_agg(
         jsonb_build_object(
@@ -64,6 +67,7 @@ BEGIN
       '[]'::jsonb
     ) AS policies
   FROM information_schema.tables t
+  JOIN pg_class c ON c.oid = (t.table_schema || '.' || t.table_name)::regclass
   LEFT JOIN pg_policies p ON p.schemaname = t.table_schema AND p.tablename = t.table_name
   WHERE t.table_schema = 'public'
     AND t.table_type = 'BASE TABLE'
@@ -71,7 +75,7 @@ BEGIN
       'profiles', 'categories', 'styles', 'tags',
       'style_tags', 'favorites', 'likes', 'comments'
     )
-  GROUP BY t.table_name
+  GROUP BY t.table_name, c.relrowsecurity
   ORDER BY t.table_name;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
