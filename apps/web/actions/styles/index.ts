@@ -43,6 +43,9 @@ export interface GetStylesOptions {
   category?: string
   search?: string
   sortBy?: 'newest' | 'popular' | 'oldest'
+  colors?: string[]      // 颜色筛选（标签名前缀 # 省略）
+  industries?: string[]  // 行业筛选（标签名前缀 # 省略）
+  complexities?: string[] // 复杂度筛选（标签名前缀 # 省略）
 }
 
 export interface GetStylesResult {
@@ -65,9 +68,24 @@ export const getStyles = cache(async (
     category,
     search,
     sortBy = 'newest',
+    colors,
+    industries,
+    complexities,
   } = options
 
   const supabase = await createClient()
+
+  // 收集所有需要筛选的标签
+  const allTagFilters: string[] = []
+  if (colors && colors.length > 0) {
+    allTagFilters.push(...colors.map(c => c.startsWith('#') ? c : `#${c}`))
+  }
+  if (industries && industries.length > 0) {
+    allTagFilters.push(...industries.map(i => i.startsWith('#') ? i : `#${i}`))
+  }
+  if (complexities && complexities.length > 0) {
+    allTagFilters.push(...complexities.map(c => c.startsWith('#') ? c : `#${c}`))
+  }
 
   // 构建查询
   let query = supabase
@@ -96,6 +114,11 @@ export const getStyles = cache(async (
   // 搜索
   if (search) {
     query = query.or(`title.ilike.%${search}%,description.ilike.%${search}%`)
+  }
+
+  // 高级筛选：标签
+  if (allTagFilters.length > 0) {
+    query = query.in('style_tags.tag.name', allTagFilters)
   }
 
   // 排序

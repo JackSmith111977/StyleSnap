@@ -8,6 +8,9 @@ interface StylesPageProps {
     category?: string
     sort?: string
     search?: string
+    colors?: string
+    industries?: string
+    complexities?: string
   }>
 }
 
@@ -44,6 +47,9 @@ export default async function StylesPage({ searchParams }: StylesPageProps) {
   const category = params.category ?? ''
   const sort = params.sort ?? 'newest'
   const search = params.search ?? ''
+  const colors = params.colors?.split(',').filter(Boolean)
+  const industries = params.industries?.split(',').filter(Boolean)
+  const complexities = params.complexities?.split(',').filter(Boolean)
 
   // 并行获取数据和分类
   const [stylesData, categories] = await Promise.all([
@@ -53,6 +59,9 @@ export default async function StylesPage({ searchParams }: StylesPageProps) {
       category: category || undefined,
       sortBy: sort as 'newest' | 'popular' | 'oldest',
       search: search || undefined,
+      colors: colors && colors.length > 0 ? colors : undefined,
+      industries: industries && industries.length > 0 ? industries : undefined,
+      complexities: complexities && complexities.length > 0 ? complexities : undefined,
     }),
     getCategories(),
   ])
@@ -78,6 +87,11 @@ export default async function StylesPage({ searchParams }: StylesPageProps) {
         initialStyles={stylesData.styles}
         totalPages={stylesData.totalPages}
         categories={categories}
+        initialFilters={{
+          colors: colors && colors.length > 0 ? colors : undefined,
+          industries: industries && industries.length > 0 ? industries : undefined,
+          complexities: complexities && complexities.length > 0 ? complexities : undefined,
+        }}
       />
     </div>
   )
