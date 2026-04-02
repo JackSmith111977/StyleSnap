@@ -7,17 +7,26 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Checkbox } from '@/components/ui/checkbox'
 
 export function RegisterForm() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string>()
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({})
   const [success, setSuccess] = useState(false)
+  const [agreeToTerms, setAgreeToTerms] = useState(false)
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setError(undefined)
     setFieldErrors({})
+
+    // 验证是否同意条款
+    if (!agreeToTerms) {
+      setError('请先同意服务条款和隐私政策')
+      return
+    }
+
     setLoading(true)
 
     const formData = new FormData(e.currentTarget)
@@ -141,6 +150,30 @@ export function RegisterForm() {
               minLength={8}
               disabled={loading}
             />
+          </div>
+
+          <div className="flex items-start space-x-2">
+            <Checkbox
+              id="agreeToTerms"
+              checked={agreeToTerms}
+              onCheckedChange={(checked) => setAgreeToTerms(Boolean(checked))}
+              disabled={loading}
+            />
+            <div className="space-y-1 leading-none">
+              <Label
+                htmlFor="agreeToTerms"
+                className="text-sm font-normal cursor-pointer"
+              >
+                我已阅读并同意{' '}
+                <Link href="/terms" className="text-blue-600 hover:underline" target="_blank">
+                  服务条款
+                </Link>
+                {' '}和{' '}
+                <Link href="/privacy" className="text-blue-600 hover:underline" target="_blank">
+                  隐私政策
+                </Link>
+              </Label>
+            </div>
           </div>
         </CardContent>
         <CardFooter className="flex flex-col space-y-4">

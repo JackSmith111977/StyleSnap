@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition, useRef, useEffect } from 'react'
+import { useState, useTransition, useRef, useEffect, useMemo } from 'react'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import { LayoutGrid, List, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -24,7 +24,7 @@ export function StyleGrid({ initialStyles, totalPages, categories, initialFilter
   const searchParams = useSearchParams()
   const router = useRouter()
   const pathname = usePathname()
-  const [isPending, startTransition] = useTransition()
+  const [_isPending, startTransition] = useTransition()
 
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [styles, setStyles] = useState<Style[]>(initialStyles)
@@ -42,9 +42,9 @@ export function StyleGrid({ initialStyles, totalPages, categories, initialFilter
   const currentCategory = searchParams.get('category') ?? ''
   const currentSearch = searchParams.get('search') ?? ''
   const sortBy = searchParams.get('sort') ?? 'newest'
-  const currentColors = searchParams.get('colors')?.split(',').filter(Boolean) ?? []
-  const currentIndustries = searchParams.get('industries')?.split(',').filter(Boolean) ?? []
-  const currentComplexities = searchParams.get('complexities')?.split(',').filter(Boolean) ?? []
+  const currentColors = useMemo(() => searchParams.get('colors')?.split(',').filter(Boolean) ?? [], [searchParams])
+  const currentIndustries = useMemo(() => searchParams.get('industries')?.split(',').filter(Boolean) ?? [], [searchParams])
+  const currentComplexities = useMemo(() => searchParams.get('complexities')?.split(',').filter(Boolean) ?? [], [searchParams])
 
   // 当筛选条件变化时，重置状态
   useEffect(() => {
