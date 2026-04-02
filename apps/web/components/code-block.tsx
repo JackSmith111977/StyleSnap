@@ -22,7 +22,9 @@ interface CodeBlockProps {
 
 export function CodeBlock({ code, language, title, showLineNumbers = true }: CodeBlockProps) {
   const [copied, setCopied] = useState(false)
+  const [copyError, setCopyError] = useState<string | null>(null)
   const codeRef = useRef<HTMLElement>(null)
+  const preRef = useRef<HTMLPreElement>(null)
 
   useEffect(() => {
     if (codeRef.current) {
@@ -31,9 +33,43 @@ export function CodeBlock({ code, language, title, showLineNumbers = true }: Cod
   }, [code])
 
   const handleCopy = async () => {
-    await navigator.clipboard.writeText(code)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
+    setCopyError(null)
+
+    try {
+      // 尝试使用 Clipboard API
+      await navigator.clipboard.writeText(code)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch (error) {
+      // 回退方案：选中文本并使用 execCommand
+      console.error('Clipboard API 复制失败，使用回退方案:', error)
+
+      if (preRef.current && codeRef.current) {
+        // 创建临时 textarea 用于选中代码
+        const textarea = document.createElement('textarea')
+        textarea.value = code
+        textarea.style.position = 'fixed'
+        textarea.style.opacity = '0'
+        document.body.appendChild(textarea)
+        textarea.select()
+
+        try {
+          const successful = document.execCommand('copy')
+          if (successful) {
+            setCopied(true)
+            setTimeout(() => setCopied(false), 2000)
+          } else {
+            setCopyError('复制失败，请手动选择复制')
+          }
+        } catch (_err) {
+          setCopyError('复制失败，请手动选择复制')
+        } finally {
+          document.body.removeChild(textarea)
+        }
+      } else {
+        setCopyError('复制失败，请手动选择复制')
+      }
+    }
   }
 
   return (
@@ -46,6 +82,7 @@ export function CodeBlock({ code, language, title, showLineNumbers = true }: Cod
           size="sm"
           className="h-8 px-2 text-gray-400 hover:text-gray-200"
           onClick={handleCopy}
+          title={copyError || undefined}
         >
           {copied ? (
             <>
@@ -59,6 +96,9 @@ export function CodeBlock({ code, language, title, showLineNumbers = true }: Cod
             </>
           )}
         </Button>
+        {copyError && (
+          <span className="text-xs text-red-400">{copyError}</span>
+        )}
       </div>
 
       {/* 代码区域 */}
@@ -74,7 +114,7 @@ export function CodeBlock({ code, language, title, showLineNumbers = true }: Cod
               ))}
             </div>
             {/* 代码 */}
-            <pre className="flex-1 py-4 pl-4">
+            <pre className="flex-1 py-4 pl-4" ref={preRef}>
               <code ref={codeRef} className={`language-${language}`}>
                 {code}
               </code>
