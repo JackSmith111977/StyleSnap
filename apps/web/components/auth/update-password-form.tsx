@@ -24,32 +24,29 @@ export function UpdatePasswordForm() {
     const newPassword = formData.get('newPassword') as string
     const confirmPassword = formData.get('confirmPassword') as string
 
+    if (!newPassword || newPassword.length < 8) {
+      setError('密码至少需要 8 位')
+      setLoading(false)
+      return
+    }
+
     if (newPassword !== confirmPassword) {
       setError('两次输入的密码不一致')
       setLoading(false)
       return
     }
 
-    if (newPassword.length < 8) {
-      setError('密码长度至少 8 位')
-      setLoading(false)
-      return
+    const result = await updatePassword(newPassword)
+
+    if (result.error) {
+      setError(result.error)
+    } else if (result.success) {
+      setSuccess(true)
+      // 2 秒后跳转到登录页
+      setTimeout(() => router.push('/login'), 2000)
     }
 
-    try {
-      const result = await updatePassword(newPassword)
-      if (result.error) {
-        setError(result.error)
-      } else if (result.success) {
-        setSuccess(true)
-        // 2 秒后跳转到登录页
-        setTimeout(() => router.push('/login'), 2000)
-      }
-    } catch {
-      setError('密码更新失败，请稍后重试')
-    } finally {
-      setLoading(false)
-    }
+    setLoading(false)
   }
 
   if (success) {

@@ -3,7 +3,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { getCurrentUser } from '@/lib/auth'
 import { captureActionError, setSentryUser } from '@/lib/sentry-capture'
-import { revalidatePath } from 'next/cache'
+import { revalidatePath, revalidateTag } from 'next/cache'
+import { validateOrThrow, toggleFavoriteSchema, styleIdSchema } from '@/lib/schemas'
 
 export interface ToggleFavoriteResult {
   isFavorite: boolean
@@ -16,7 +17,12 @@ export interface ToggleFavoriteResult {
 export async function toggleFavorite(
   styleId: string
 ): Promise<{ success: boolean; data?: ToggleFavoriteResult; error?: string }> {
+  let validatedData: { styleId: string } | undefined
+
   try {
+    // 验证输入参数
+    validatedData = validateOrThrow(toggleFavoriteSchema, { styleId })
+
     const supabase = await createClient()
     const user = await getCurrentUser()
 
@@ -30,77 +36,31 @@ export async function toggleFavorite(
       email: user.email ?? undefined,
     })
 
-    // 检查风格是否存在
-    const { data: style, error: styleError } = await supabase
-      .from('styles')
-      .select('id, favorite_count')
-      .eq('id', styleId)
-      .single()
+    // 使用数据库 RPC 函数实现原子更新
+    const { data, error } = await supabase.rpc('toggle_favorite_atomic', {
+      p_style_id: validatedData.styleId,
+      p_user_id: user.id,
+    })
 
-    if (styleError || !style) {
-      return { success: false, error: '风格不存在' }
+    if (error) {
+      throw error
     }
 
-    // 检查是否已收藏
-    const { data: existing } = await supabase
-      .from('favorites')
-      .select('id')
-      .eq('user_id', user.id)
-      .eq('style_id', styleId)
-      .single()
+    const result = data as { is_favorite: boolean; count: number }
 
-    let isFavorite: boolean
-    let count: number
-
-    if (existing) {
-      // 取消收藏
-      const { error: deleteError } = await supabase
-        .from('favorites')
-        .delete()
-        .eq('user_id', user.id)
-        .eq('style_id', styleId)
-
-      if (deleteError) {
-        throw deleteError
-      }
-
-      isFavorite = false
-      count = Math.max(style.favorite_count - 1, 0)
-    } else {
-      // 添加收藏
-      const { error: insertError } = await supabase
-        .from('favorites')
-        .insert({
-          user_id: user.id,
-          style_id: styleId,
-        })
-
-      if (insertError) {
-        throw insertError
-      }
-
-      isFavorite = true
-      count = (style.favorite_count ?? 0) + 1
-    }
-
-    // 更新收藏计数
-    await supabase
-      .from('styles')
-      .update({ favorite_count: count })
-      .eq('id', styleId)
-
-    // 清除缓存
-    revalidatePath(`/styles/${styleId}`)
-    revalidatePath('/styles')
+    // 清除缓存 - 使用精确的 tag 而非全局 revalidate
+    revalidateTag(`style-${validatedData.styleId}`, 'max')
+    revalidatePath(`/styles/${validatedData.styleId}`, 'page')
+    revalidatePath('/styles', 'page')
 
     return {
       success: true,
-      data: { isFavorite, count },
+      data: { isFavorite: result.is_favorite, count: result.count },
     }
   } catch (error) {
     await captureActionError(error, {
       action: 'toggleFavorite',
-      styleId,
+      styleId: validatedData?.styleId ?? styleId,
     })
     return { success: false, error: '操作失败，请重试' }
   }
@@ -255,7 +215,12 @@ export async function getMyFavorites(
 export async function checkIsFavorite(
   styleId: string
 ): Promise<{ success: boolean; data?: { isFavorite: boolean }; error?: string }> {
+  let validatedData: string | undefined
+
   try {
+    // 验证输入参数
+    validatedData = validateOrThrow(styleIdSchema, styleId)
+
     const supabase = await createClient()
     const user = await getCurrentUser()
 
@@ -267,7 +232,7 @@ export async function checkIsFavorite(
       .from('favorites')
       .select('id')
       .eq('user_id', user.id)
-      .eq('style_id', styleId)
+      .eq('style_id', validatedData)
       .single()
 
     if (error && error.code !== 'PGRST116') {
@@ -281,7 +246,7 @@ export async function checkIsFavorite(
   } catch (error) {
     await captureActionError(error, {
       action: 'checkIsFavorite',
-      styleId,
+      styleId: validatedData ?? styleId,
     })
     return { success: false, error: '检查收藏状态失败' }
   }

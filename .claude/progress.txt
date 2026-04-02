@@ -1,24 +1,72 @@
 # StyleSnap - 任务进度跟踪
 
-> 最后更新：2026-04-01（登录 Cookie 修复完成）
+> 最后更新：2026-04-02（P0 安全与可靠性增强完成，数据库迁移已应用，代码已推送）
 
 ---
 
 ## 当前阶段
-**P1 阶段 - 社交功能** ✅ 已完成
+**P0 阶段完成总结 - 2026-04-02**
 
 **已完成里程碑**：
 - ✅ 需求定义与调研阶段（2026-03-20 ~ 2026-03-22）
 - ✅ P0 基础架构（任务 1.1-1.7 全部完成）
 - ✅ P0 核心功能（任务 2.1-2.5 全部完成）
-- ✅ Next.js 16 兼容性警告修复（2026-03-27）
-- ✅ MCP 调试文档更新（2026-03-27）
-- ✅ P0 阶段问题修复（2026-03-27）
 - ✅ P1 社交功能（任务 5.1-5.4 全部完成）
-- ✅ Playwright MCP 知识文档（2026-04-01）
-- ✅ 登录 Cookie 修复（2026-04-01）
-- ✅ 风格详情页登录后错误修复（2026-04-01）
-- ✅ 评论系统扁平化改造（2026-04-01）
+- ✅ BMad Method Core v6.2.2 集成（2026-04-01）
+- ✅ P0 安全增强（2026-04-01）- 输入验证、日志脱敏
+- ✅ P0 质量优化（2026-04-01）- 评论嵌套限制、缓存优化
+- ✅ P0 可靠性增强（2026-04-02）- 原子更新、邮件重试、RLS 策略修复
+
+---
+
+## 当前任务
+
+### P0 安全与可靠性增强修复 ✅ 已完成
+
+- 时间：2026-04-02
+- 状态：✅ 已完成（数据库迁移已应用，代码已推送）
+- 修复内容：
+  - [x] **问题 1：Profile 创建重复风险** - 代码中已有检查逻辑，无需修复
+  - [x] **问题 2：软删除权限检查** - 修复 comments 表 DELETE 策略
+    - [x] 创建迁移文件 `0010_rls_policies_fix.sql`
+    - [x] 修复 DELETE 策略：只有作者或管理员可以删除评论
+    - [x] 创建 `verify_rls_policies()` 函数用于 RLS 验证
+  - [x] **问题 3：点赞/收藏计数非原子更新** - 使用数据库 RPC 函数实现原子更新
+    - [x] 创建 `toggle_like_atomic()` 函数
+    - [x] 创建 `toggle_favorite_atomic()` 函数
+    - [x] 使用 plpgsql 事务保证计数准确性
+    - [x] 消除高并发下的计数错误风险
+  - [x] **问题 4：邮件发送无重试机制** - 添加指数退避重试
+    - [x] 实现 `sendEmailWithRetry()` 辅助函数
+    - [x] 使用指数退避策略 (1s, 2s, 4s)
+    - [x] 应用到 verification/reset-password/welcome 所有邮件
+  - [x] **问题 5：评论嵌套层级限制** - 添加最多 2 级回复限制，防止无限嵌套
+  - [x] **问题 6：RLS 策略验证** - 创建 RLS 验证函数
+  - [x] **问题 7：错误日志脱敏** - 移除 auth actions 中的 PII 信息（email, username）记录
+  - [x] **问题 8：Cache Revalidation 优化** - 使用 revalidateTag 精确控制缓存失效
+    - [x] 添加 `revalidateTag('style-[id]', 'max')` 用于点赞/收藏
+    - [x] 添加 `revalidateTag('comments-[id]', 'max')` 用于评论
+    - [x] 使用 stale-while-revalidate 语义
+  - [x] **问题 10：密码重置 Token 过期配置** - 创建配置文档
+    - [x] 创建 `docs/reference/supabase-auth-config.md`
+    - [ ] 待在 Supabase Dashboard 配置 Token 过期时间为 3600 秒
+
+- 创建的文件：
+  - [x] `apps/web/lib/schemas.ts` - Zod 验证 schemas
+  - [x] `supabase/migrations/0009_atomic_updates.sql` - 原子更新和 RPC 函数
+  - [x] `supabase/migrations/0010_rls_policies_fix.sql` - RLS 策略修复
+  - [x] `docs/reference/supabase-auth-config.md` - Supabase Auth 配置指南
+
+- Git 提交：
+  - 796221b fix: P0 安全增强 - 输入验证和日志脱敏 ✅ 已推送
+  - e160897 fix: 评论嵌套层级限制和 Cache Revalidation 优化 ✅ 已推送
+  - 94a22ca fix: 原子更新和邮件重试机制 ✅ 已推送
+  - f548584 fix: RLS 验证函数修复 ✅ 已推送
+
+- 数据库迁移：
+  - [x] 应用数据库迁移：手动在 Dashboard SQL Editor 执行 ✅
+  - [x] 执行 `SELECT verify_rls_policies();` 验证 RLS 策略 ✅
+  - [ ] 在 Supabase Dashboard 配置密码重置 Token 过期时间为 3600 秒
 
 ---
 

@@ -3,7 +3,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { getCurrentUser } from '@/lib/auth'
 import { captureActionError, setSentryUser } from '@/lib/sentry-capture'
-import { revalidatePath } from 'next/cache'
+import { revalidatePath, revalidateTag } from 'next/cache'
+import { validateOrThrow, createCommentSchema, deleteCommentSchema, styleIdSchema } from '@/lib/schemas'
 
 export interface Comment {
   id: string
@@ -29,7 +30,12 @@ export interface CreateCommentResult {
 export async function getComments(
   styleId: string
 ): Promise<{ success: boolean; data?: Comment[]; error?: string }> {
+  let validatedData: string | undefined
+
   try {
+    // 验证输入参数
+    validatedData = validateOrThrow(styleIdSchema, styleId)
+
     const supabase = await createClient()
 
     const { data, error } = await supabase
@@ -41,7 +47,7 @@ export async function getComments(
           avatar_url
         )
       `)
-      .eq('style_id', styleId)
+      .eq('style_id', validatedData)
       .eq('status', 'approved')
       .is('parent_id', null)
       .order('created_at', { ascending: false })
@@ -89,7 +95,7 @@ export async function getComments(
   } catch (error) {
     await captureActionError(error, {
       action: 'getComments',
-      styleId,
+      styleId: validatedData ?? styleId,
     })
     return { success: false, error: '获取评论失败' }
   }
@@ -103,7 +109,12 @@ export async function createComment(
   content: string,
   parentId?: string
 ): Promise<{ success: boolean; data?: CreateCommentResult; error?: string }> {
+  let validatedData: { styleId: string; content: string; parentId?: string | null } | undefined
+
   try {
+    // 验证输入参数
+    validatedData = validateOrThrow(createCommentSchema, { styleId, content, parentId })
+
     const supabase = await createClient()
     const user = await getCurrentUser()
 
@@ -121,33 +132,38 @@ export async function createComment(
     const { data: style, error: styleError } = await supabase
       .from('styles')
       .select('id')
-      .eq('id', styleId)
+      .eq('id', validatedData.styleId)
       .single()
 
     if (styleError || !style) {
       return { success: false, error: '风格不存在' }
     }
 
-    // 验证内容
-    if (!content || content.trim().length === 0) {
-      return { success: false, error: '评论内容不能为空' }
-    }
-
-    if (content.length > 1000) {
-      return { success: false, error: '评论内容不能超过 1000 字' }
-    }
-
     // 如果是回复评论，检查父评论是否存在
-    if (parentId) {
-      const { data: parentComment } = await supabase
+    if (validatedData.parentId) {
+      const { data: parentComment, error: parentError } = await supabase
         .from('comments')
-        .select('id')
-        .eq('id', parentId)
-        .eq('style_id', styleId)
+        .select('id, parent_id')
+        .eq('id', validatedData.parentId)
+        .eq('style_id', validatedData.styleId)
         .single()
 
-      if (!parentComment) {
+      if (parentError || !parentComment) {
         return { success: false, error: '父评论不存在' }
+      }
+
+      // 检查嵌套层级（最多支持 2 级：评论 -> 回复 -> 回复的回复）
+      if (parentComment.parent_id !== null) {
+        // 父评论本身也是回复，检查爷爷评论是否存在
+        const { data: grandparentComment } = await supabase
+          .from('comments')
+          .select('parent_id')
+          .eq('id', parentComment.parent_id)
+          .single()
+
+        if (grandparentComment && grandparentComment.parent_id !== null) {
+          return { success: false, error: '评论嵌套层级过深，最多支持 2 级回复' }
+        }
       }
     }
 
@@ -155,11 +171,11 @@ export async function createComment(
     const { data: comment, error: insertError } = await supabase
       .from('comments')
       .insert({
-        style_id: styleId,
+        style_id: validatedData.styleId,
         user_id: user.id,
-        parent_id: parentId || null,
-        content: content.trim(),
-        status: 'approved', // 默认直接通过，后期可改为 pending 需要审核
+        parent_id: validatedData.parentId || null,
+        content: validatedData.content.trim(),
+        status: 'approved',
       })
       .select(`
         *,
@@ -181,8 +197,9 @@ export async function createComment(
       replies: [],
     }
 
-    // 清除缓存
-    revalidatePath(`/styles/${styleId}`)
+    // 清除缓存 - 使用精确的 tag 而非全局 revalidate
+    revalidateTag(`comments-${validatedData.styleId}`, 'max')
+    revalidatePath(`/styles/${validatedData.styleId}`, 'page')
 
     return {
       success: true,
@@ -191,8 +208,8 @@ export async function createComment(
   } catch (error) {
     await captureActionError(error, {
       action: 'createComment',
-      styleId,
-      parentId,
+      styleId: validatedData?.styleId ?? styleId,
+      parentId: validatedData?.parentId ?? parentId,
     })
     return { success: false, error: '发表评论失败，请重试' }
   }
@@ -204,7 +221,12 @@ export async function createComment(
 export async function deleteComment(
   commentId: string
 ): Promise<{ success: boolean; error?: string }> {
+  let validatedData: { commentId: string } | undefined
+
   try {
+    // 验证输入参数
+    validatedData = validateOrThrow(deleteCommentSchema, { commentId })
+
     const supabase = await createClient()
     const user = await getCurrentUser()
 
@@ -222,7 +244,7 @@ export async function deleteComment(
     const { data: comment, error: fetchError } = await supabase
       .from('comments')
       .select('id, user_id, style_id')
-      .eq('id', commentId)
+      .eq('id', validatedData.commentId)
       .single()
 
     if (fetchError || !comment) {
@@ -250,14 +272,15 @@ export async function deleteComment(
         status: 'deleted',
         content: '[此评论已删除]',
       })
-      .eq('id', commentId)
+      .eq('id', validatedData.commentId)
 
     if (updateError) {
       throw updateError
     }
 
-    // 清除缓存
-    revalidatePath(`/styles/${comment.style_id}`)
+    // 清除缓存 - 使用精确的 tag 而非全局 revalidate
+    revalidateTag(`comments-${comment.style_id}`, 'max')
+    revalidatePath(`/styles/${comment.style_id}`, 'page')
 
     return {
       success: true,
@@ -265,7 +288,7 @@ export async function deleteComment(
   } catch (error) {
     await captureActionError(error, {
       action: 'deleteComment',
-      commentId,
+      commentId: validatedData?.commentId ?? commentId,
     })
     return { success: false, error: '删除评论失败，请重试' }
   }
