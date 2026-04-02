@@ -16,10 +16,40 @@
 - ✅ P0 安全增强（2026-04-01）- 输入验证、日志脱敏
 - ✅ P0 质量优化（2026-04-01）- 评论嵌套限制、缓存优化
 - ✅ P0 可靠性增强（2026-04-02）- 原子更新、邮件重试、RLS 策略修复
+- ✅ Bug 修复（2026-04-02）- 重复邮箱注册检测
 
 ---
 
 ## 当前任务
+
+### ✅ Bug 修复 - 重复邮箱注册检测 已完成
+
+- 时间：2026-04-02
+- 状态：✅ 已完成（代码已提交，测试通过）
+- Git 提交：[待提交]
+- 问题描述：
+  - 用户报告：注册时邮箱重复，仍显示注册成功，但邮箱收不到验证邮件
+  - auth 表不新增数据，profile 表却更新用户信息
+- 根本原因：
+  - Supabase 的 `signUp()` 对已验证邮箱返回新用户对象（`email_confirmed_at=null`），但实际不创建 auth 记录
+  - 现有检测逻辑依赖 `email_confirmed_at` 无法识别这种情况
+- 修复方案：
+  - [x] 创建数据库迁移 `0012_add_email_to_profiles.sql`：
+    - 在 profiles 表添加 `email` 字段（TEXT，允许 NULL）
+    - 从 auth.users 同步 email 数据到 profiles
+    - 添加唯一索引 `idx_profiles_email`（WHERE email IS NOT NULL）
+    - 更新触发器 `create_profile_on_signup` 确保新注册用户 email 字段被填充
+  - [x] 修改 `apps/web/actions/auth/index.ts` 注册逻辑：
+    - 步骤 1: 查询 profiles 表检查 email 是否已存在
+    - 如果存在，立即返回错误 "该邮箱已注册，请直接登录"
+    - 步骤 2: 检查用户名是否已存在
+    - 步骤 3: 调用 supabase.auth.signUp
+- 验证结果：
+  - [x] 数据库迁移应用成功
+  - [x] `pnpm build` 编译成功
+  - [x] E2E 测试验证：用已存在邮箱 `qq3526547131@gmail.com` 注册，显示"该邮箱已注册，请直接登录"错误
+
+---
 
 ### ✅ Story 1.8 - 隐私政策与用户协议 已完成
 

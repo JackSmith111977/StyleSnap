@@ -90,16 +90,40 @@ export async function register(
 
     const supabase = await createClient()
 
-    // 步骤 1: 检查邮箱是否已存在（通过查询 profiles 表）
+    // ============================================
+    // 步骤 1: 检查邮箱是否已存在（查询 profiles 表）
+    // ============================================
     console.log('[注册] 步骤 1: 检查邮箱是否已注册')
-    const { data: existingUser, error: checkError } = await supabase
+    const { data: existingProfile, error: checkEmailError } = await supabase
+      .from('profiles')
+      .select('id, email')
+      .eq('email', validatedData.email)
+      .maybeSingle()
+
+    if (checkEmailError) {
+      console.warn('[注册] 检查邮箱失败:', checkEmailError)
+    }
+
+    // 如果邮箱已存在，返回错误
+    if (existingProfile) {
+      return {
+        error: '该邮箱已注册，请直接登录',
+        fieldErrors: { email: ['该邮箱已注册，请直接登录'] }
+      }
+    }
+
+    // ============================================
+    // 步骤 2: 检查用户名是否已存在
+    // ============================================
+    console.log('[注册] 步骤 2: 检查用户名是否已注册')
+    const { data: existingUser, error: checkUsernameError } = await supabase
       .from('profiles')
       .select('id')
       .eq('username', validatedData.username)
       .maybeSingle()
 
-    if (checkError) {
-      console.warn('[注册] 检查用户名失败:', checkError)
+    if (checkUsernameError) {
+      console.warn('[注册] 检查用户名失败:', checkUsernameError)
     }
 
     // 如果用户名已存在，返回错误
@@ -110,8 +134,10 @@ export async function register(
       }
     }
 
-    // 步骤 2: 调用 supabase.auth.signUp
-    console.log('[注册] 步骤 2: 调用 supabase.auth.signUp')
+    // ============================================
+    // 步骤 3: 调用 supabase.auth.signUp
+    // ============================================
+    console.log('[注册] 步骤 3: 调用 supabase.auth.signUp')
     const { data, error } = await supabase.auth.signUp({
       email: validatedData.email,
       password: validatedData.password,
@@ -126,8 +152,12 @@ export async function register(
     console.log('[注册] signUp 返回结果:', {
       hasUser: !!data?.user,
       hasSession: !!data?.session,
+      userId: data?.user?.id,
+      userEmail: data?.user?.email,
       userConfirmed: data?.user?.email_confirmed_at,
-      error: error,
+      userCreatedAt: data?.user?.created_at,
+      errorCode: error?.code,
+      errorMessage: error?.message,
     })
 
     if (error) {
@@ -152,6 +182,25 @@ export async function register(
       return { error: '注册失败' }
     }
 
+    // ============================================
+    // 步骤 3: 检查是否是重复邮箱（未验证场景）
+    // ============================================
+    // Supabase 对重复邮箱调用 signUp() 时：
+    // - 如果邮箱已验证：返回 user_already_exists 错误
+    // - 如果邮箱未验证：返回成功但不创建新用户，也不发邮件
+    //
+    // 检测逻辑：比较返回的 user.created_at 是否为刚刚创建
+    const userCreatedAtTime = new Date(data.user.created_at).getTime()
+    const timeDiff = Date.now() - userCreatedAtTime
+    const isNewUser = !data.user.email_confirmed_at && timeDiff < 60000 // 1 分钟内创建
+
+    console.log('[注册] 新用户检测:', {
+      emailConfirmed: !!data.user.email_confirmed_at,
+      userCreatedAt: data.user.created_at,
+      timeDiff: timeDiff + 'ms',
+      isNewUser,
+    })
+
     // 检查用户是否已经确认过邮箱（即已注册过的用户）
     if (data.user.email_confirmed_at) {
       console.log('[注册] 该邮箱已注册且已验证')
@@ -161,23 +210,38 @@ export async function register(
       }
     }
 
-    // 步骤 3: 检查 profile 是否已创建
-    console.log('[注册] 步骤 3: 检查 profile 是否已创建')
+    // ============================================
+    // 步骤 3.5: 检测未验证邮箱的重复注册
+    // ============================================
+    // 如果用户不是新用户（created_at 是旧时间），但 email_confirmed_at 为空
+    // 说明这是一个已注册但未验证邮箱的用户，或者 Supabase 返回了旧用户记录
+    if (!isNewUser && !data.user.email_confirmed_at && timeDiff > 60000) {
+      console.log('[注册] 检测到未验证邮箱的重复注册')
+      return {
+        error: '该邮箱已注册，请查看邮箱验证邮件或直接登录',
+        fieldErrors: { email: ['该邮箱已注册，请查看邮箱验证邮件或直接登录'] }
+      }
+    }
+
+    // ============================================
+    // 步骤 4: 检查 profile 是否已创建
+    // ============================================
+    console.log('[注册] 步骤 4: 检查 profile 是否已创建')
     const { data: profileData, error: profileError } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', data.user.id)
-      .single() as { data: { id: string; username: string; role: string; avatar_url?: string } | null; error: Error | null }
+      .maybeSingle()
 
     if (profileError) {
       console.error('[注册] profile 查询失败:', profileError)
-    } else {
-      console.log('[注册] profile 已存在:', profileData)
     }
 
-    // 步骤 4: 如果 profile 不存在，手动创建
+    // ============================================
+    // 步骤 5: 如果 profile 不存在，手动创建
+    // ============================================
     if (!profileData) {
-      console.log('[注册] 步骤 4: profile 不存在，尝试手动创建')
+      console.log('[注册] 步骤 5: profile 不存在，尝试手动创建')
       const { error: insertError } = await supabase.from('profiles').insert({
         id: data.user.id,
         username: validatedData.username,
@@ -186,32 +250,43 @@ export async function register(
       })
 
       if (insertError) {
-        console.error('[注册] 手动创建 profile 失败:', {
-          message: insertError.message,
-          details: insertError.details,
-          hint: insertError.hint,
-          code: insertError.code,
-        })
+        // 如果是唯一约束冲突（profile 被触发器创建了）
+        if (insertError.code === '23505') {
+          console.log('[注册] profile 已被触发器创建，跳过手动创建')
+        } else {
+          console.error('[注册] 手动创建 profile 失败:', {
+            message: insertError.message,
+            details: insertError.details,
+            hint: insertError.hint,
+            code: insertError.code,
+          })
+        }
       } else {
         console.log('[注册] 手动创建 profile 成功')
       }
+    } else {
+      console.log('[注册] profile 已存在:', profileData)
+      // 注意：不更新已有 profile，只创建新用户的 profile
     }
 
-    // 步骤 5: 发送邮件
-    console.log('[注册] 步骤 5: 发送邮件')
-    if (data.user && !data.user.email_confirmed_at) {
+    // ============================================
+    // 步骤 6: 发送邮件（只对新用户发送）
+    // ============================================
+    console.log('[注册] 步骤 6: 发送邮件')
+    // 只有真正的新用户才需要发送邮件
+    // Supabase 会自动给未验证邮箱发送验证邮件
+    // 这里发送欢迎邮件
+    if (isNewUser && data.user && !data.user.email_confirmed_at) {
       try {
         await sendRegistrationEmails(validatedData.email, validatedData.username)
-        console.log('[注册] 邮件发送完成')
+        console.log('[注册] 欢迎邮件发送完成')
       } catch (emailError) {
-        console.error('[注册] 邮件发送失败:', emailError)
+        console.error('[注册] 欢迎邮件发送失败:', emailError)
         // 邮件失败不影响注册流程
       }
     }
 
     console.log('[注册] 注册流程完成')
-    // 注意：用户需要验证邮箱后才能登录
-    // create_profile_on_signup 触发器会自动创建 profile
     return { success: true }
   } catch (error) {
     await captureActionError(error, {
