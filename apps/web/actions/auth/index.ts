@@ -90,20 +90,27 @@ export async function register(
 
     const supabase = await createClient()
 
-    // 步骤 1: 检查 profiles 表结构和 RLS 策略
-    console.log('[注册] 步骤 1: 检查 profiles 表')
-    const { data: profilesCheck, error: profilesCheckError } = await supabase
+    // 步骤 1: 检查邮箱是否已存在（通过查询 profiles 表）
+    console.log('[注册] 步骤 1: 检查邮箱是否已注册')
+    const { data: existingUser, error: checkError } = await supabase
       .from('profiles')
       .select('id')
-      .limit(1)
+      .eq('username', validatedData.username)
+      .maybeSingle()
 
-    if (profilesCheckError) {
-      console.error('[注册] profiles 表检查失败:', profilesCheckError)
-    } else {
-      console.log('[注册] profiles 表检查成功:', profilesCheck)
+    if (checkError) {
+      console.warn('[注册] 检查用户名失败:', checkError)
     }
 
-    // 步骤 2: 执行注册
+    // 如果用户名已存在，返回错误
+    if (existingUser) {
+      return {
+        error: '该用户名已被使用',
+        fieldErrors: { username: ['该用户名已被使用'] }
+      }
+    }
+
+    // 步骤 2: 调用 supabase.auth.signUp
     console.log('[注册] 步骤 2: 调用 supabase.auth.signUp')
     const { data, error } = await supabase.auth.signUp({
       email: validatedData.email,
@@ -143,6 +150,15 @@ export async function register(
     if (!data.user) {
       console.error('[注册] 没有返回用户数据')
       return { error: '注册失败' }
+    }
+
+    // 检查用户是否已经确认过邮箱（即已注册过的用户）
+    if (data.user.email_confirmed_at) {
+      console.log('[注册] 该邮箱已注册且已验证')
+      return {
+        error: '该邮箱已注册，请直接登录',
+        fieldErrors: { email: ['该邮箱已注册，请直接登录'] }
+      }
     }
 
     // 步骤 3: 检查 profile 是否已创建
