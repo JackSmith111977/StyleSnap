@@ -2,6 +2,7 @@
   "permissions": {
     "allow": [
       "WebSearch",
+      "WebFetch",
       "mcp__WebSearch__bailian_web_search",
       "Bash(pnpm lint:*)",
       "Bash(pnpm build:*)",
