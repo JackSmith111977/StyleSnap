@@ -12,10 +12,12 @@ export function SearchBox() {
   const pathname = usePathname()
 
   const [value, setValue] = useState(searchParams.get('search') ?? '')
+  const [error, setError] = useState<string | null>(null)
   const debounceRef = useRef<NodeJS.Timeout | undefined>(undefined)
 
   useEffect(() => {
     setValue(searchParams.get('search') ?? '')
+    setError(null)
   }, [searchParams])
 
   const handleSearch = (searchValue: string) => {
@@ -23,10 +25,20 @@ export function SearchBox() {
       clearTimeout(debounceRef.current)
     }
 
+    // 验证搜索词长度（至少 2 个字符）
+    const trimmedValue = searchValue.trim()
+    if (trimmedValue && trimmedValue.length < 2) {
+      setError('至少输入 2 个字符')
+      return
+    }
+
+    // 清除错误
+    setError(null)
+
     debounceRef.current = setTimeout(() => {
       const params = new URLSearchParams(searchParams.toString())
-      if (searchValue.trim()) {
-        params.set('search', searchValue.trim())
+      if (trimmedValue) {
+        params.set('search', trimmedValue)
       } else {
         params.delete('search')
       }
@@ -55,6 +67,8 @@ export function SearchBox() {
         value={value}
         onChange={handleChange}
         className="w-full pl-9 pr-9"
+        aria-invalid={!!error}
+        aria-describedby={error ? 'search-error' : undefined}
       />
       {value && (
         <Button
@@ -65,6 +79,11 @@ export function SearchBox() {
         >
           <X className="h-4 w-4" />
         </Button>
+      )}
+      {error && (
+        <p id="search-error" className="mt-1 text-sm text-red-500">
+          {error}
+        </p>
       )}
     </div>
   )
