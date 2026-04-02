@@ -11,11 +11,13 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 export function RegisterForm() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string>()
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({})
   const [success, setSuccess] = useState(false)
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setError(undefined)
+    setFieldErrors({})
     setLoading(true)
 
     const formData = new FormData(e.currentTarget)
@@ -41,6 +43,10 @@ export function RegisterForm() {
       const result = await register(email, password, username)
       if (result.error) {
         setError(result.error)
+        // 设置字段级错误
+        if (result.fieldErrors) {
+          setFieldErrors(result.fieldErrors)
+        }
       } else if (result.success) {
         setSuccess(true)
       }
@@ -108,6 +114,9 @@ export function RegisterForm() {
               required
               disabled={loading}
             />
+            {fieldErrors?.email && (
+              <p className="text-sm text-red-500">{fieldErrors.email[0]}</p>
+            )}
           </div>
 
           <div className="space-y-2">

@@ -16,6 +16,7 @@ export interface LoginResult {
 export interface RegisterResult {
   error?: string
   success?: boolean
+  fieldErrors?: Record<string, string[]>
 }
 
 export interface ResetPasswordResult {
@@ -127,6 +128,15 @@ export async function register(
         message: error.message,
         code: error.code,
       })
+
+      // 针对邮箱已注册场景返回字段级错误
+      if (error.code === 'user_already_exists' || error.message.includes('already been registered') || error.message.includes('already exists')) {
+        return {
+          error: '该邮箱已被注册',
+          fieldErrors: { email: ['该邮箱已被注册'] }
+        }
+      }
+
       return { error: `注册失败：${error.message}` }
     }
 
