@@ -1,6 +1,6 @@
 # StyleSnap - 任务进度跟踪
 
-> 最后更新：2026-04-02（P0 安全与可靠性增强完成，数据库迁移已应用，代码已推送）
+> 最后更新：2026-04-02（BMad Method Core v6.2.2 集成完成，35 个 Skills 已添加）
 
 ---
 
@@ -20,6 +20,31 @@
 ---
 
 ## 当前任务
+
+### BMad Method Core v6.2.2 集成 ✅ 已完成
+
+- 时间：2026-04-02
+- 状态：✅ 已完成（代码已推送到远程仓库）
+- Git 提交：fac619a feat: 集成 BMad Method Core v6.2.2 完整模块 ✅ 已推送
+- 新增内容:
+  - [x] 35 个 BMad Agent Skills（.claude/skills/bmad-agent-*）
+  - [x] 26 个核心 BMad Skills（.claude/skills/bmad-*）
+  - [x] BMad 配置文件更新（_bmad/_config/）
+  - [x] 总计 616 个文件变更，97456 行新增
+
+- 主要 Skills:
+  - **Agent 系列**: analyst, architect, builder, dev, pm, qa, ux-designer, tech-writer, sm, quick-flow-solo-dev
+  - **需求阶段**: bmad-create-prd, bmad-edit-prd, bmad-validate-prd, bmad-product-brief
+  - **架构阶段**: bmad-create-architecture, bmad-create-epics-and-stories, bmad-create-story
+  - **开发阶段**: bmad-dev-story, bmad-quick-dev, bmad-code-review
+  - **设计阶段**: bmad-create-ux-design
+  - **测试阶段**: bmad-qa-generate-e2e-tests, bmad-check-implementation-readiness
+  - **项目管理**: bmad-sprint-planning, bmad-sprint-status, bmad-retrospective, bmad-correct-course
+  - **文档工具**: bmad-document-project, bmad-generate-project-context
+  - **调研工具**: bmad-technical-research, bmad-domain-research, bmad-market-research
+  - **模块工具**: bmad-bmb-setup, bmad-module-builder, bmad-workflow-builder
+
+---
 
 ### P0 安全与可靠性增强修复 ✅ 已完成
 
