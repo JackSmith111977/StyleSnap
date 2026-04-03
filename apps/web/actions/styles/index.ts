@@ -266,3 +266,111 @@ export async function incrementViewCount(id: string): Promise<boolean> {
 
   return true
 }
+
+/**
+ * 获取相关推荐风格（按分类或标签匹配）
+ * @param styleId 当前风格 ID
+ * @param limit 返回数量限制，默认 4
+ */
+export const getRelatedStyles = cache(async (
+  styleId: string,
+  limit = 4
+): Promise<Style[]> => {
+  const supabase = await createClient()
+
+  // 1. 先获取当前风格的分类和标签
+  const { data: currentStyle } = await supabase
+    .from('styles')
+    .select(`
+      category_id,
+      style_tags:style_tags(
+        tag:tags(
+          id,
+          name
+        )
+      )
+    `)
+    .eq('id', styleId)
+    .single()
+
+  if (!currentStyle) {
+    return []
+  }
+
+  const categoryId = currentStyle.category_id
+  const tagIds = (currentStyle.style_tags as Array<{ tag: { id: string; name: string } }> | undefined)
+    ?.map(st => st.tag.id) ?? []
+
+  // 2. 查询推荐风格：优先同分类，其次同标签
+  // 使用 UNION 组合两个查询
+  const { data, error } = await supabase.rpc('get_related_styles', {
+    target_style_id: styleId,
+    target_category_id: categoryId,
+    target_tag_ids: tagIds.length > 0 ? tagIds : [],
+    result_limit: limit
+  })
+
+  if (error) {
+    console.error('获取相关推荐失败:', error)
+    return []
+  }
+
+  // 3. 如果 RPC 函数不存在，使用备用方案：直接查询同分类的风格
+  if ((error as Error & { code?: string })?.code === '42883') { // undefined_function
+    console.log('get_related_styles RPC 不存在，使用备用查询方案')
+
+    let query = supabase
+      .from('styles')
+      .select(`
+        *,
+        category:categories!inner(
+          id,
+          name,
+          name_en,
+          icon
+        ),
+        style_tags:style_tags(
+          tag:tags(
+            name
+          )
+        )
+      `)
+      .eq('status', 'published')
+      .neq('id', styleId)
+
+    // 优先筛选同分类
+    if (categoryId) {
+      query = query.eq('category_id', categoryId)
+    }
+
+    query = query.order('like_count', { ascending: false }).limit(limit)
+
+    const { data: fallbackData, error: fallbackError } = await query
+
+    if (fallbackError) {
+      console.error('备用查询失败:', fallbackError)
+      return []
+    }
+
+    return ((fallbackData as unknown[]) ?? []).map((item: unknown) => {
+      const typedItem = item as Record<string, unknown>
+      const styleTags = typedItem.style_tags as Array<{ tag: { name: string } }> | undefined
+      return {
+        ...typedItem,
+        tags: styleTags?.map((st) => st.tag.name) ?? [],
+        style_tags: undefined,
+      }
+    }) as Style[]
+  }
+
+  // 4. 转换 RPC 返回的数据格式
+  return ((data as unknown[]) ?? []).map((item: unknown) => {
+    const typedItem = item as Record<string, unknown>
+    const styleTags = typedItem.style_tags as Array<{ tag: { name: string } }> | undefined
+    return {
+      ...typedItem,
+      tags: styleTags?.map((st) => st.tag.name) ?? [],
+      style_tags: undefined,
+    }
+  }) as Style[]
+})

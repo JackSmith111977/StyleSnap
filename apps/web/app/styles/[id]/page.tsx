@@ -1,14 +1,15 @@
 import { notFound } from 'next/navigation'
-import { getStyle, incrementViewCount } from '@/actions/styles'
+import { getStyle, incrementViewCount, getRelatedStyles } from '@/actions/styles'
 import { getComments } from '@/actions/comments'
 import { checkIsLiked } from '@/actions/likes'
 import { StyleDetail } from '@/components/style-detail'
-import { CodeBlock } from '@/components/code-block'
+import { CodeSnippetDisplay } from '@/components/style-code-snippet'
 import { LikeButton } from '@/components/like-button'
 import { CommentList } from '@/components/comment-list'
 import { CommentForm } from '@/components/comment-form'
+import { RelatedStyles } from '@/components/related-styles'
 import Link from 'next/link'
-import { ArrowLeft, Code, Eye, Heart, MessageCircle } from 'lucide-react'
+import { Eye, Heart, MessageCircle } from 'lucide-react'
 import { type Metadata } from 'next'
 import { getCurrentUser } from '@/lib/auth'
 
@@ -51,6 +52,7 @@ export default async function StyleDetailPage({ params }: StyleDetailPageProps) 
   const style = await getStyle(id)
   const user = await getCurrentUser()
   const commentsResult = await getComments(id)
+  const relatedStyles = await getRelatedStyles(id)
 
   if (!style) {
     notFound()
@@ -125,48 +127,16 @@ export default async function StyleDetailPage({ params }: StyleDetailPageProps) 
         {/* 设计变量展示 */}
         <StyleDetail style={style} />
 
-        {/* 代码示例 */}
-        <div className="mt-8 space-y-6">
-          <h2 className="flex items-center gap-2 text-2xl font-bold">
-            <Code className="h-6 w-6" />
-            代码示例
-          </h2>
-
-          {/* HTML 代码 */}
-          {style.code_html && (
-            <CodeBlock
-              code={style.code_html}
-              language="html"
-              title="HTML"
-            />
-          )}
-
-          {/* CSS 代码 */}
-          {style.code_css && (
-            <CodeBlock
-              code={style.code_css}
-              language="css"
-              title="CSS"
-            />
-          )}
-
-          {/* React 代码 */}
-          {style.code_react && (
-            <CodeBlock
-              code={style.code_react}
-              language="tsx"
-              title="React Component"
-            />
-          )}
-
-          {/* Tailwind 代码 */}
-          {style.code_tailwind && (
-            <CodeBlock
-              code={style.code_tailwind}
-              language="html"
-              title="Tailwind CSS"
-            />
-          )}
+        {/* 代码示例 - Tabs 切换 */}
+        <div className="mt-8">
+          <CodeSnippetDisplay
+            snippets={[
+              { language: 'html', title: 'HTML', code: style.code_html },
+              { language: 'css', title: 'CSS', code: style.code_css },
+              { language: 'tsx', title: 'React', code: style.code_react },
+              { language: 'html', title: 'Tailwind', code: style.code_tailwind },
+            ]}
+          />
         </div>
 
         {/* 评论区域 */}
@@ -195,6 +165,11 @@ export default async function StyleDetailPage({ params }: StyleDetailPageProps) 
             initialComments={commentsResult.data ?? []}
             isLoggedIn={!!user}
           />
+        </div>
+
+        {/* 相关推荐 */}
+        <div className="mt-12">
+          <RelatedStyles relatedStyles={relatedStyles} currentStyleId={style.id} />
         </div>
       </div>
     </div>

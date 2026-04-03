@@ -69,13 +69,13 @@ development_status:
   epic-2-retrospective: optional
 
   # ========== Epic 3: 风格详情与代码使用 ==========
-  epic-3: in-progress
+  epic-3: done
   # Epic 3 Stories
   3-1-style-detail-page: done
   3-2-design-tokens-display: done
   3-3-code-snippet-display: done
   3-4-code-copy: done
-  3-5-related-styles: backlog
+  3-5-related-styles: done
   # Epic 3 Retrospective
   epic-3-retrospective: optional
 
