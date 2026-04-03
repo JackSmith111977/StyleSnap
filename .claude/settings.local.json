@@ -77,7 +77,8 @@
       "Bash(mv *)",
       "Bash(rm *)",
       "Bash(mkdir:*)",
-      "Bash(cd:*)"
+      "Bash(cd:*)",
+      "Bash(curl -s http://localhost:3000 -o /dev/null)"
     ],
     "defaultMode": "auto"
   }

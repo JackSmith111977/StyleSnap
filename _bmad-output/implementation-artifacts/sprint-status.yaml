@@ -57,22 +57,22 @@ development_status:
   epic-1-retrospective: optional
 
   # ========== Epic 2: 风格浏览与发现 ==========
-  epic-2: backlog
+  epic-2: done
   # Epic 2 Stories
-  2-1-style-grid-view: backlog
-  2-2-style-list-view: backlog
-  2-3-basic-search: backlog
-  2-4-category-filter: backlog
-  2-5-advanced-filter: backlog
-  2-6-infinite-scroll: backlog
+  2-1-style-grid-view: done
+  2-2-style-list-view: done
+  2-3-basic-search: done
+  2-4-category-filter: done
+  2-5-advanced-filter: done
+  2-6-infinite-scroll: done
   # Epic 2 Retrospective
   epic-2-retrospective: optional
 
   # ========== Epic 3: 风格详情与代码使用 ==========
-  epic-3: backlog
+  epic-3: in-progress
   # Epic 3 Stories
-  3-1-style-detail-page: backlog
-  3-2-design-tokens-display: backlog
+  3-1-style-detail-page: done
+  3-2-design-tokens-display: ready-for-dev
   3-3-code-snippet-display: backlog
   3-4-code-copy: backlog
   3-5-related-styles: backlog

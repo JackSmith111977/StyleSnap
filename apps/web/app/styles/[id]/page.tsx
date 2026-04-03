@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation'
-import { getStyle } from '@/actions/styles'
+import { getStyle, incrementViewCount } from '@/actions/styles'
 import { getComments } from '@/actions/comments'
 import { checkIsLiked } from '@/actions/likes'
 import { StyleDetail } from '@/components/style-detail'
@@ -8,7 +8,7 @@ import { LikeButton } from '@/components/like-button'
 import { CommentList } from '@/components/comment-list'
 import { CommentForm } from '@/components/comment-form'
 import Link from 'next/link'
-import { ArrowLeft, Code, Eye, Heart, Calendar, MessageCircle } from 'lucide-react'
+import { ArrowLeft, Code, Eye, Heart, MessageCircle } from 'lucide-react'
 import { type Metadata } from 'next'
 import { getCurrentUser } from '@/lib/auth'
 
@@ -56,6 +56,9 @@ export default async function StyleDetailPage({ params }: StyleDetailPageProps) 
     notFound()
   }
 
+  // 异步增加浏览次数（不阻塞渲染）
+  incrementViewCount(id).catch(console.error)
+
   // 获取用户点赞状态（仅已登录用户）
   let isLiked = false
   if (user) {
@@ -65,16 +68,26 @@ export default async function StyleDetailPage({ params }: StyleDetailPageProps) 
 
   return (
     <div className="min-h-screen bg-background">
-      {/* 顶部导航栏 */}
+      {/* 顶部导航栏 - 面包屑 */}
       <div className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto px-4 py-4">
-          <Link
-            href="/styles"
-            className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            返回列表
-          </Link>
+          <nav className="flex items-center gap-2 text-sm">
+            <Link
+              href="/"
+              className="text-muted-foreground hover:text-foreground"
+            >
+              首页
+            </Link>
+            <span className="text-muted-foreground">/</span>
+            <Link
+              href="/styles"
+              className="text-muted-foreground hover:text-foreground"
+            >
+              风格列表
+            </Link>
+            <span className="text-muted-foreground">/</span>
+            <span className="text-foreground font-medium">{style.title}</span>
+          </nav>
         </div>
       </div>
 
@@ -95,8 +108,8 @@ export default async function StyleDetailPage({ params }: StyleDetailPageProps) 
               {style.like_count} 次点赞
             </span>
             <span className="flex items-center gap-1">
-              <Calendar className="h-4 w-4" />
-              {new Date(style.created_at).toLocaleDateString('zh-CN')}
+              <MessageCircle className="h-4 w-4" />
+              {commentsResult.data?.length ?? 0} 条评论
             </span>
             {/* 点赞按钮 */}
             <LikeButton

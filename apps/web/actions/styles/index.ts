@@ -246,3 +246,23 @@ export const getTags = cache(async () => {
 
   return data || []
 })
+
+/**
+ * 增加浏览次数（异步，不阻塞页面渲染）
+ * 使用 atomix 更新避免并发问题
+ */
+export async function incrementViewCount(id: string): Promise<boolean> {
+  const supabase = await createClient()
+
+  // 使用 Postgres 原子操作增加计数
+  const { error } = await supabase.rpc('increment_style_view_count', {
+    style_id: id
+  })
+
+  if (error) {
+    console.error('增加浏览次数失败:', error)
+    return false
+  }
+
+  return true
+}
