@@ -256,11 +256,16 @@ export async function incrementViewCount(id: string): Promise<boolean> {
 
   // 使用 Postgres 原子操作增加计数
   const { error } = await supabase.rpc('increment_style_view_count', {
-    style_id: id
+    p_style_id: id
   })
 
   if (error) {
-    console.error('增加浏览次数失败:', error)
+    console.error('增加浏览次数失败:', {
+      message: error.message,
+      code: error.code,
+      details: error.details,
+      hint: error.hint
+    })
     return false
   }
 
@@ -311,7 +316,12 @@ export const getRelatedStyles = cache(async (
   })
 
   if (error) {
-    console.error('获取相关推荐失败:', error)
+    console.error('获取相关推荐失败:', {
+      message: error.message,
+      code: error.code,
+      details: error.details,
+      hint: error.hint
+    })
     return []
   }
 

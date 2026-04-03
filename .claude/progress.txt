@@ -45,6 +45,23 @@
 
 ---
 
+### ✅ RPC 函数参数名修复 - 已完成
+
+- 时间：2026-04-03
+- 状态：✅ 已完成
+- 问题：PostgREST 无法找到 RPC 函数，参数名不匹配（PGRST202 错误）
+- 修复内容：
+  - [x] 修复 `increment_style_view_count` 调用：`style_id` → `p_style_id`
+  - [x] 增强错误日志输出（message, code, details, hint）
+  - [x] 创建修复报告文档 `docs/main/P1_RPC_FUNCTION_FIX_REPORT.md`
+- 验证结果：
+  - [x] 浏览次数功能正常（3 → 4）
+  - [x] 点赞功能正常（0 → 1）
+  - [x] 相关推荐功能无错误
+  - [x] 无运行时错误（Next.js get_errors 返回空）
+
+---
+
 ## 历史完成记录
 
 ### P0 阶段完成总结 - 2026-04-02
