@@ -2,9 +2,11 @@ import { notFound } from 'next/navigation'
 import { getStyle, incrementViewCount, getRelatedStyles } from '@/actions/styles'
 import { getComments } from '@/actions/comments'
 import { checkIsLiked } from '@/actions/likes'
+import { checkIsFavorite } from '@/actions/favorites'
 import { StyleDetail } from '@/components/style-detail'
 import { CodeSnippetDisplay } from '@/components/style-code-snippet'
 import { LikeButton } from '@/components/like-button'
+import { FavoriteButton } from '@/components/favorite-button'
 import { CommentList } from '@/components/comment-list'
 import { CommentForm } from '@/components/comment-form'
 import { RelatedStyles } from '@/components/related-styles'
@@ -68,6 +70,13 @@ export default async function StyleDetailPage({ params }: StyleDetailPageProps) 
     isLiked = likeStatus.success ? likeStatus.data?.isLiked ?? false : false
   }
 
+  // 获取用户收藏状态（仅已登录用户）
+  let isFavorite = false
+  if (user) {
+    const favoriteStatus = await checkIsFavorite(id)
+    isFavorite = favoriteStatus.success ? favoriteStatus.data?.isFavorite ?? false : false
+  }
+
   return (
     <div className="min-h-screen bg-background">
       {/* 顶部导航栏 - 面包屑 */}
@@ -113,14 +122,23 @@ export default async function StyleDetailPage({ params }: StyleDetailPageProps) 
               <MessageCircle className="h-4 w-4" />
               {commentsResult.data?.length ?? 0} 条评论
             </span>
-            {/* 点赞按钮 */}
-            <LikeButton
-              styleId={style.id}
-              initialIsLiked={isLiked}
-              initialCount={style.like_count ?? 0}
-              size="sm"
-              variant="outline"
-            />
+            {/* 点赞和收藏按钮 */}
+            <div className="flex items-center gap-2">
+              <LikeButton
+                styleId={style.id}
+                initialIsLiked={isLiked}
+                initialCount={style.like_count ?? 0}
+                size="sm"
+                variant="outline"
+              />
+              <FavoriteButton
+                styleId={style.id}
+                initialIsFavorite={isFavorite}
+                initialCount={style.favorite_count ?? 0}
+                size="sm"
+                variant="outline"
+              />
+            </div>
           </div>
         </div>
 
@@ -164,6 +182,7 @@ export default async function StyleDetailPage({ params }: StyleDetailPageProps) 
             styleId={style.id}
             initialComments={commentsResult.data ?? []}
             isLoggedIn={!!user}
+            currentUserId={user?.id}
           />
         </div>
 

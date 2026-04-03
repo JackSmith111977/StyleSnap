@@ -13,13 +13,14 @@ interface CommentListProps {
   styleId: string
   initialComments: Comment[]
   isLoggedIn: boolean
+  currentUserId?: string
 }
 
 interface CommentWithReplyInfo extends Comment {
   replyToUsername?: string // 被回复者的用户名
 }
 
-export function CommentList({ styleId, initialComments, isLoggedIn }: CommentListProps) {
+export function CommentList({ styleId, initialComments, isLoggedIn, currentUserId }: CommentListProps) {
   const [comments, setComments] = useState<CommentWithReplyInfo[]>(initialComments)
   const [replyTo, setReplyTo] = useState<{ commentId: string; username: string } | null>(null)
 
@@ -159,7 +160,8 @@ export function CommentList({ styleId, initialComments, isLoggedIn }: CommentLis
                       <span className="text-xs text-muted-foreground italic">[此评论已删除]</span>
                     ) : (
                       isLoggedIn &&
-                      comment.user_id === (typeof window !== 'undefined' ? null : null) && (
+                      currentUserId &&
+                      comment.user_id === currentUserId && (
                         <button
                           onClick={() => handleDelete(comment.id)}
                           className="text-xs text-muted-foreground hover:text-destructive flex items-center gap-1 transition-colors opacity-0 group-hover:opacity-100"
@@ -237,8 +239,8 @@ export function CommentList({ styleId, initialComments, isLoggedIn }: CommentLis
                                   </span>
                                 ) : (
                                   isLoggedIn &&
-                                  reply.user_id ===
-                                    (typeof window !== 'undefined' ? null : null) && (
+                                  currentUserId &&
+                                  reply.user_id === currentUserId && (
                                     <button
                                       onClick={() => handleDelete(reply.id)}
                                       className="text-xs text-muted-foreground hover:text-destructive flex items-center gap-1 transition-colors opacity-0 group-hover/reply:opacity-100"

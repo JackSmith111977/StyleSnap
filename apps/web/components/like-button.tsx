@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button'
 import { ThumbsUp } from 'lucide-react'
 import { toggleLike } from '@/actions/likes'
 import { cn } from '@/lib/utils'
+import { toast } from 'sonner'
+import { useRouter } from 'next/navigation'
 import type { ComponentProps } from 'react'
 
 type LikeButtonProps = Omit<ComponentProps<typeof Button>, 'onClick'> & {
@@ -20,6 +22,7 @@ export function LikeButton({
   size = 'icon',
   variant = 'ghost',
 }: LikeButtonProps) {
+  const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [isLiked, setIsLiked] = useState(initialIsLiked)
   const [count, setCount] = useState(initialCount)
@@ -51,12 +54,21 @@ export function LikeButton({
         console.log('[LikeButton] 失败，回滚', result.error)
         setIsLiked(!newIsLiked)
         setCount(newIsLiked ? count - 1 : count + 1)
+
+        // 未登录用户跳转登录页
+        if (result.error === '请先登录') {
+          router.push(`/login?returnTo=/styles/${styleId}`)
+          return
+        }
+
+        toast.error(result.error || '操作失败，请重试')
       } else if (result.data) {
         // 始终信任服务器返回的准确值
         // 服务器返回的计数是数据库的真实状态
         console.log('[LikeButton] 使用服务器返回值', result.data)
         setIsLiked(result.data.isLiked)
         setCount(result.data.count)
+        toast.success(result.data.isLiked ? '已点赞' : '已取消点赞')
       }
     })
   }

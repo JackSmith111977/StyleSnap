@@ -80,10 +80,10 @@ development_status:
   epic-3-retrospective: optional
 
   # ========== Epic 4: 社交互动 - 收藏与点赞 ==========
-  epic-4: backlog
+  epic-4: in-progress
   # Epic 4 Stories
-  4-1-favorite-style: backlog
-  4-2-like-style: backlog
+  4-1-favorite-style: done
+  4-2-like-style: done
   4-3-my-favorites-page: backlog
   # Epic 4 Retrospective
   epic-4-retrospective: optional

@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button'
 import { Heart } from 'lucide-react'
 import { toggleFavorite } from '@/actions/favorites'
 import { cn } from '@/lib/utils'
+import { toast } from 'sonner'
+import { useRouter } from 'next/navigation'
 import type { ComponentProps } from 'react'
 
 type FavoriteButtonProps = Omit<ComponentProps<typeof Button>, 'onClick'> & {
@@ -20,6 +22,7 @@ export function FavoriteButton({
   size = 'icon',
   variant = 'ghost',
 }: FavoriteButtonProps) {
+  const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [isFavorite, setIsFavorite] = useState(initialIsFavorite)
   const [count, setCount] = useState(initialCount)
@@ -39,10 +42,19 @@ export function FavoriteButton({
       if (!result.success) {
         setIsFavorite(!newIsFavorite)
         setCount(newIsFavorite ? count - 1 : count + 1)
+
+        // 未登录用户跳转登录页
+        if (result.error === '请先登录') {
+          router.push(`/login?returnTo=/styles/${styleId}`)
+          return
+        }
+
+        toast.error(result.error || '操作失败，请重试')
       } else if (result.data) {
         // 使用服务器返回的准确值
         setIsFavorite(result.data.isFavorite)
         setCount(result.data.count)
+        toast.success(result.data.isFavorite ? '已加入收藏夹' : '已取消收藏')
       }
     })
   }

@@ -21,6 +21,47 @@
 
 ## 当前任务
 
+### ✅ Epic 4 Story 4.1: 收藏风格 - 已完成
+
+- 时间：2026-04-03
+- 状态：✅ done
+- 实现内容：
+  - [x] 检查现有 FavoriteButton 组件 - 已存在且功能完整
+  - [x] 集成 checkIsFavorite 到风格详情页
+  - [x] 获取用户收藏状态（服务端）
+  - [x] 集成 FavoriteButton 组件到页面元数据区域
+  - [x] 构建验证成功 (21.1s)
+  - [x] 无 Next.js 编译错误
+  - [x] Code Review 发现 P0 问题修复：
+    - [x] 添加 Toast 反馈（sonner）
+    - [x] 未登录用户点击收藏跳转登录页
+    - [x] 修复评论删除权限检查（传入 currentUserId）
+- 修改文件：
+  - `apps/web/app/styles/[id]/page.tsx` - 添加收藏按钮集成、传入 currentUserId
+  - `apps/web/components/favorite-button.tsx` - 添加 Toast 和登录跳转逻辑
+  - `apps/web/components/comment-list.tsx` - 修复删除权限检查
+- 验证结果：
+  - [x] pnpm build 成功 (17.9s)
+  - [x] pnpm lint 通过（0 errors）
+
+### ✅ Epic 4 Story 4.2: 点赞风格 - 已完成
+
+- 时间：2026-04-03
+- 状态：✅ done
+- 实现内容：
+  - [x] 创建 Story 文件 (AC 分析)
+  - [x] 检查 LikeButton 组件是否存在 - 已存在
+  - [x] 检查 toggleLike Server Action 是否存在 - 已存在
+  - [x] 验证 LikeButton 已集成到风格详情页 - 已集成
+  - [x] 修复 Toast 反馈 - 已添加
+  - [x] 修复未登录用户跳转逻辑 - 已添加
+  - [x] 构建验证成功
+- 修改文件：
+  - `apps/web/components/like-button.tsx` - 添加 Toast 和登录跳转逻辑
+- 验证结果：
+  - [x] pnpm build 成功 (17.7s)
+  - [x] pnpm lint 通过（0 errors）
+
 ### ✅ Bug 修复：计数负数问题 - 已完成
 
 - 时间：2026-04-03
