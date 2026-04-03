@@ -110,6 +110,7 @@ export function RegisterForm() {
               placeholder="username"
               required
               disabled={loading}
+              autoComplete="username"
             />
           </div>
 
@@ -122,6 +123,7 @@ export function RegisterForm() {
               placeholder="your@email.com"
               required
               disabled={loading}
+              autoComplete="email"
             />
             {fieldErrors?.email && (
               <p className="text-sm text-red-500">{fieldErrors.email[0]}</p>
@@ -137,6 +139,7 @@ export function RegisterForm() {
               required
               minLength={8}
               disabled={loading}
+              autoComplete="new-password"
             />
           </div>
 
@@ -149,6 +152,7 @@ export function RegisterForm() {
               required
               minLength={8}
               disabled={loading}
+              autoComplete="new-password"
             />
           </div>
 
