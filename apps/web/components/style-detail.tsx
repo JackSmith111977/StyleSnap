@@ -1,5 +1,6 @@
-import { Palette, Type, Ruler, Square, Circle } from 'lucide-react'
+import { Type, Ruler, Square, Circle } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { ColorPalette } from '@/components/style-color-palette'
 
 interface StyleDetailProps {
   style: {
@@ -45,31 +46,7 @@ export function StyleDetail({ style }: StyleDetailProps) {
 
       {/* 配色方案 */}
       {style.color_palette && Object.keys(style.color_palette).length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Palette className="h-5 w-5" />
-              配色方案
-            </CardTitle>
-            <CardDescription>主色、辅色及语义化颜色</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {Object.entries(style.color_palette).map(([name, value]) => (
-                <div key={name} className="space-y-2">
-                  <div
-                    className="h-16 w-full rounded border"
-                    style={{ backgroundColor: value }}
-                  />
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="font-medium capitalize">{name}</span>
-                    <span className="text-muted-foreground font-mono text-xs">{value}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+        <ColorPalette colors={style.color_palette} />
       )}
 
       {/* 字体设置 */}

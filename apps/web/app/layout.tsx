@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { Layout } from '@/components/layout/Layout';
 import { ErrorBoundary } from '@/components/error-boundary';
 import { initializeTheme } from '@/stores/theme-store';
+import { Toaster } from 'sonner';
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-sans' });
 
@@ -80,6 +81,7 @@ export default function RootLayout({
           </div>
         }>
           <Layout>{children}</Layout>
+          <Toaster position="top-center" richColors />
         </ErrorBoundary>
       </body>
     </html>
