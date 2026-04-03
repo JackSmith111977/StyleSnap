@@ -12,6 +12,7 @@ import 'prismjs/components/prism-json'
 import 'prismjs/themes/prism-tomorrow.css'
 import { Copy, Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { toast } from 'sonner'
 
 interface CodeBlockProps {
   code: string
@@ -39,6 +40,7 @@ export function CodeBlock({ code, language, title, showLineNumbers = true }: Cod
       // 尝试使用 Clipboard API
       await navigator.clipboard.writeText(code)
       setCopied(true)
+      toast.success('代码已复制')
       setTimeout(() => setCopied(false), 2000)
     } catch (error) {
       // 回退方案：选中文本并使用 execCommand
@@ -57,17 +59,21 @@ export function CodeBlock({ code, language, title, showLineNumbers = true }: Cod
           const successful = document.execCommand('copy')
           if (successful) {
             setCopied(true)
+            toast.success('代码已复制')
             setTimeout(() => setCopied(false), 2000)
           } else {
             setCopyError('复制失败，请手动选择复制')
+            toast.error('复制失败，请手动选择复制')
           }
         } catch (_err) {
           setCopyError('复制失败，请手动选择复制')
+          toast.error('复制失败，请手动选择复制')
         } finally {
           document.body.removeChild(textarea)
         }
       } else {
         setCopyError('复制失败，请手动选择复制')
+        toast.error('复制失败，请手动选择复制')
       }
     }
   }
