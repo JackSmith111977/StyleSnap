@@ -1,6 +1,6 @@
 # StyleSnap - 任务进度跟踪
 
-> 最后更新：2026-04-03（Epic 3 完成，5/5 Stories）
+> 最后更新：2026-04-03（Epic 3 完成，浏览器验证与 Lint 修复完成）
 
 ---
 
@@ -15,38 +15,33 @@
 - 3.4 ✅ done (代码复制功能)
 - 3.5 ✅ done (相关推荐)
 
-**下一步：** Epic 3 Retrospective（optional）或开始 Epic 4: 社交互动 - 收藏与点赞
+**下一步：** Epic 4: 社交互动 - 收藏与点赞
 
 ---
 
 ## 当前任务
 
-### ✅ Story 3.5 - 相关推荐功能 已完成
+### ✅ Epic 3 浏览器验证与 Lint 修复 - 已完成
 
 - 时间：2026-04-03
-- 状态：✅ 已完成（代码已提交）
-- Git 提交：89500e9 feat: 完成 Story 3.5 相关推荐功能
+- 状态：✅ 已完成
 - 完成内容：
-  - [x] 创建 Story 3.5 文档 `3-5-related-styles.md`
-  - [x] 实现 getRelatedStyles Server Action（优先同分类，其次按标签匹配）
-  - [x] 创建数据库迁移 0016_add_related_styles_rpc.sql
-  - [x] 创建 RelatedStyles 组件（4 列网格展示）
-  - [x] 集成到风格详情页
-  - [x] 构建验证通过 (16.1s)
-  - [x] 更新 sprint-status.yaml（3.5 标记为 done，Epic 3 标记为 done）
+  - [x] 使用 Playwright MCP 验证 Epic 3 所有 Stories 功能
+  - [x] 验证风格列表页正常显示 10 个风格卡片
+  - [x] 验证风格详情页包含所有必需元素
+  - [x] 验证相关推荐区域（空状态处理正确）
+  - [x] 修复 3 个组件的未使用导入/参数 lint 错误
+  - [x] 修复测试文件未使用导入错误
+  - [x] 修复 promise 未 await 的 error
+  - [x] pnpm lint 验证通过（0 errors, 151 warnings）
+  - [x] pnpm build 验证通过（13.2s）
 
-- 验收标准达成：
-  - [x] Given 用户查看风格详情页底部，When 页面加载，Then 系统显示"相关推荐"区域
-  - [x] Given 页面加载，When 有相似风格，Then 展示 4 个同分类或同标签的风格卡片
-  - [x] Given 无相关推荐，When 该风格无相似风格，Then 显示"查看更多风格"链接跳转至列表页
-  - [x] Given 用户点击推荐风格，When 用户感兴趣，Then 跳转至推荐风格详情页
-
-- Epic 3 完成情况：
-  - 3.1 ✅ done (风格详情页基础)
-  - 3.2 ✅ done (设计变量展示)
-  - 3.3 ✅ done (代码片段展示)
-  - 3.4 ✅ done (代码复制功能)
-  - 3.5 ✅ done (相关推荐)
+- 修复详情：
+  - `related-styles.tsx`: 移除未使用的 `currentStyleId` 参数
+  - `style-code-snippet.tsx`: 移除未使用的 `useState` 导入
+  - `style-color-palette.tsx`: 移除未使用的 `Button` 导入，修复 `void` promise
+  - `auth-validation.test.ts`: 移除未使用的 `vi` 导入
+  - `search-box.test.ts`: 移除未使用的 `beforeEach` 导入
 
 ---
 

@@ -2,7 +2,6 @@
 
 import { Palette } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 import { Check, Copy } from 'lucide-react'
 import { useState } from 'react'
@@ -49,7 +48,7 @@ export function ColorPalette({ colors }: ColorPaletteProps) {
                 tabIndex={0}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
-                    handleCopy(name, value)
+                    void handleCopy(name, value)
                   }
                 }}
                 aria-label={`复制颜色 ${name}: ${value}`}

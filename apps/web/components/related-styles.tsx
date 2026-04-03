@@ -5,10 +5,9 @@ import type { Style } from '@/actions/styles'
 
 interface RelatedStylesProps {
   relatedStyles: Style[]
-  currentStyleId: string
 }
 
-export function RelatedStyles({ relatedStyles, currentStyleId }: RelatedStylesProps) {
+export function RelatedStyles({ relatedStyles }: RelatedStylesProps) {
   // 无相关推荐
   if (relatedStyles.length === 0) {
     return (

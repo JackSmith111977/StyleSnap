@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { CodeBlock } from '@/components/code-block'
 import { Code } from 'lucide-react'
