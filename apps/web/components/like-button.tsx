@@ -25,22 +25,36 @@ export function LikeButton({
   const [count, setCount] = useState(initialCount)
 
   const handleClick = () => {
+    // 防止快速连续点击
+    if (isPending) {
+      console.log('[LikeButton] 忽略点击，因为 isPending=true', { isLiked, count })
+      return
+    }
+
+    console.log('[LikeButton] 点击前', { isLiked, count, styleId })
+
     startTransition(async () => {
       // 乐观更新
       const newIsLiked = !isLiked
       const newCount = newIsLiked ? count + 1 : count - 1
+      console.log('[LikeButton] 乐观更新后', { newIsLiked, newCount })
       setIsLiked(newIsLiked)
       setCount(newCount)
 
       // 调用 Server Action
+      console.log('[LikeButton] 调用 toggleLike', { styleId })
       const result = await toggleLike(styleId)
+      console.log('[LikeButton] toggleLike 返回', result)
 
-      // 如果失败，回滚到初始状态
+      // 如果失败，回滚到点击前的状态
       if (!result.success) {
-        setIsLiked(isLiked)
-        setCount(count)
+        console.log('[LikeButton] 失败，回滚', result.error)
+        setIsLiked(!newIsLiked)
+        setCount(newIsLiked ? count - 1 : count + 1)
       } else if (result.data) {
-        // 使用服务器返回的准确值
+        // 始终信任服务器返回的准确值
+        // 服务器返回的计数是数据库的真实状态
+        console.log('[LikeButton] 使用服务器返回值', result.data)
         setIsLiked(result.data.isLiked)
         setCount(result.data.count)
       }

@@ -26,7 +26,7 @@
 
 - 时间：2026-04-02
 - 状态：✅ 已完成（代码已提交，测试通过）
-- Git 提交：[待提交]
+- Git 提交：309ac4c fix: 检测重复邮箱并阻止重复注册
 - 问题描述：
   - 用户报告：注册时邮箱重复，仍显示注册成功，但邮箱收不到验证邮件
   - auth 表不新增数据，profile 表却更新用户信息
@@ -48,6 +48,33 @@
   - [x] 数据库迁移应用成功
   - [x] `pnpm build` 编译成功
   - [x] E2E 测试验证：用已存在邮箱 `qq3526547131@gmail.com` 注册，显示"该邮箱已注册，请直接登录"错误
+
+---
+
+### 🔄 Resend SMTP 配置中 - 解决邮箱速率限制问题
+
+- 时间：2026-04-02
+- 状态：⏳ 等待 Resend 域名验证生效
+- 问题描述：
+  - 使用 Supabase 内置 SMTP 发送邮件时提示 `email rate limit exceeded`
+  - Supabase 内置 SMTP 限制约 4 封邮件/小时
+- 解决方案：
+  - [x] 创建配置文档 `docs/reference/supabase-smtp-config.md`
+  - [x] 在 Resend 添加域名 `mail.keidesu.top`
+  - [x] 添加 DNS 记录（TXT 验证、MX、DMARC、DKIM）
+  - [x] DNS 记录已确认配置正确（通过 nslookup 验证）
+  - [ ] 等待 Resend 域名验证通过（当前状态：Pending）
+  - [ ] 更新 Supabase SMTP 配置（Sender email: `noreply@mail.keidesu.top`）
+  - [ ] 发送测试邮件验证
+- DNS 记录确认：
+  ```
+  resend._verification.mail.keidesu.top  TXT  ✓
+  mail.keidesu.top                       MX   ✓
+  _dmarc.mail.keidesu.top                TXT  ✓
+  resend._domainkey.mail.keidesu.top     TXT  ✓
+  ```
+- 临时方案（开发环境）：
+  - [ ] 禁用邮箱验证以继续测试注册功能
 
 ---
 

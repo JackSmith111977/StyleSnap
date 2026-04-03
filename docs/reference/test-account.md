@@ -8,7 +8,7 @@
 
 | 字段 | 值 |
 |------|-----|
-| **邮箱** | `3526547131@qq.com` |
+| **邮箱** | `qq3526547131@gmail.com` |
 | **密码** | `test1234` |
 | **用途** | E2E 测试、手动功能测试 |
 
@@ -35,20 +35,20 @@
 
 ### 查看用户信息
 ```sql
-SELECT * FROM auth.users WHERE email = '3526547131@qq.com';
-SELECT * FROM profiles WHERE id = (SELECT id FROM auth.users WHERE email = '3526547131@qq.com');
+SELECT * FROM auth.users WHERE email = 'qq3526547131@gmail.com';
+SELECT * FROM profiles WHERE id = (SELECT id FROM auth.users WHERE email = 'qq3526547131@gmail.com');
 ```
 
 ### 清理测试数据
 ```sql
 -- 删除测试评论
-DELETE FROM comments WHERE user_id = (SELECT id FROM auth.users WHERE email = '3526547131@qq.com');
+DELETE FROM comments WHERE user_id = (SELECT id FROM auth.users WHERE email = 'qq3526547131@gmail.com');
 
 -- 删除测试收藏
-DELETE FROM favorites WHERE user_id = (SELECT id FROM auth.users WHERE email = '3526547131@qq.com');
+DELETE FROM favorites WHERE user_id = (SELECT id FROM auth.users WHERE email = 'qq3526547131@gmail.com');
 
 -- 删除测试点赞
-DELETE FROM likes WHERE user_id = (SELECT id FROM auth.users WHERE email = '3526547131@qq.com');
+DELETE FROM likes WHERE user_id = (SELECT id FROM auth.users WHERE email = 'qq3526547131@gmail.com');
 ```
 
 ---

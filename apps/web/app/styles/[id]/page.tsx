@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import { getStyle } from '@/actions/styles'
 import { getComments } from '@/actions/comments'
+import { checkIsLiked } from '@/actions/likes'
 import { StyleDetail } from '@/components/style-detail'
 import { CodeBlock } from '@/components/code-block'
 import { LikeButton } from '@/components/like-button'
@@ -55,6 +56,13 @@ export default async function StyleDetailPage({ params }: StyleDetailPageProps) 
     notFound()
   }
 
+  // 获取用户点赞状态（仅已登录用户）
+  let isLiked = false
+  if (user) {
+    const likeStatus = await checkIsLiked(id)
+    isLiked = likeStatus.success ? likeStatus.data?.isLiked ?? false : false
+  }
+
   return (
     <div className="min-h-screen bg-background">
       {/* 顶部导航栏 */}
@@ -93,7 +101,7 @@ export default async function StyleDetailPage({ params }: StyleDetailPageProps) 
             {/* 点赞按钮 */}
             <LikeButton
               styleId={style.id}
-              initialIsLiked={false}
+              initialIsLiked={isLiked}
               initialCount={style.like_count ?? 0}
               size="sm"
               variant="outline"

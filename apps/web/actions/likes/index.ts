@@ -3,7 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { getCurrentUser } from '@/lib/auth'
 import { captureActionError, setSentryUser } from '@/lib/sentry-capture'
-import { revalidatePath, revalidateTag } from 'next/cache'
+import { revalidatePath } from 'next/cache'
 import { validateOrThrow, toggleLikeSchema, styleIdSchema } from '@/lib/schemas'
 
 export interface ToggleLikeResult {
@@ -48,8 +48,7 @@ export async function toggleLike(
 
     const result = data as { is_liked: boolean; count: number }
 
-    // 清除缓存 - 使用精确的 tag 而非全局 revalidate
-    revalidateTag(`style-${validatedData.styleId}`, 'max')
+    // 清除缓存 - revalidatePath 会清除 React cache 缓存
     revalidatePath(`/styles/${validatedData.styleId}`, 'page')
     revalidatePath('/styles', 'page')
 

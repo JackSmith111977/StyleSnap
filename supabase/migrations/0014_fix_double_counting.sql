@@ -1,18 +1,16 @@
--- StyleSnap 原子更新函数
--- 创建时间：2026-04-01
--- 修改时间：2026-04-03
--- 说明：修复双重计数问题 - 移除手动更新计数，由触发器自动处理
+-- 修复点赞/收藏双重计数问题
+-- 创建时间：2026-04-03
+-- 说明：toggle_like_atomic 和 toggle_favorite_atomic 函数原本手动更新计数，
+--      但数据库中已有触发器自动更新计数，导致每次操作计数增加 2。
+--      此修复移除函数中的手动更新逻辑，改由触发器自动处理。
 
 -- ===========================================
--- 1. 点赞原子更新函数
+-- 1. 修复点赞原子更新函数
 -- ===========================================
 
 /**
  * 切换点赞状态（原子操作）
  * 注意：计数更新由 trigger_update_style_counts_likes 触发器自动处理
- * @param p_style_id - 风格 ID
- * @param p_user_id - 用户 ID
- * @returns JSON { is_liked: boolean, count: number }
  */
 CREATE OR REPLACE FUNCTION toggle_like_atomic(
   p_style_id UUID,
@@ -49,15 +47,12 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- ===========================================
--- 2. 收藏原子更新函数
+-- 2. 修复收藏原子更新函数
 -- ===========================================
 
 /**
  * 切换收藏状态（原子操作）
  * 注意：计数更新由 trigger_update_style_counts_favorites 触发器自动处理
- * @param p_style_id - 风格 ID
- * @param p_user_id - 用户 ID
- * @returns JSON { is_favorite: boolean, count: number }
  */
 CREATE OR REPLACE FUNCTION toggle_favorite_atomic(
   p_style_id UUID,
@@ -94,13 +89,11 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- ===========================================
--- 3. 权限设置
+-- 3. 重新授予执行权限
 -- ===========================================
 
--- 允许认证用户调用这些函数
 GRANT EXECUTE ON FUNCTION toggle_like_atomic TO authenticated;
 GRANT EXECUTE ON FUNCTION toggle_favorite_atomic TO authenticated;
 
--- 注释说明
-COMMENT ON FUNCTION toggle_like_atomic IS '原子切换点赞状态，避免并发计数错误';
-COMMENT ON FUNCTION toggle_favorite_atomic IS '原子切换收藏状态，避免并发计数错误';
+COMMENT ON FUNCTION toggle_like_atomic IS '原子切换点赞状态，由触发器自动更新计数';
+COMMENT ON FUNCTION toggle_favorite_atomic IS '原子切换收藏状态，由触发器自动更新计数';
