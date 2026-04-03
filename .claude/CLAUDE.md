@@ -50,6 +50,12 @@
     - **控制台/网络分析**：使用 `browser-tools-mcp`（console 输出、网络请求、Lighthouse 审计）
     - **参考文档**：`docs/guide/agent-browser-debug-tools.md`
 
+15. **数据库触发器与手动操作冲突风险** - 当数据库存在触发器时，避免在函数中手动执行相同操作：
+    - **问题案例**：点赞计数双重增加问题（2026-04-03 修复）
+    - **根因**：`toggle_like_atomic` 函数手动 `UPDATE like_count` + 触发器自动 `UPDATE like_count` = 计数增加 2
+    - **修复方案**：移除函数中的手动 `UPDATE`，改为 `SELECT` 查询触发器更新后的值
+    - **参考文档**：`docs/main/P0_LIKE_COUNT_FIX_REPORT.md`
+
 15. **Next.js 16 Proxy 规范** - Next.js 16 中 `middleware.ts` 已重命名为 `proxy.ts`：
     - **文件位置**：项目根目录或 `src/` 下，与 `app/` 同级
     - **运行时**：Node.js 运行时（非 Edge）
