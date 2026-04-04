@@ -86,7 +86,8 @@
 - 实现内容：
   - [x] 创建 E2E 测试文件 (Playwright)
   - [x] 创建单元测试文件 (Vitest)
-  - [x] 构建验证成功 (20s)
+  - [x] 修复顶层 await 语法错误
+  - [x] 构建验证成功 (18s)
   - [x] Lint 验证通过（0 errors）
 - 测试覆盖：
   - E2E 测试：14 个测试用例
@@ -103,7 +104,7 @@
     - checkIsLiked: 3 个测试
 - 测试文件：
   - `apps/web/tests/e2e/epic-4-social-interaction.spec.ts` - E2E 测试
-  - `apps/web/__tests__/actions/epic-4-favorites-likes.test.ts` - 单元测试
+  - `apps/web/tests/unit/actions/epic-4-favorites-likes.test.ts` - 单元测试
 
 ### ✅ Bug 修复：计数负数问题 - 已完成
 
