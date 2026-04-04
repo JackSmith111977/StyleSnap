@@ -3,10 +3,6 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 export async function proxy(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({
-    request,
-  })
-
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -16,22 +12,16 @@ export async function proxy(request: NextRequest) {
           return request.cookies.getAll()
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options: _options }) =>
-            request.cookies.set(name, value)
-          )
-          supabaseResponse = NextResponse.next({
-            request,
-          })
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
-          )
+          // Cookie 设置由 Server Component 处理，middleware 中忽略
         },
       },
     }
   )
 
-  // 刷新会话（如果 token 即将过期）
-  await supabase.auth.getSession()
+  // 检查是否有认证 cookie（Supabase cookie 格式：sb-*-auth-token）
+  const hasAuthCookie = request.cookies.getAll().some(
+    cookie => cookie.name.includes('sb-') && cookie.name.includes('auth-token')
+  )
 
   // 受保护路由列表
   const protectedPaths = ['/user', '/settings']
@@ -41,35 +31,23 @@ export async function proxy(request: NextRequest) {
   const isProtectedPath = protectedPaths.some(path => pathname.startsWith(path))
   const isAdminPath = adminPaths.some(path => pathname.startsWith(path))
 
-  // 获取当前用户
-  const { data: { user } } = await supabase.auth.getUser()
-
-  // 访问受保护页面但未登录
-  if (isProtectedPath && !user) {
+  // 访问受保护页面但未登录（只检查 cookie 存在性）
+  if (isProtectedPath && !hasAuthCookie) {
     const loginUrl = new URL('/login', request.url)
     loginUrl.searchParams.set('redirect', pathname)
     return NextResponse.redirect(loginUrl)
   }
 
-  // 访问管理后台但非管理员
-  if (isAdminPath && user) {
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single()
-
-    if (!profile || (profile.role !== 'admin' && profile.role !== 'super_admin')) {
-      return NextResponse.redirect(new URL('/unauthorized', request.url))
-    }
-  }
-
   // 已登录用户访问登录/注册页面，重定向到首页
-  if (user && (pathname === '/login' || pathname === '/register')) {
+  if (hasAuthCookie && (pathname === '/login' || pathname === '/register')) {
     return NextResponse.redirect(new URL('/', request.url))
   }
 
-  return supabaseResponse
+  // 管理员路由检查在页面组件中进行
+
+  return NextResponse.next({
+    request,
+  })
 }
 
 export const config = {

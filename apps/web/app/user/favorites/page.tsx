@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { requireAuth } from '@/lib/auth'
+import { getCurrentUser } from '@/lib/auth'
 import { getMyFavorites } from '@/actions/favorites'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -11,8 +11,8 @@ export default async function FavoritesPage({
 }: {
   searchParams: Promise<{ page?: string }>
 }): Promise<React.JSX.Element> {
-  // 要求登录
-  await requireAuth()
+  // 获取当前用户（不强制要求登录，让 getMyFavorites 处理认证）
+  const user = await getCurrentUser()
 
   const resolvedSearchParams = await searchParams
   const page = parseInt(resolvedSearchParams.page ?? '1', 10)
@@ -20,7 +20,8 @@ export default async function FavoritesPage({
 
   const result = await getMyFavorites(page, limit)
 
-  if (!result.success || !result.data) {
+  // 未登录或获取失败，重定向到登录页
+  if (!user || !result.success || !result.data) {
     redirect('/login')
   }
 
