@@ -2,7 +2,11 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-export async function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest): Promise<NextResponse> {
+  const supabaseResponse = NextResponse.next({
+    request,
+  })
+
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -12,11 +16,21 @@ export async function proxy(request: NextRequest) {
           return request.cookies.getAll()
         },
         setAll(cookiesToSet) {
-          // Cookie 设置由 Server Component 处理，middleware 中忽略
+          // 关键：必须同时设置 request 和 response 的 cookie，确保 token 刷新后 Server Component 能读取
+          cookiesToSet.forEach(({ name, value, options }) => {
+            request.cookies.set(name, value)
+            supabaseResponse.cookies.set(name, value, options)
+          })
         },
       },
     }
   )
+
+  // 关键：必须调用 getUser() 刷新 session token，否则 Server Component 无法获取用户
+  await supabase.auth.getUser()
+
+  // 应用缓存头防止 CDN 缓存认证状态
+  supabaseResponse.headers.set('Cache-Control', 'private, no-store')
 
   // 检查是否有认证 cookie（Supabase cookie 格式：sb-*-auth-token）
   const hasAuthCookie = request.cookies.getAll().some(
@@ -25,11 +39,9 @@ export async function proxy(request: NextRequest) {
 
   // 受保护路由列表
   const protectedPaths = ['/user', '/settings']
-  const adminPaths = ['/admin']
 
   const { pathname } = request.nextUrl
   const isProtectedPath = protectedPaths.some(path => pathname.startsWith(path))
-  const isAdminPath = adminPaths.some(path => pathname.startsWith(path))
 
   // 访问受保护页面但未登录（只检查 cookie 存在性）
   if (isProtectedPath && !hasAuthCookie) {
