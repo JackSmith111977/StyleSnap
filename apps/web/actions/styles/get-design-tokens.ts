@@ -5,7 +5,7 @@ import { DesignTokens } from '@/stores/preview-editor-store'
 
 /**
  * 获取风格设计变量 Server Action
- * 从 style_design_tokens 表获取指定风格的设计变量数据
+ * 从 styles 表直接读取设计变量数据
  */
 
 export interface GetDesignTokensResult {
@@ -20,11 +20,11 @@ export async function getStyleDesignTokens(
   try {
     const supabase = await createClient()
 
-    // 从 style_design_tokens 表获取设计变量
-    const { data, error } = await supabase
-      .from('style_design_tokens')
-      .select('*')
-      .eq('style_id', styleId)
+    // 从 styles 表获取设计变量
+    const { data: style, error } = await supabase
+      .from('styles')
+      .select('color_palette, fonts, spacing, border_radius, shadows')
+      .eq('id', styleId)
       .single()
 
     if (error) {
@@ -32,7 +32,7 @@ export async function getStyleDesignTokens(
         // 没有找到记录
         return {
           success: false,
-          error: '该风格暂无设计变量数据',
+          error: '该风格不存在',
         }
       }
       console.error('获取设计变量失败:', error)
@@ -45,24 +45,24 @@ export async function getStyleDesignTokens(
     // 将数据库格式转换为 DesignTokens 格式
     const tokens: DesignTokens = {
       colors: {
-        primary: data.colors?.primary || '#3B82F6',
-        secondary: data.colors?.secondary || '#10B981',
-        background: data.colors?.background || '#FFFFFF',
-        surface: data.colors?.surface || '#F3F4F6',
-        text: data.colors?.text || '#1F2937',
-        textMuted: data.colors?.textMuted || '#6B7280',
+        primary: style.color_palette?.primary || '#3B82F6',
+        secondary: style.color_palette?.secondary || '#10B981',
+        background: style.color_palette?.background || '#FFFFFF',
+        surface: style.color_palette?.surface || '#F3F4F6',
+        text: style.color_palette?.text || '#1F2937',
+        textMuted: style.color_palette?.textMuted || '#6B7280',
       },
       fonts: {
-        heading: data.typography?.fontFamily || 'Inter, system-ui, sans-serif',
-        body: data.typography?.fontFamily || 'Inter, system-ui, sans-serif',
+        heading: style.fonts?.heading || 'Inter, system-ui, sans-serif',
+        body: style.fonts?.body || 'Inter, system-ui, sans-serif',
         mono: 'Fira Code, monospace',
       },
       spacing: {
-        xs: data.spacing?.scale?.[0] || 4,
-        sm: data.spacing?.scale?.[1] || 8,
-        md: data.spacing?.scale?.[2] || 16,
-        lg: data.spacing?.scale?.[3] || 24,
-        xl: data.spacing?.scale?.[4] || 32,
+        xs: style.spacing?.xs || 4,
+        sm: style.spacing?.sm || 8,
+        md: style.spacing?.md || 16,
+        lg: style.spacing?.lg || 24,
+        xl: style.spacing?.xl || 32,
       },
     }
 
