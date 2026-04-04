@@ -79,6 +79,32 @@
   - [x] pnpm build 成功 (18.1s)
   - [x] 路由 /favorites 正确注册
 
+### ✅ Epic 4 测试与优化 - 已完成
+
+- 时间：2026-04-04
+- 状态：✅ 已完成
+- 实现内容：
+  - [x] 创建 E2E 测试文件 (Playwright)
+  - [x] 创建单元测试文件 (Vitest)
+  - [x] 构建验证成功 (20s)
+  - [x] Lint 验证通过（0 errors）
+- 测试覆盖：
+  - E2E 测试：14 个测试用例
+    - 收藏功能：3 个测试
+    - 点赞功能：3 个测试
+    - 未登录用户处理：3 个测试
+    - 收藏页：4 个测试
+    - 并发点击防护：2 个测试
+  - 单元测试：16 个测试用例
+    - toggleFavorite: 4 个测试
+    - checkIsFavorite: 3 个测试
+    - getMyFavorites: 3 个测试
+    - toggleLike: 3 个测试
+    - checkIsLiked: 3 个测试
+- 测试文件：
+  - `apps/web/tests/e2e/epic-4-social-interaction.spec.ts` - E2E 测试
+  - `apps/web/__tests__/actions/epic-4-favorites-likes.test.ts` - 单元测试
+
 ### ✅ Bug 修复：计数负数问题 - 已完成
 
 - 时间：2026-04-03
