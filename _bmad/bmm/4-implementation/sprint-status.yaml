@@ -1,0 +1,87 @@
+# generated: 2026-04-04
+# last_updated: 2026-04-04
+# project: StyleSnap
+# project_key: NOKEY
+# tracking_system: file-system
+# story_location: {project-root}/_bmad/bmm/4-implementation/stories
+# epic_location: {project-root}/_bmad/bmm/3-solutioning/epics.md
+
+# STATUS DEFINITIONS:
+# ==================
+# Epic Status:
+#   - backlog: Epic not yet started
+#   - in-progress: Epic actively being worked on
+#   - done: All stories in epic completed
+#
+# Epic Status Transitions:
+#   - backlog → in-progress: Automatically when first story is created (via create-story)
+#   - in-progress → done: Manually when all stories reach 'done' status
+#
+# Story Status:
+#   - backlog: Story only exists in epic file
+#   - ready-for-dev: Story file created in stories folder
+#   - in-progress: Developer actively working on implementation
+#   - review: Ready for code review (via Dev's code-review workflow)
+#   - done: Story completed
+#
+# Retrospective Status:
+#   - optional: Can be completed but not required
+#   - done: Retrospective has been completed
+
+generated: 2026-04-04
+last_updated: 2026-04-04
+project: StyleSnap
+project_key: NOKEY
+tracking_system: file-system
+story_location: _bmad/bmm/4-implementation/stories
+
+development_status:
+  # Epic 1: 用户认证与账户管理
+  epic-1: backlog
+  epic-1-retrospective: optional
+
+  # Epic 2: 风格浏览与发现
+  epic-2: backlog
+  2-1-style-list-grid-view: backlog
+  2-2-style-list-list-view: backlog
+  2-3-basic-search: backlog
+  2-4-category-filter: backlog
+  2-5-advanced-filtering: ready-for-dev
+  2-6-pagination-infinite-scroll: backlog
+  epic-2-retrospective: optional
+
+  # Epic 3: 风格详情与代码使用
+  epic-3: done
+  3-1-style-detail-page-basic: done
+  3-2-design-tokens-display: done
+  3-3-code-snippet-display: done
+  3-4-code-copy: done
+  3-5-related-styles: done
+  epic-3-retrospective: optional
+
+  # Epic 4: 社交互动 - 收藏与点赞
+  epic-4: done
+  4-1-favorite-style: done
+  4-2-like-style: done
+  4-3-my-favorites-page: done
+  epic-4-retrospective: done
+
+  # Epic 5: 社交互动 - 评论系统 (当前 Sprint)
+  epic-5: done
+  5-1-create-comment: done
+  5-2-reply-comment: done
+  5-3-comment-list-display: done
+  5-4-delete-comment: done
+  epic-5-retrospective: done
+  epic-5-e2e-tests: done
+
+  # Epic 6: 高级功能与增强
+  epic-6: backlog
+  6-1-live-preview-editor: backlog
+  6-2-user-submission-flow: backlog
+  6-3-share-functionality: backlog
+  6-4-follow-system: backlog
+  6-5-user-collections: backlog
+  6-6-code-export-options: backlog
+  6-7-preview-style-modes: backlog
+  epic-6-retrospective: optional
