@@ -2,7 +2,7 @@
 title: '分享功能 - Story 6.3'
 type: 'feature'
 created: '2026-04-04'
-status: 'ready-for-dev'
+status: 'review'
 context: ['_bmad/bmm/3-solutioning/epics.md', '_bmad/bmm/3-solutioning/architecture.md', '_bmad/bmm/4-implementation/artifacts/FRONTEND_GUIDELINES.md']
 ---
 
@@ -90,16 +90,16 @@ utm_campaign=style_{id} // 活动/风格 ID
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] `lib/share.ts` -- 创建分享工具函数 -- UTM 参数生成、分享链接构建
-- [ ] `lib/qr-code.ts` -- 创建二维码生成工具 -- 生成风格详情页二维码
-- [ ] `components/share/share-button.tsx` -- 分享按钮组件 -- 触发分享弹窗
-- [ ] `components/share/share-modal.tsx` -- 分享弹窗主组件 -- 整合所有分享选项
-- [ ] `components/share/share-image-generator.tsx` -- 分享图生成组件 -- canvas 绘制、下载功能
-- [ ] `components/share/social-share-buttons.tsx` -- 社交媒体分享按钮 -- Twitter/LinkedIn/微信
-- [ ] `app/styles/[id]/opengraph-image.tsx` -- 动态 Open Graph 图片 -- SEO 优化
-- [ ] `app/styles/[id]/page.tsx` -- 集成分享功能 -- 在详情页添加分享按钮
-- [ ] Toast 通知 -- 成功/失败反馈
-- [ ] 错误处理 -- 所有错误场景的用户提示
+- [x] `lib/share.ts` -- 创建分享工具函数 -- UTM 参数生成、分享链接构建
+- [x] `lib/qr-code.ts` -- 创建二维码生成工具 -- 生成风格详情页二维码
+- [x] `components/share/share-button.tsx` -- 分享按钮组件 -- 触发分享弹窗
+- [x] `components/share/share-modal.tsx` -- 分享弹窗主组件 -- 整合所有分享选项
+- [x] `components/share/share-image-generator.tsx` -- 分享图生成组件 -- canvas 绘制、下载功能
+- [x] `components/share/social-share-buttons.tsx` -- 社交媒体分享按钮 -- Twitter/LinkedIn/微信
+- [x] `app/styles/[id]/opengraph-image.tsx` -- 动态 Open Graph 图片 -- SEO 优化
+- [x] `app/styles/[id]/page.tsx` -- 集成分享功能 -- 在详情页添加分享按钮
+- [x] Toast 通知 -- 成功/失败反馈（使用 Sonner）
+- [x] 错误处理 -- 所有错误场景的用户提示
 
 **Acceptance Criteria:**
 - Given 用户查看风格详情页，When 页面加载，Then 系统显示分享按钮（通常在标题旁或固定操作栏）
@@ -123,5 +123,46 @@ utm_campaign=style_{id} // 活动/风格 ID
 - 生成分享图功能正常，图片质量清晰，二维码可扫描
 - 社交媒体分享正常打开对应平台分享页面
 - 在移动端测试分享功能正常
+
+## File List
+
+**New Files:**
+- `apps/web/lib/share.ts`
+- `apps/web/lib/qr-code.ts`
+- `apps/web/components/share/share-button.tsx`
+- `apps/web/components/share/share-modal.tsx`
+- `apps/web/components/share/share-image-generator.tsx`
+- `apps/web/components/share/social-share-buttons.tsx`
+- `apps/web/components/share/share.module.css`
+- `apps/web/components/share/index.ts`
+- `apps/web/app/styles/[id]/opengraph-image.tsx`
+
+**Modified Files:**
+- `apps/web/app/styles/[id]/page.tsx`
+- `apps/web/package.json`
+
+## Change Log
+
+- 2026-04-04: Story 实施完成
+  - 创建所有分享功能组件和工具函数
+  - 集成到风格详情页
+  - 安装依赖：qrcode-generator
+  - 构建验证：pnpm build 成功 (15.9s)
+
+## Dev Agent Record
+
+### Implementation Summary
+
+Story 6.3 分享功能已完成实施，包括：
+1. **工具函数**：`lib/share.ts`（UTM 参数、分享链接生成）、`lib/qr-code.ts`（二维码生成）
+2. **组件**：ShareButton、ShareModal、ShareImageGenerator、SocialShareButtons
+3. **Open Graph 图片**：动态生成 1200x630 的分享预览图
+4. **集成**：风格详情页添加分享按钮
+
+### Technical Decisions
+- 使用 `canvas` API 生成 1080x1080 分享图（不依赖外部库）
+- 使用 `qrcode-generator` 生成二维码
+- 使用 `sonner` Toast 提供用户反馈
+- 剪贴板复制提供降级方案（createElement + execCommand）
 
 </frozen-after-approval>

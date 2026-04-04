@@ -78,7 +78,8 @@
       "Bash(rm *)",
       "Bash(mkdir:*)",
       "Bash(cd:*)",
-      "Bash(curl -s http://localhost:3000 -o /dev/null)"
+      "Bash(curl -s http://localhost:3000 -o /dev/null)",
+      "Bash(pnpm test:e2e -- --grep \"Epic 5\" --project=chromium)"
     ],
     "defaultMode": "auto"
   }

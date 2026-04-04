@@ -11,8 +11,9 @@ import { CommentList } from '@/components/comment-list'
 import { CommentForm } from '@/components/comment-form'
 import { RelatedStyles } from '@/components/related-styles'
 import { LivePreviewEditor } from '@/components/preview'
+import { ShareButton } from '@/components/share'
 import Link from 'next/link'
-import { Eye, Heart, MessageCircle } from 'lucide-react'
+import { Eye, Heart, MessageCircle, Share2 } from 'lucide-react'
 import { type Metadata } from 'next'
 import { getCurrentUser } from '@/lib/auth'
 
@@ -123,7 +124,7 @@ export default async function StyleDetailPage({ params }: StyleDetailPageProps) 
               <MessageCircle className="h-4 w-4" />
               {commentsResult.data?.length ?? 0} 条评论
             </span>
-            {/* 点赞和收藏按钮 */}
+            {/* 点赞、收藏和分享按钮 */}
             <div className="flex items-center gap-2">
               <LikeButton
                 styleId={style.id}
@@ -138,6 +139,12 @@ export default async function StyleDetailPage({ params }: StyleDetailPageProps) 
                 initialCount={style.favorite_count ?? 0}
                 size="sm"
                 variant="outline"
+              />
+              <ShareButton
+                styleId={style.id}
+                styleTitle={style.title}
+                styleDescription={style.description}
+                previewImageUrl={style.preview_images?.light}
               />
             </div>
           </div>

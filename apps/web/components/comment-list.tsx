@@ -22,7 +22,7 @@ interface CommentWithReplyInfo extends Comment {
 
 export function CommentList({ styleId, initialComments, isLoggedIn, currentUserId }: CommentListProps) {
   const [comments, setComments] = useState<CommentWithReplyInfo[]>(initialComments)
-  const [replyTo, setReplyTo] = useState<{ commentId: string; username: string } | null>(null)
+  const [replyTo, setReplyTo] = useState<{ commentId: string; username: string; replyToUserId?: string } | null>(null)
 
   const handleDelete = async (commentId: string) => {
     if (!confirm('确定要删除此评论吗？')) return
@@ -52,30 +52,19 @@ export function CommentList({ styleId, initialComments, isLoggedIn, currentUserI
     }
   }
 
-  const handleReplySuccess = (newComment: Comment, parentId?: string, replyToUsername?: string) => {
-    console.log('[handleReplySuccess] 收到新评论:', newComment, 'parentId:', parentId, 'replyToUsername:', replyToUsername)
+  const handleReplySuccess = (newComment: Comment, parentId?: string, replyToUserId?: string, replyToUsername?: string) => {
+    console.log('[handleReplySuccess] 收到新评论:', newComment, 'parentId:', parentId, 'replyToUserId:', replyToUserId, 'replyToUsername:', replyToUsername)
 
     if (parentId) {
-      // 递归查找父评论（可能是一级评论或二级回复）
+      // 扁平化存储方案：所有回复都添加到一级评论下
       const findAndUpdate = (comments: CommentWithReplyInfo[]): CommentWithReplyInfo[] => {
         return comments.map((c) => {
-          // 找到目标评论/回复（无论是主评论还是二级回复）
+          // 找到一级评论
           if (c.id === parentId) {
-            console.log('[handleReplySuccess] 找到父评论/回复:', parentId)
-            // 将新回复作为此评论/回复的子回复添加
+            console.log('[handleReplySuccess] 找到一级评论:', parentId)
             return {
               ...c,
               replies: [...(c.replies || []), { ...newComment, replyToUsername }],
-            }
-          }
-          // 递归查找（但只添加到直接子回复，不再深入）
-          if (c.replies && c.replies.length > 0) {
-            const updatedReplies = findAndUpdate(c.replies)
-            if (updatedReplies !== c.replies) {
-              return {
-                ...c,
-                replies: updatedReplies,
-              }
             }
           }
           return c
@@ -148,7 +137,7 @@ export function CommentList({ styleId, initialComments, isLoggedIn, currentUserI
                   <div className="mt-3 flex items-center gap-4">
                     {isLoggedIn && (
                       <button
-                        onClick={() => setReplyTo({ commentId: comment.id, username: comment.username })}
+                        onClick={() => setReplyTo({ commentId: comment.id, username: comment.username, replyToUserId: comment.user_id })}
                         className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 transition-colors"
                       >
                         <Reply className="h-3 w-3" />
@@ -179,8 +168,10 @@ export function CommentList({ styleId, initialComments, isLoggedIn, currentUserI
                       <CommentForm
                         styleId={styleId}
                         parentId={comment.id}
+                        replyToUser={comment.username}
+                        replyToUserId={comment.user_id}  // 新增：传递真正回复的用户 ID
                         placeholder={`回复 @${comment.username}...`}
-                        onSuccess={(newComment) => handleReplySuccess(newComment, comment.id)}
+                        onSuccess={(newComment) => handleReplySuccess(newComment, comment.id, comment.user_id)}
                         onCancel={() => setReplyTo(null)}
                       />
                     </div>
@@ -225,7 +216,11 @@ export function CommentList({ styleId, initialComments, isLoggedIn, currentUserI
                                 {isLoggedIn && (
                                   <button
                                     onClick={() =>
-                                      setReplyTo({ commentId: reply.id, username: reply.username })
+                                      setReplyTo({
+                                        commentId: comment.id,  // parentId 指向一级评论
+                                        username: reply.username,
+                                        replyToUserId: reply.user_id  // 真正回复的用户
+                                      })
                                     }
                                     className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 transition-colors"
                                   >
@@ -255,10 +250,11 @@ export function CommentList({ styleId, initialComments, isLoggedIn, currentUserI
                                 <div className="mt-2">
                                   <CommentForm
                                     styleId={styleId}
-                                    parentId={reply.id}
+                                    parentId={comment.id}  // 一级评论 ID
                                     replyToUser={reply.username}
+                                    replyToUserId={reply.user_id}  // 新增：传递真正回复的用户 ID
                                     onSuccess={(newComment) =>
-                                      handleReplySuccess(newComment, reply.id, reply.username)
+                                      handleReplySuccess(newComment, comment.id, reply.user_id, reply.username)
                                     }
                                     onCancel={() => setReplyTo(null)}
                                   />

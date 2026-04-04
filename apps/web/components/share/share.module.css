@@ -1,0 +1,238 @@
+/* 分享按钮样式 */
+.shareButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text);
+  background-color: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.shareButton:hover {
+  background-color: var(--color-muted);
+  border-color: var(--color-primary);
+}
+
+/* 分享弹窗样式 */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.modalContent {
+  background-color: var(--color-background);
+  border-radius: 12px;
+  padding: 24px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s ease-out;
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.modalTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  color: var(--color-muted-foreground);
+  cursor: pointer;
+  font-size: 20px;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.closeButton:hover {
+  background-color: var(--color-muted);
+  color: var(--color-text);
+}
+
+/* 分享选项 */
+.shareOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.shareSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.shareSectionTitle {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-muted-foreground);
+}
+
+/* 复制链接区域 */
+.copyLinkContainer {
+  display: flex;
+  gap: 8px;
+}
+
+.linkInput {
+  flex: 1;
+  padding: 10px 14px;
+  font-size: 14px;
+  color: var(--color-text);
+  background-color: var(--color-muted);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  font-family: monospace;
+}
+
+.copyButton {
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  color: white;
+  background-color: var(--color-primary);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.copyButton:hover {
+  background-color: var(--color-primary-hover);
+}
+
+/* 社交媒体按钮 */
+.socialButtons {
+  display: flex;
+  gap: 12px;
+}
+
+.socialButton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+  background-color: var(--color-muted);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 80px;
+}
+
+.socialButton:hover {
+  background-color: var(--color-muted-hover);
+  border-color: var(--color-primary);
+  transform: translateY(-2px);
+}
+
+.socialIcon {
+  width: 32px;
+  height: 32px;
+}
+
+.socialName {
+  font-size: 12px;
+  color: var(--color-text);
+}
+
+/* 生成分享图按钮 */
+.generateImageButton {
+  width: 100%;
+  padding: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: white;
+  background-color: var(--color-primary);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.generateImageButton:hover {
+  background-color: var(--color-primary-hover);
+}
+
+/* 预览容器 */
+.previewContainer {
+  margin-top: 16px;
+  padding: 16px;
+  background-color: var(--color-muted);
+  border-radius: 8px;
+}
+
+.shareImagePreview {
+  width: 100%;
+  max-width: 400px;
+  aspect-ratio: 1 / 1;
+  margin: 0 auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.downloadButton {
+  width: 100%;
+  margin-top: 12px;
+  padding: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text);
+  background-color: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.downloadButton:hover {
+  background-color: var(--color-muted);
+}
+
+/* 动画 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

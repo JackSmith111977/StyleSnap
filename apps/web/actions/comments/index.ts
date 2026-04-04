@@ -107,13 +107,15 @@ export async function getComments(
 export async function createComment(
   styleId: string,
   content: string,
-  parentId?: string
+  parentId?: string,
+  replyToUserId?: string  // 新增：回复的目标用户 ID（扁平化存储方案）
 ): Promise<{ success: boolean; data?: CreateCommentResult; error?: string }> {
-  let validatedData: { styleId: string; content: string; parentId?: string | null } | undefined
+  let validatedData: { styleId: string; content: string; parentId?: string | null; replyToUserId?: string } | undefined
+  let actualParentId: string | null = null
 
   try {
     // 验证输入参数
-    validatedData = validateOrThrow(createCommentSchema, { styleId, content, parentId })
+    validatedData = validateOrThrow(createCommentSchema, { styleId, content, parentId, replyToUserId })
 
     const supabase = await createClient()
     const user = await getCurrentUser()
@@ -139,7 +141,7 @@ export async function createComment(
       return { success: false, error: '风格不存在' }
     }
 
-    // 如果是回复评论，检查父评论是否存在
+    // 如果是回复评论，检查父评论是否存在并应用扁平化存储逻辑
     if (validatedData.parentId) {
       const { data: parentComment, error: parentError } = await supabase
         .from('comments')
@@ -152,19 +154,9 @@ export async function createComment(
         return { success: false, error: '父评论不存在' }
       }
 
-      // 检查嵌套层级（最多支持 2 级：评论 -> 回复 -> 回复的回复）
-      if (parentComment.parent_id !== null) {
-        // 父评论本身也是回复，检查爷爷评论是否存在
-        const { data: grandparentComment } = await supabase
-          .from('comments')
-          .select('parent_id')
-          .eq('id', parentComment.parent_id)
-          .single()
-
-        if (grandparentComment && grandparentComment.parent_id !== null) {
-          return { success: false, error: '评论嵌套层级过深，最多支持 2 级回复' }
-        }
-      }
+      // 扁平化存储方案：parent_id 必须指向一级评论
+      // 如果 parentComment.parent_id 不为空，说明传入的是二级评论 ID，需要改为一级评论 ID
+      actualParentId = parentComment.parent_id !== null ? parentComment.parent_id : validatedData.parentId
     }
 
     // 创建评论
@@ -173,8 +165,9 @@ export async function createComment(
       .insert({
         style_id: validatedData.styleId,
         user_id: user.id,
-        parent_id: validatedData.parentId || null,
+        parent_id: actualParentId,
         content: validatedData.content.trim(),
+        reply_to_user_id: validatedData.replyToUserId || null,  // 新增：记录回复关系
         status: 'approved',
       })
       .select(`

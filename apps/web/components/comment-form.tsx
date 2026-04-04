@@ -11,8 +11,9 @@ interface CommentFormProps {
   styleId: string
   parentId?: string
   replyToUser?: string // 被回复者的用户名（用于回复二级回复时显示）
+  replyToUserId?: string // 新增：被回复者的用户 ID（用于数据库记录）
   placeholder?: string
-  onSuccess?: (comment: Comment, parentId?: string, replyToUsername?: string) => void
+  onSuccess?: (comment: Comment, parentId?: string, replyToUserId?: string, replyToUsername?: string) => void
   onCancel?: () => void
 }
 
@@ -20,6 +21,7 @@ export function CommentForm({
   styleId,
   parentId,
   replyToUser,
+  replyToUserId,  // 新增
   placeholder = '发表评论...',
   onSuccess,
   onCancel,
@@ -43,12 +45,12 @@ export function CommentForm({
     }
 
     startTransition(async () => {
-      const result = await createComment(styleId, finalContent, parentId)
+      const result = await createComment(styleId, finalContent, parentId, replyToUserId)
 
       if (result.success && result.data) {
         setContent('')
-        // 传递 replyToUser 给 onSuccess 回调
-        onSuccess?.(result.data.comment, parentId, replyToUser)
+        // 传递 replyToUserId 和 replyToUser 给 onSuccess 回调
+        onSuccess?.(result.data.comment, parentId, replyToUserId, replyToUser)
       } else {
         setError(result.error || '发表评论失败')
       }
