@@ -6,6 +6,15 @@
 
 ### ✅ 已完成
 
+**任务：代码块定高功能实现**
+- 状态：已完成
+- 开始时间：2026-04-04
+- 完成时间：2026-04-04
+- 输出：
+  - 修改 `apps/web/components/code-block.tsx` - 添加 maxHeight props（默认 400px）
+  - 代码区域支持纵向滚动
+  - 构建验证：pnpm build 成功 (19.9s)
+
 **任务：StyleDetail 组件使用 designTokens - 配色字体展示更新**
 - 状态：已完成
 - 开始时间：2026-04-04

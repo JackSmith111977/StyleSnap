@@ -19,9 +19,10 @@ interface CodeBlockProps {
   language: 'html' | 'css' | 'jsx' | 'tsx' | 'typescript' | 'javascript' | 'bash' | 'json'
   title?: string
   showLineNumbers?: boolean
+  maxHeight?: number  // 代码区域最大高度（px），默认不限制
 }
 
-export function CodeBlock({ code, language, title, showLineNumbers = true }: CodeBlockProps) {
+export function CodeBlock({ code, language, title, showLineNumbers = true, maxHeight = 400 }: CodeBlockProps) {
   const [copied, setCopied] = useState(false)
   const [copyError, setCopyError] = useState<string | null>(null)
   const codeRef = useRef<HTMLElement>(null)
@@ -108,7 +109,7 @@ export function CodeBlock({ code, language, title, showLineNumbers = true }: Cod
       </div>
 
       {/* 代码区域 */}
-      <div className="relative overflow-x-auto">
+      <div className="relative overflow-x-auto" style={{ maxHeight: `${maxHeight}px`, overflowY: 'auto' }}>
         {showLineNumbers ? (
           <div className="flex">
             {/* 行号 */}
