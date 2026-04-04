@@ -86,7 +86,7 @@ development_status:
   4-2-like-style: done
   4-3-my-favorites-page: done
   # Epic 4 Retrospective
-  epic-4-retrospective: optional
+  epic-4-retrospective: done
 
   # ========== Epic 5: 社交互动 - 评论系统 ==========
   epic-5: backlog
