@@ -75,6 +75,13 @@ export function UserMenu() {
               >
                 我的收藏
               </Link>
+              <Link
+                href="/collections"
+                className="block px-2 py-1.5 text-sm hover:bg-accent rounded"
+                onClick={() => setOpen(false)}
+              >
+                我的合集
+              </Link>
               <button
                 onClick={async () => {
                   await signOut()
