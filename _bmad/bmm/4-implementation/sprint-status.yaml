@@ -81,7 +81,7 @@ development_status:
   6-2-user-submission-flow: done
   6-3-share-functionality: done
   6-4-follow-system: backlog
-  6-5-user-collections: backlog
+  6-5-user-collections: done
   6-6-code-export-options: backlog
   6-7-preview-style-modes: backlog
   6-8-style-preview-component: done  # v1.5 StyleDetail 组件使用 designTokens 完成
