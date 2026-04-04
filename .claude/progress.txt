@@ -27,6 +27,16 @@
     - 导出功能：生成 CSS 代码，支持复制/下载
   - git 提交：93769a6
 
+
+**任务：Story 6.2 用户提交流程 - Spec 创建**
+- 状态：已完成
+- 开始时间：2026-04-04
+- 完成时间：2026-04-04
+- 输出：
+  - 创建 `_bmad/bmm/4-implementation/stories/story-6-2-user-submission-flow.md` - 完整的用户提交功能规格
+  - 包含：表单验证、图片上传、代码输入、审核流程
+  - 更新 sprint-status.yaml - Story 6.2 状态改为 ready-for-dev
+  - git 提交：ad553ab
 **任务：评论系统二级回复扁平化存储 E2E 测试**
 - 状态：已完成
 - 开始时间：2026-04-04
