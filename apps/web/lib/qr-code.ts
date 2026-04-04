@@ -89,7 +89,7 @@ export function generateQRCodeCanvas(
     }
 
     return canvas
-  } catch (err) {
+  } catch (err: unknown) {
     console.error('二维码生成失败:', err)
     return null
   }

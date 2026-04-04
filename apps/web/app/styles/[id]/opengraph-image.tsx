@@ -12,6 +12,12 @@ export default async function Image({
 }) {
   try {
     const { id } = await params
+
+    // 验证 ID 格式和长度
+    if (!id || id.length < 8) {
+      return new Response('Invalid style ID', { status: 400 })
+    }
+
     const style = await getStyle(id)
 
     if (!style) {
@@ -127,7 +133,7 @@ export default async function Image({
                 color: '#999999',
               }}
             >
-              stylesnap.com/styles/{style.id.substring(0, 8)}
+              stylesnap.com/styles/{style.id.length >= 8 ? style.id.substring(0, 8) : style.id}
             </span>
           </div>
         </div>
@@ -137,7 +143,7 @@ export default async function Image({
         height: 630,
       }
     )
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Open Graph 图片生成失败:', error)
     return new Response('生成失败', { status: 500 })
   }

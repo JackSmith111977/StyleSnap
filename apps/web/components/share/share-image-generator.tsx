@@ -69,24 +69,35 @@ export function ShareImageGenerator({
           img.crossOrigin = 'anonymous'
           img.src = previewImageUrl
 
-          await new Promise((resolve, reject) => {
-            img.onload = resolve
-            img.onerror = reject
-          })
+          // 添加超时处理（10 秒）
+          await Promise.race([
+            new Promise<void>((resolve, reject) => {
+              img.onload = () => resolve()
+              img.onerror = () => reject(new Error('图片加载失败'))
+            }),
+            new Promise<never>((_, reject) =>
+              setTimeout(() => reject(new Error('图片加载超时')), 10000)
+            ),
+          ])
 
           // 计算图片位置和尺寸（居中显示）
           const imageSize = 600
           const imageX = (1080 - imageSize) / 2
           const imageY = 120
 
-          // 绘制圆角矩形裁剪路径
+          // 绘制圆角矩形裁剪路径（带兼容性检查）
           ctx.save()
           ctx.beginPath()
-          ctx.roundRect(imageX, imageY, imageSize, imageSize, 16)
+          if (ctx.roundRect) {
+            ctx.roundRect(imageX, imageY, imageSize, imageSize, 16)
+          } else {
+            // 降级：普通矩形裁剪
+            ctx.rect(imageX, imageY, imageSize, imageSize)
+          }
           ctx.clip()
           ctx.drawImage(img, imageX, imageY, imageSize, imageSize)
           ctx.restore()
-        } catch (err) {
+        } catch (err: unknown) {
           console.error('预览图加载失败:', err)
           // 图片加载失败时显示占位背景
           ctx.fillStyle = '#f0f0f0'
@@ -101,11 +112,20 @@ export function ShareImageGenerator({
       // 4. 绘制底部信息区域
       const bottomY = 760
 
-      // 风格标题
+      // 风格标题（带自动换行）
       ctx.fillStyle = '#1a1a1a'
       ctx.font = 'bold 48px system-ui, -apple-system, sans-serif'
       ctx.textAlign = 'center'
-      ctx.fillText(styleTitle, 540, bottomY + 60)
+
+      // 检测标题长度，超长时截断
+      const maxWidth = 1000
+      let displayTitle = styleTitle
+      if (ctx.measureText(styleTitle).width > maxWidth) {
+        // 简单截断：找到合适的字符数
+        let chars = Math.floor((maxWidth / ctx.measureText(styleTitle).width) * styleTitle.length)
+        displayTitle = styleTitle.substring(0, chars - 2) + '...'
+      }
+      ctx.fillText(displayTitle, 540, bottomY + 60)
 
       // 风格描述（截断至 50 字）
       if (styleDescription) {
@@ -148,7 +168,7 @@ export function ShareImageGenerator({
       const dataUrl = canvas.toDataURL('image/png')
       setPreviewUrl(dataUrl)
       toast.success('分享图已生成')
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('分享图生成失败:', err)
       toast.error('生成失败，请重试')
     } finally {

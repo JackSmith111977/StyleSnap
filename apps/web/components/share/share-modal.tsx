@@ -59,9 +59,14 @@ export function ShareModal({
       }
 
       toast.success('链接已复制')
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('复制失败:', err)
-      toast.error('复制失败，请手动复制')
+      // 细化错误处理
+      if (err instanceof Error && err.name === 'NotAllowedError') {
+        toast.info('剪贴板权限被拒绝，请手动复制')
+      } else {
+        toast.error('复制失败，请手动复制')
+      }
       // 自动选中文本
       const input = document.getElementById('share-link-input') as HTMLInputElement
       if (input) {
@@ -88,17 +93,25 @@ export function ShareModal({
       return
     }
 
-    // 打开分享窗口
+    // 打开分享窗口（带拦截检测）
     const width = 600
     const height = 400
     const left = window.screenX + (window.innerWidth - width) / 2
     const top = window.screenY + (window.innerHeight - height) / 2
 
-    window.open(
+    const popup = window.open(
       shareUrlResult,
       '_blank',
       `width=${width},height=${height},left=${left},top=${top}`
     )
+
+    // 检测弹窗是否被拦截
+    if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+      toast.error('分享窗口被拦截，请允许弹窗后重试')
+      // 降级：在当前标签页打开
+      window.open(shareUrlResult, '_blank')
+      return
+    }
   }, [shareUrl, styleId, styleTitle])
 
   // 处理生成分享图

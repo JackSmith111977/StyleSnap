@@ -1,0 +1,1262 @@
+diff --git a/apps/web/app/styles/[id]/opengraph-image.tsx b/apps/web/app/styles/[id]/opengraph-image.tsx
+new file mode 100644
+index 0000000..2a32ab6
+--- /dev/null
++++ b/apps/web/app/styles/[id]/opengraph-image.tsx
+@@ -0,0 +1,144 @@
++import { ImageResponse } from 'next/og'
++import { getStyle } from '@/actions/styles'
++
++/**
++ * 动态 Open Graph 图片生成
++ * 为每个风格详情页生成独立的分享图片
++ */
++export default async function Image({
++  params,
++}: {
++  params: Promise<{ id: string }>
++}) {
++  try {
++    const { id } = await params
++    const style = await getStyle(id)
++
++    if (!style) {
++      return new Response('风格不存在', { status: 404 })
++    }
++
++    // 获取预览图（如果有）
++    const previewImages = style.preview_images as { light?: string; dark?: string } | null
++    const previewUrl = previewImages?.light || null
++
++    return new ImageResponse(
++      (
++        <div
++          style={{
++            width: '100%',
++            height: '100%',
++            display: 'flex',
++            flexDirection: 'column',
++            backgroundColor: '#FFFFFF',
++          }}
++        >
++          {/* 顶部品牌栏 */}
++          <div
++            style={{
++              width: '100%',
++              height: '80px',
++              backgroundColor: '#1a1a1a',
++              display: 'flex',
++              alignItems: 'center',
++              paddingLeft: '40px',
++            }}
++          >
++            <span
++              style={{
++                color: '#FFFFFF',
++                fontSize: '32px',
++                fontWeight: 'bold',
++                fontFamily: 'system-ui, -apple-system, sans-serif',
++              }}
++            >
++              StyleSnap
++            </span>
++          </div>
++
++          {/* 主体内容 */}
++          <div
++            style={{
++              flex: 1,
++              display: 'flex',
++              flexDirection: 'column',
++              alignItems: 'center',
++              justifyContent: 'center',
++              gap: '24px',
++              padding: '40px',
++            }}
++          >
++            {/* 风格标题 */}
++            <span
++              style={{
++                fontSize: '48px',
++                fontWeight: 'bold',
++                fontFamily: 'system-ui, -apple-system, sans-serif',
++                color: '#1a1a1a',
++                textAlign: 'center',
++              }}
++            >
++              {style.title}
++            </span>
++
++            {/* 风格描述 */}
++            {style.description && (
++              <span
++                style={{
++                  fontSize: '28px',
++                  fontFamily: 'system-ui, -apple-system, sans-serif',
++                  color: '#666666',
++                  textAlign: 'center',
++                  maxWidth: '800px',
++                }}
++              >
++                {style.description.length > 100
++                  ? `${style.description.substring(0, 100)}...`
++                  : style.description}
++              </span>
++            )}
++          </div>
++
++          {/* 底部二维码提示 */}
++          <div
++            style={{
++              width: '100%',
++              height: '120px',
++              display: 'flex',
++              flexDirection: 'column',
++              alignItems: 'center',
++              justifyContent: 'center',
++              gap: '8px',
++            }}
++          >
++            <span
++              style={{
++                fontSize: '20px',
++                fontFamily: 'system-ui, -apple-system, sans-serif',
++                color: '#1a1a1a',
++              }}
++            >
++              扫码查看详情
++            </span>
++            <span
++              style={{
++                fontSize: '14px',
++                fontFamily: 'system-ui, -apple-system, sans-serif',
++                color: '#999999',
++              }}
++            >
++              stylesnap.com/styles/{style.id.substring(0, 8)}
++            </span>
++          </div>
++        </div>
++      ),
++      {
++        width: 1200,
++        height: 630,
++      }
++    )
++  } catch (error) {
++    console.error('Open Graph 图片生成失败:', error)
++    return new Response('生成失败', { status: 500 })
++  }
++}
+diff --git a/apps/web/components/share/index.ts b/apps/web/components/share/index.ts
+new file mode 100644
+index 0000000..9f62760
+--- /dev/null
++++ b/apps/web/components/share/index.ts
+@@ -0,0 +1,7 @@
++/**
++ * 分享功能组件导出
++ */
++export { ShareButton } from './share-button'
++export { ShareModal } from './share-modal'
++export { ShareImageGenerator } from './share-image-generator'
++export { SocialShareButtons } from './social-share-buttons'
+diff --git a/apps/web/components/share/share-button.tsx b/apps/web/components/share/share-button.tsx
+new file mode 100644
+index 0000000..9b62642
+--- /dev/null
++++ b/apps/web/components/share/share-button.tsx
+@@ -0,0 +1,58 @@
++'use client'
++
++import { useState, useCallback } from 'react'
++import { Share2 } from 'lucide-react'
++import { ShareModal } from './share-modal'
++import styles from './share.module.css'
++
++interface ShareButtonProps {
++  styleId: string
++  styleTitle: string
++  styleDescription?: string | null
++  previewImageUrl?: string | null
++}
++
++/**
++ * 分享按钮组件
++ * 点击后打开分享弹窗
++ */
++export function ShareButton({
++  styleId,
++  styleTitle,
++  styleDescription,
++  previewImageUrl,
++}: ShareButtonProps) {
++  const [isOpen, setIsOpen] = useState(false)
++
++  const handleOpen = useCallback(() => {
++    setIsOpen(true)
++  }, [])
++
++  const handleClose = useCallback(() => {
++    setIsOpen(false)
++  }, [])
++
++  return (
++    <>
++      <button
++        className={styles.shareButton}
++        onClick={handleOpen}
++        type="button"
++        aria-label="分享此风格"
++      >
++        <Share2 className="h-4 w-4" />
++        <span>分享</span>
++      </button>
++
++      {isOpen && (
++        <ShareModal
++          styleId={styleId}
++          styleTitle={styleTitle}
++          styleDescription={styleDescription}
++          previewImageUrl={previewImageUrl}
++          onClose={handleClose}
++        />
++      )}
++    </>
++  )
++}
+diff --git a/apps/web/components/share/share-image-generator.tsx b/apps/web/components/share/share-image-generator.tsx
+new file mode 100644
+index 0000000..b43e2c7
+--- /dev/null
++++ b/apps/web/components/share/share-image-generator.tsx
+@@ -0,0 +1,261 @@
++'use client'
++
++import { useState, useCallback, useRef, useEffect } from 'react'
++import { Download, ArrowLeft, Loader2, X } from 'lucide-react'
++import { toast } from 'sonner'
++import { generateQRCodeCanvas } from '@/lib/qr-code'
++import styles from './share.module.css'
++
++interface ShareImageGeneratorProps {
++  styleId: string
++  styleTitle: string
++  styleDescription?: string | null
++  previewImageUrl?: string | null
++  onBack: () => void
++  onClose: () => void
++}
++
++/**
++ * 分享图生成组件
++ * 生成 1080x1080 的分享图，包含预览图、标题、二维码
++ */
++export function ShareImageGenerator({
++  styleId,
++  styleTitle,
++  styleDescription,
++  previewImageUrl,
++  onBack,
++  onClose,
++}: ShareImageGeneratorProps) {
++  const [isGenerating, setIsGenerating] = useState(false)
++  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
++  const canvasRef = useRef<HTMLCanvasElement>(null)
++
++  // 生成分享图
++  const generateShareImage = useCallback(async () => {
++    setIsGenerating(true)
++
++    try {
++      const canvas = canvasRef.current
++      if (!canvas) {
++        toast.error('生成失败，请重试')
++        return
++      }
++
++      const ctx = canvas.getContext('2d')
++      if (!ctx) {
++        toast.error('生成失败，请重试')
++        return
++      }
++
++      // 1. 填充背景（白色）
++      ctx.fillStyle = '#FFFFFF'
++      ctx.fillRect(0, 0, 1080, 1080)
++
++      // 2. 绘制顶部区域 - StyleSnap Logo / 品牌标识
++      ctx.fillStyle = '#1a1a1a'
++      ctx.fillRect(0, 0, 1080, 80)
++
++      // 绘制品牌文字
++      ctx.fillStyle = '#FFFFFF'
++      ctx.font = 'bold 32px system-ui, -apple-system, sans-serif'
++      ctx.textAlign = 'left'
++      ctx.fillText('StyleSnap', 40, 55)
++
++      // 3. 加载并绘制预览图（如果有）
++      if (previewImageUrl) {
++        try {
++          const img = new Image()
++          img.crossOrigin = 'anonymous'
++          img.src = previewImageUrl
++
++          await new Promise((resolve, reject) => {
++            img.onload = resolve
++            img.onerror = reject
++          })
++
++          // 计算图片位置和尺寸（居中显示）
++          const imageSize = 600
++          const imageX = (1080 - imageSize) / 2
++          const imageY = 120
++
++          // 绘制圆角矩形裁剪路径
++          ctx.save()
++          ctx.beginPath()
++          ctx.roundRect(imageX, imageY, imageSize, imageSize, 16)
++          ctx.clip()
++          ctx.drawImage(img, imageX, imageY, imageSize, imageSize)
++          ctx.restore()
++        } catch (err) {
++          console.error('预览图加载失败:', err)
++          // 图片加载失败时显示占位背景
++          ctx.fillStyle = '#f0f0f0'
++          ctx.fillRect(240, 120, 600, 600)
++          ctx.fillStyle = '#999999'
++          ctx.font = '24px system-ui, -apple-system, sans-serif'
++          ctx.textAlign = 'center'
++          ctx.fillText('StyleSnap', 540, 420)
++        }
++      }
++
++      // 4. 绘制底部信息区域
++      const bottomY = 760
++
++      // 风格标题
++      ctx.fillStyle = '#1a1a1a'
++      ctx.font = 'bold 48px system-ui, -apple-system, sans-serif'
++      ctx.textAlign = 'center'
++      ctx.fillText(styleTitle, 540, bottomY + 60)
++
++      // 风格描述（截断至 50 字）
++      if (styleDescription) {
++        const desc = styleDescription.length > 50
++          ? styleDescription.substring(0, 50) + '...'
++          : styleDescription
++
++        ctx.fillStyle = '#666666'
++        ctx.font = '28px system-ui, -apple-system, sans-serif'
++        ctx.fillText(desc, 540, bottomY + 110)
++      }
++
++      // 5. 生成并绘制二维码
++      const qrUrl = `https://stylesnap.com/styles/${styleId}`
++      const qrCanvas = generateQRCodeCanvas(qrUrl, {
++        size: 200,
++        margin: 2,
++        level: 'M',
++      })
++
++      if (qrCanvas) {
++        const qrSize = 200
++        const qrX = (1080 - qrSize) / 2
++        const qrY = bottomY + 160
++
++        // 绘制二维码背景
++        ctx.fillStyle = '#FFFFFF'
++        ctx.fillRect(qrX - 20, qrY - 20, qrSize + 40, qrSize + 40)
++
++        // 绘制二维码
++        ctx.drawImage(qrCanvas, qrX, qrY, qrSize, qrSize)
++
++        // 二维码下方文字
++        ctx.fillStyle = '#1a1a1a'
++        ctx.font = '20px system-ui, -apple-system, sans-serif'
++        ctx.fillText('扫码查看详情', 540, qrY + qrSize + 35)
++      }
++
++      // 6. 生成预览 URL
++      const dataUrl = canvas.toDataURL('image/png')
++      setPreviewUrl(dataUrl)
++      toast.success('分享图已生成')
++    } catch (err) {
++      console.error('分享图生成失败:', err)
++      toast.error('生成失败，请重试')
++    } finally {
++      setIsGenerating(false)
++    }
++  }, [styleId, styleTitle, styleDescription, previewImageUrl])
++
++  // 组件挂载时自动生成
++  useEffect(() => {
++    generateShareImage()
++  }, []) // eslint-disable-line react-hooks/exhaustive-deps
++
++  // 处理下载
++  const handleDownload = useCallback(() => {
++    const canvas = canvasRef.current
++    if (!canvas || !previewUrl) {
++      toast.error('请先等待图片生成')
++      return
++    }
++
++    const link = document.createElement('a')
++    link.download = `stylesnap-${styleId}.png`
++    link.href = previewUrl
++    link.click()
++
++    toast.success('图片已下载')
++  }, [previewUrl, styleId])
++
++  // 处理弹窗点击关闭
++  const handleOverlayClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
++    if (e.target === e.currentTarget) {
++      onClose()
++    }
++  }, [onClose])
++
++  return (
++    <div
++      className={styles.modalOverlay}
++      onClick={handleOverlayClick}
++      role="dialog"
++      aria-modal="true"
++      aria-labelledby="share-image-title"
++    >
++      <div className={styles.modalContent}>
++        <div className={styles.modalHeader}>
++          <h3 id="share-image-title" className={styles.modalTitle}>
++            生成分享图
++          </h3>
++          <button
++            className={styles.closeButton}
++            onClick={onClose}
++            type="button"
++            aria-label="关闭分享图"
++          >
++            <X className="h-5 w-5" />
++          </button>
++        </div>
++
++        <div className={styles.shareOptions}>
++          {/* 返回按钮 */}
++          <button
++            className={styles.shareButton}
++            onClick={onBack}
++            type="button"
++          >
++            <ArrowLeft className="h-4 w-4" />
++            <span>返回</span>
++          </button>
++
++          {/* 加载状态 */}
++          {isGenerating && (
++            <div className={styles.previewContainer}>
++              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '400px' }}>
++                <Loader2 className="h-8 w-8 animate-spin text-primary" />
++                <span style={{ marginLeft: '12px', fontSize: '14px' }}>正在生成分享图...</span>
++              </div>
++            </div>
++          )}
++
++          {/* 隐藏的真实 Canvas */}
++          <canvas
++            ref={canvasRef}
++            width={1080}
++            height={1080}
++            style={{ display: 'none' }}
++          />
++
++          {/* 预览图（生成后显示） */}
++          {previewUrl && (
++            <div className={styles.previewContainer}>
++              <img
++                src={previewUrl}
++                alt="分享图预览"
++                className={styles.shareImagePreview}
++              />
++              <button
++                className={styles.downloadButton}
++                onClick={handleDownload}
++                type="button"
++              >
++                <Download className="h-4 w-4 inline mr-2" />
++                下载分享图
++              </button>
++            </div>
++          )}
++        </div>
++      </div>
++    </div>
++  )
++}
+diff --git a/apps/web/components/share/share-modal.tsx b/apps/web/components/share/share-modal.tsx
+new file mode 100644
+index 0000000..31726f0
+--- /dev/null
++++ b/apps/web/components/share/share-modal.tsx
+@@ -0,0 +1,208 @@
++'use client'
++
++import { useState, useCallback, useEffect } from 'react'
++import { X, Link, Image, Share2 } from 'lucide-react'
++import { toast } from 'sonner'
++import { buildShareUrl, generateShareUrl, getSocialShareUrl } from '@/lib/share'
++import { downloadQRCode } from '@/lib/qr-code'
++import styles from './share.module.css'
++import { SocialShareButtons } from './social-share-buttons'
++import { ShareImageGenerator } from './share-image-generator'
++
++interface ShareModalProps {
++  styleId: string
++  styleTitle: string
++  styleDescription?: string | null
++  previewImageUrl?: string | null
++  onClose: () => void
++}
++
++/**
++ * 分享弹窗组件
++ * 整合所有分享选项：复制链接、生成分享图、社交媒体分享
++ */
++export function ShareModal({
++  styleId,
++  styleTitle,
++  styleDescription,
++  previewImageUrl,
++  onClose,
++}: ShareModalProps) {
++  const [shareUrl, setShareUrl] = useState('')
++  const [showImageGenerator, setShowImageGenerator] = useState(false)
++
++  // 初始化分享链接
++  useEffect(() => {
++    const path = `/styles/${styleId}`
++    const url = buildShareUrl(path)
++    setShareUrl(url)
++  }, [styleId])
++
++  // 处理复制链接
++  const handleCopyLink = useCallback(async () => {
++    try {
++      // 生成带 UTM 参数的链接
++      const url = generateShareUrl(shareUrl, 'copy', styleId)
++
++      if (navigator.clipboard && navigator.clipboard.writeText) {
++        await navigator.clipboard.writeText(url)
++      } else {
++        // 降级方案：创建 textarea 选中复制
++        const textarea = document.createElement('textarea')
++        textarea.value = url
++        textarea.style.position = 'fixed'
++        textarea.style.opacity = '0'
++        document.body.appendChild(textarea)
++        textarea.select()
++        document.execCommand('copy')
++        document.body.removeChild(textarea)
++      }
++
++      toast.success('链接已复制')
++    } catch (err) {
++      console.error('复制失败:', err)
++      toast.error('复制失败，请手动复制')
++      // 自动选中文本
++      const input = document.getElementById('share-link-input') as HTMLInputElement
++      if (input) {
++        input.focus()
++        input.select()
++      }
++    }
++  }, [shareUrl, styleId])
++
++  // 处理社交媒体分享
++  const handleSocialShare = useCallback((platform: string) => {
++    const url = generateShareUrl(shareUrl, platform, styleId)
++    const shareUrlResult = getSocialShareUrl(platform, url, styleTitle)
++
++    if (!shareUrlResult) {
++      toast.error('不支持的分享平台')
++      return
++    }
++
++    // 微信特殊处理
++    if (platform === 'wechat') {
++      toast.info('请在打开的微信中分享内容')
++      window.location.href = shareUrlResult
++      return
++    }
++
++    // 打开分享窗口
++    const width = 600
++    const height = 400
++    const left = window.screenX + (window.innerWidth - width) / 2
++    const top = window.screenY + (window.innerHeight - height) / 2
++
++    window.open(
++      shareUrlResult,
++      '_blank',
++      `width=${width},height=${height},left=${left},top=${top}`
++    )
++  }, [shareUrl, styleId, styleTitle])
++
++  // 处理生成分享图
++  const handleGenerateImage = useCallback(() => {
++    setShowImageGenerator(true)
++  }, [])
++
++  // 处理弹窗点击关闭
++  const handleOverlayClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
++    if (e.target === e.currentTarget) {
++      onClose()
++    }
++  }, [onClose])
++
++  // 处理 ESC 键关闭
++  useEffect(() => {
++    const handleEsc = (e: KeyboardEvent) => {
++      if (e.key === 'Escape') {
++        onClose()
++      }
++    }
++    document.addEventListener('keydown', handleEsc)
++    return () => document.removeEventListener('keydown', handleEsc)
++  }, [onClose])
++
++  if (showImageGenerator) {
++    return (
++      <ShareImageGenerator
++        styleId={styleId}
++        styleTitle={styleTitle}
++        styleDescription={styleDescription}
++        previewImageUrl={previewImageUrl}
++        onBack={onClose}
++        onClose={onClose}
++      />
++    )
++  }
++
++  return (
++    <div
++      className={styles.modalOverlay}
++      onClick={handleOverlayClick}
++      role="dialog"
++      aria-modal="true"
++      aria-labelledby="share-modal-title"
++    >
++      <div className={styles.modalContent}>
++        <div className={styles.modalHeader}>
++          <h3 id="share-modal-title" className={styles.modalTitle}>
++            分享此风格
++          </h3>
++          <button
++            className={styles.closeButton}
++            onClick={onClose}
++            type="button"
++            aria-label="关闭分享弹窗"
++          >
++            <X className="h-5 w-5" />
++          </button>
++        </div>
++
++        <div className={styles.shareOptions}>
++          {/* 复制链接区域 */}
++          <div className={styles.shareSection}>
++            <span className={styles.shareSectionTitle}>复制链接</span>
++            <div className={styles.copyLinkContainer}>
++              <input
++                id="share-link-input"
++                className={styles.linkInput}
++                type="text"
++                value={shareUrl}
++                readOnly
++                aria-label="分享链接"
++              />
++              <button
++                className={styles.copyButton}
++                onClick={handleCopyLink}
++                type="button"
++              >
++                复制
++              </button>
++            </div>
++          </div>
++
++          {/* 社交媒体分享 */}
++          <div className={styles.shareSection}>
++            <span className={styles.shareSectionTitle}>分享到社交媒体</span>
++            <SocialShareButtons onShare={handleSocialShare} />
++          </div>
++
++          {/* 生成分享图 */}
++          <div className={styles.shareSection}>
++            <span className={styles.shareSectionTitle}>生成分享图</span>
++            <button
++              className={styles.generateImageButton}
++              onClick={handleGenerateImage}
++              type="button"
++            >
++              <Image className="h-4 w-4 inline mr-2" />
++              生成 1080x1080 分享图
++            </button>
++          </div>
++        </div>
++      </div>
++    </div>
++  )
++}
+diff --git a/apps/web/components/share/share.module.css b/apps/web/components/share/share.module.css
+new file mode 100644
+index 0000000..4d188ec
+--- /dev/null
++++ b/apps/web/components/share/share.module.css
+@@ -0,0 +1,238 @@
++/* 分享按钮样式 */
++.shareButton {
++  display: inline-flex;
++  align-items: center;
++  gap: 8px;
++  padding: 10px 20px;
++  font-size: 14px;
++  font-weight: 500;
++  color: var(--color-text);
++  background-color: var(--color-background);
++  border: 1px solid var(--color-border);
++  border-radius: 8px;
++  cursor: pointer;
++  transition: all 0.2s;
++}
++
++.shareButton:hover {
++  background-color: var(--color-muted);
++  border-color: var(--color-primary);
++}
++
++/* 分享弹窗样式 */
++.modalOverlay {
++  position: fixed;
++  inset: 0;
++  background-color: rgba(0, 0, 0, 0.5);
++  display: flex;
++  align-items: center;
++  justify-content: center;
++  z-index: 1000;
++  animation: fadeIn 0.2s ease-out;
++}
++
++.modalContent {
++  background-color: var(--color-background);
++  border-radius: 12px;
++  padding: 24px;
++  width: 90%;
++  max-width: 500px;
++  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
++  animation: slideUp 0.3s ease-out;
++}
++
++.modalHeader {
++  display: flex;
++  justify-content: space-between;
++  align-items: center;
++  margin-bottom: 20px;
++  padding-bottom: 16px;
++  border-bottom: 1px solid var(--color-border);
++}
++
++.modalTitle {
++  font-size: 18px;
++  font-weight: 600;
++  color: var(--color-text);
++}
++
++.closeButton {
++  background: none;
++  border: none;
++  color: var(--color-muted-foreground);
++  cursor: pointer;
++  font-size: 20px;
++  padding: 4px;
++  display: flex;
++  align-items: center;
++  justify-content: center;
++  border-radius: 4px;
++  transition: all 0.2s;
++}
++
++.closeButton:hover {
++  background-color: var(--color-muted);
++  color: var(--color-text);
++}
++
++/* 分享选项 */
++.shareOptions {
++  display: flex;
++  flex-direction: column;
++  gap: 16px;
++}
++
++.shareSection {
++  display: flex;
++  flex-direction: column;
++  gap: 8px;
++}
++
++.shareSectionTitle {
++  font-size: 14px;
++  font-weight: 500;
++  color: var(--color-muted-foreground);
++}
++
++/* 复制链接区域 */
++.copyLinkContainer {
++  display: flex;
++  gap: 8px;
++}
++
++.linkInput {
++  flex: 1;
++  padding: 10px 14px;
++  font-size: 14px;
++  color: var(--color-text);
++  background-color: var(--color-muted);
++  border: 1px solid var(--color-border);
++  border-radius: 6px;
++  font-family: monospace;
++}
++
++.copyButton {
++  padding: 10px 20px;
++  font-size: 14px;
++  font-weight: 500;
++  color: white;
++  background-color: var(--color-primary);
++  border: none;
++  border-radius: 6px;
++  cursor: pointer;
++  transition: all 0.2s;
++}
++
++.copyButton:hover {
++  background-color: var(--color-primary-hover);
++}
++
++/* 社交媒体按钮 */
++.socialButtons {
++  display: flex;
++  gap: 12px;
++}
++
++.socialButton {
++  display: flex;
++  flex-direction: column;
++  align-items: center;
++  gap: 8px;
++  padding: 16px;
++  background-color: var(--color-muted);
++  border: 1px solid var(--color-border);
++  border-radius: 8px;
++  cursor: pointer;
++  transition: all 0.2s;
++  min-width: 80px;
++}
++
++.socialButton:hover {
++  background-color: var(--color-muted-hover);
++  border-color: var(--color-primary);
++  transform: translateY(-2px);
++}
++
++.socialIcon {
++  width: 32px;
++  height: 32px;
++}
++
++.socialName {
++  font-size: 12px;
++  color: var(--color-text);
++}
++
++/* 生成分享图按钮 */
++.generateImageButton {
++  width: 100%;
++  padding: 12px;
++  font-size: 14px;
++  font-weight: 500;
++  color: white;
++  background-color: var(--color-primary);
++  border: none;
++  border-radius: 8px;
++  cursor: pointer;
++  transition: all 0.2s;
++}
++
++.generateImageButton:hover {
++  background-color: var(--color-primary-hover);
++}
++
++/* 预览容器 */
++.previewContainer {
++  margin-top: 16px;
++  padding: 16px;
++  background-color: var(--color-muted);
++  border-radius: 8px;
++}
++
++.shareImagePreview {
++  width: 100%;
++  max-width: 400px;
++  aspect-ratio: 1 / 1;
++  margin: 0 auto;
++  border-radius: 8px;
++  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
++}
++
++.downloadButton {
++  width: 100%;
++  margin-top: 12px;
++  padding: 12px;
++  font-size: 14px;
++  font-weight: 500;
++  color: var(--color-text);
++  background-color: var(--color-background);
++  border: 1px solid var(--color-border);
++  border-radius: 6px;
++  cursor: pointer;
++  transition: all 0.2s;
++}
++
++.downloadButton:hover {
++  background-color: var(--color-muted);
++}
++
++/* 动画 */
++@keyframes fadeIn {
++  from {
++    opacity: 0;
++  }
++  to {
++    opacity: 1;
++  }
++}
++
++@keyframes slideUp {
++  from {
++    transform: translateY(20px);
++    opacity: 0;
++  }
++  to {
++    transform: translateY(0);
++    opacity: 1;
++  }
++}
+diff --git a/apps/web/components/share/social-share-buttons.tsx b/apps/web/components/share/social-share-buttons.tsx
+new file mode 100644
+index 0000000..709c68e
+--- /dev/null
++++ b/apps/web/components/share/social-share-buttons.tsx
+@@ -0,0 +1,40 @@
++'use client'
++
++import { Share2 } from 'lucide-react'
++import { SOCIAL_PLATFORMS } from '@/lib/share'
++import styles from './share.module.css'
++
++interface SocialShareButtonsProps {
++  onShare: (platform: string) => void
++}
++
++/**
++ * 社交媒体分享按钮组件
++ * 支持 Twitter、LinkedIn、微信、QQ
++ */
++export function SocialShareButtons({ onShare }: SocialShareButtonsProps) {
++  // 按顺序显示支持的社交平台
++  const platforms = ['twitter', 'linkedin', 'wechat', 'qq']
++
++  return (
++    <div className={styles.socialButtons}>
++      {platforms.map((platformId) => {
++        const platform = SOCIAL_PLATFORMS[platformId]
++        if (!platform) return null
++
++        return (
++          <button
++            key={platform.id}
++            className={styles.socialButton}
++            onClick={() => onShare(platform.id)}
++            type="button"
++            aria-label={`分享到${platform.name}`}
++          >
++            <Share2 className={styles.socialIcon} />
++            <span className={styles.socialName}>{platform.name}</span>
++          </button>
++        )
++      })}
++    </div>
++  )
++}
+diff --git a/apps/web/lib/qr-code.ts b/apps/web/lib/qr-code.ts
+new file mode 100644
+index 0000000..ad082d8
+--- /dev/null
++++ b/apps/web/lib/qr-code.ts
+@@ -0,0 +1,141 @@
++/**
++ * 二维码生成工具
++ * 使用 qrcode-generator 库生成二维码
++ */
++
++import qr from 'qrcode-generator'
++
++/**
++ * 二维码配置
++ */
++export interface QRCodeOptions {
++  size?: number // 二维码尺寸（默认 256）
++  margin?: number // 边距（默认 4）
++  level?: 'L' | 'M' | 'Q' | 'H' // 容错级别
++}
++
++/**
++ * 生成二维码 SVG
++ * @param url - 二维码内容（URL）
++ * @param options - 配置选项
++ * @returns SVG 字符串
++ */
++export function generateQRCodeSVG(url: string, options: QRCodeOptions = {}): string {
++  const {
++    size = 256,
++    margin = 4,
++    level = 'M',
++  } = options
++
++  // 创建二维码实例
++  const qrInstance = qr(0, level)
++  qrInstance.addData(url)
++  qrInstance.make()
++
++  // 生成 SVG
++  return qrInstance.createSvgTag({
++    cellSize: size / (qrInstance.getModuleCount() + margin * 2),
++    margin: margin,
++    scalable: true,
++  })
++}
++
++/**
++ * 生成二维码 Canvas
++ * @param url - 二维码内容（URL）
++ * @param options - 配置选项
++ * @returns Canvas 元素
++ */
++export function generateQRCodeCanvas(
++  url: string,
++  options: QRCodeOptions = {}
++): HTMLCanvasElement | null {
++  const {
++    size = 256,
++    margin = 4,
++    level = 'M',
++  } = options
++
++  try {
++    const qrInstance = qr(0, level)
++    qrInstance.addData(url)
++    qrInstance.make()
++
++    const canvas = document.createElement('canvas')
++    const cellSize = size / (qrInstance.getModuleCount() + margin * 2)
++    canvas.width = size
++    canvas.height = size
++
++    const ctx = canvas.getContext('2d')
++    if (!ctx) return null
++
++    // 填充背景（白色）
++    ctx.fillStyle = '#FFFFFF'
++    ctx.fillRect(0, 0, size, size)
++
++    // 绘制二维码
++    ctx.fillStyle = '#000000'
++    for (let row = 0; row < qrInstance.getModuleCount(); row++) {
++      for (let col = 0; col < qrInstance.getModuleCount(); col++) {
++        if (qrInstance.isDark(row, col)) {
++          ctx.fillRect(
++            (col + margin) * cellSize,
++            (row + margin) * cellSize,
++            cellSize,
++            cellSize
++          )
++        }
++      }
++    }
++
++    return canvas
++  } catch (err) {
++    console.error('二维码生成失败:', err)
++    return null
++  }
++}
++
++/**
++ * 生成二维码图片 URL（Base64）
++ * @param url - 二维码内容（URL）
++ * @param options - 配置选项
++ * @returns Base64 图片 URL
++ */
++export function generateQRCodeDataURL(url: string, options: QRCodeOptions = {}): string | null {
++  if (typeof window === 'undefined') {
++    return null // SSR 环境不支持
++  }
++
++  const canvas = generateQRCodeCanvas(url, options)
++  if (!canvas) {
++    return null
++  }
++
++  return canvas.toDataURL('image/png')
++}
++
++/**
++ * 下载二维码图片
++ * @param url - 二维码内容（URL）
++ * @param filename - 文件名
++ * @param options - 配置选项
++ */
++export function downloadQRCode(
++  url: string,
++  filename: string = 'qrcode.png',
++  options: QRCodeOptions = {}
++): void {
++  if (typeof window === 'undefined') {
++    return // SSR 环境不支持
++  }
++
++  const canvas = generateQRCodeCanvas(url, options)
++  if (!canvas) {
++    return
++  }
++
++  const link = document.createElement('a')
++  link.download = filename
++  link.href = canvas.toDataURL('image/png')
++  link.click()
++}
+diff --git a/apps/web/lib/share.ts b/apps/web/lib/share.ts
+new file mode 100644
+index 0000000..08e8157
+--- /dev/null
++++ b/apps/web/lib/share.ts
+@@ -0,0 +1,111 @@
++/**
++ * 分享功能工具函数
++ * 用于生成分享链接、UTM 参数、社交媒体分享 URL 等
++ */
++
++/**
++ * UTM 参数配置
++ */
++export interface UTMParams {
++  utm_source: string
++  utm_medium: string
++  utm_campaign?: string
++  utm_content?: string
++}
++
++/**
++ * 社交媒体平台配置
++ */
++export interface SocialPlatform {
++  id: string
++  name: string
++  urlBuilder: (url: string, title: string) => string
++  icon?: string
++}
++
++/**
++ * 支持的社交媒体平台
++ */
++export const SOCIAL_PLATFORMS: Record<string, SocialPlatform> = {
++  twitter: {
++    id: 'twitter',
++    name: 'Twitter',
++    urlBuilder: (url, title) =>
++      `https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}`,
++  },
++  linkedin: {
++    id: 'linkedin',
++    name: 'LinkedIn',
++    urlBuilder: (url, title) =>
++      `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`,
++  },
++  wechat: {
++    id: 'wechat',
++    name: '微信',
++    urlBuilder: (url, title) => `weixin://`, // 微信需要特殊处理
++  },
++  qq: {
++    id: 'qq',
++    name: 'QQ',
++    urlBuilder: (url, title) =>
++      `http://connect.qq.com/widget/shareqq/index.html?url=${encodeURIComponent(url)}&title=${encodeURIComponent(title)}`,
++  },
++} as const
++
++/**
++ * 生成带 UTM 参数的分享链接
++ * @param baseUrl - 基础 URL（风格详情页）
++ * @param source - 分享来源（twitter, linkedin, wechat, copy）
++ * @param styleId - 风格 ID
++ * @returns 带 UTM 参数的完整 URL
++ */
++export function generateShareUrl(baseUrl: string, source: string, styleId: string): string {
++  const url = new URL(baseUrl)
++  url.searchParams.set('utm_source', source)
++  url.searchParams.set('utm_medium', 'share')
++  url.searchParams.set('utm_campaign', `style_${styleId}`)
++  return url.toString()
++}
++
++/**
++ * 构建分享链接（相对路径转绝对路径）
++ * @param path - 相对路径（如 /styles/xxx）
++ * @returns 绝对路径
++ */
++export function buildShareUrl(path: string): string {
++  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://stylesnap.com'
++  return `${baseUrl}${path}`
++}
++
++/**
++ * 获取社交媒体分享 URL
++ * @param platform - 平台 ID
++ * @param url - 分享链接
++ * @param title - 分享标题
++ * @returns 分享页面 URL
++ */
++export function getSocialShareUrl(
++  platform: string,
++  url: string,
++  title: string
++): string | null {
++  const platformConfig = SOCIAL_PLATFORMS[platform]
++  if (!platformConfig) {
++    return null
++  }
++  return platformConfig.urlBuilder(url, title)
++}
++
++/**
++ * 验证分享链接是否有效
++ * @param url - 待验证的 URL
++ * @returns 验证结果
++ */
++export function isValidShareUrl(url: string): boolean {
++  try {
++    new URL(url)
++    return true
++  } catch {
++    return false
++  }
++}
