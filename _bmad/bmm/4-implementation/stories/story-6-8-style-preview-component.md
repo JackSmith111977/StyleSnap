@@ -2,7 +2,7 @@
 
 > **Epic:** 6 - 高级功能与增强  
 > **Story ID:** 6.8  
-> **状态:** ready-for-dev  
+> **状态:** review  
 > **优先级:** P2  
 > **创建日期:** 2026-04-04  
 > **来源:** PRD.md v1.3, 需求变更记录 2026-04-04
@@ -174,32 +174,32 @@ apps/web/components/
 
 ### 5.1 数据库/后端任务
 
-- [ ] **任务 1**: 创建 `getStyleDesignTokens` Server Action
+- [x] **任务 1**: 创建 `getStyleDesignTokens` Server Action
   - 文件：`apps/web/actions/styles/get-design-tokens.ts`
   - 功能：从 `style_design_tokens` 表获取设计变量
 
 ### 5.2 前端组件任务
 
-- [ ] **任务 2**: 创建 `StylePreview` 主组件
+- [x] **任务 2**: 创建 `StylePreview` 主组件
   - 文件：`apps/web/components/preview/style-preview/index.tsx`
   - 功能：接收 design tokens props，渲染完整预览
 
-- [ ] **任务 3**: 创建预览子组件
+- [x] **任务 3**: 创建预览子组件
   - `preview-header.tsx` - 导航栏预览
   - `preview-sidebar.tsx` - 侧边栏预览
   - `preview-content.tsx` - 内容区域（标题/正文/卡片/列表）
   - `preview-footer.tsx` - 页脚预览
 
-- [ ] **任务 4**: 创建 CSS Modules 样式
+- [x] **任务 4**: 创建 CSS Modules 样式
   - 文件：`apps/web/components/preview/style-preview/styles.module.css`
   - 功能：定义固定布局、响应式、CSS Variables 映射
 
-- [ ] **任务 5**: 创建组件导出索引
+- [x] **任务 5**: 创建组件导出索引
   - 文件：`apps/web/components/preview/style-preview/index.ts`
 
 ### 5.3 集成任务
 
-- [ ] **任务 6**: 集成到风格详情页
+- [x] **任务 6**: 集成到风格详情页
   - 文件：`apps/web/app/styles/[id]/page.tsx`
   - 功能：在详情页添加 `StylePreview` 组件
 
@@ -332,7 +332,48 @@ apps/web/app/styles/[id]/page.tsx  # 添加 StylePreview 组件集成
 | 版本 | 日期 | 变更内容 |
 |------|------|----------|
 | 1.0 | 2026-04-04 | 初始版本 - Story Spec 创建 |
+| 1.1 | 2026-04-04 | 实施完成 - 创建所有组件并集成到风格详情页，构建验证通过 |
 
 ---
 
-**下一步:** 运行 `bmad-dev-story` 开始实施
+## 13. 实施记录
+
+### 已完成工作
+
+**后端任务:**
+- ✅ 创建 `getStyleDesignTokens` Server Action - 从 `style_design_tokens` 表获取设计变量
+
+**前端组件:**
+- ✅ 创建 `StylePreview` 主组件 - 固定尺寸、响应式布局
+- ✅ 创建 `PreviewHeader` - 导航栏预览
+- ✅ 创建 `PreviewSidebar` - 侧边栏预览
+- ✅ 创建 `PreviewContent` - 内容区域（标题/正文/卡片/列表）
+- ✅ 创建 `PreviewFooter` - 页脚预览
+- ✅ 创建 CSS Modules 样式 - 固定布局、响应式、CSS Variables 映射
+- ✅ 创建组件导出索引
+
+**集成任务:**
+- ✅ 集成到风格详情页 `/styles/[id]/page.tsx`
+- ✅ 添加 `getStyleDesignTokens` 调用获取设计变量
+- ✅ 在详情页渲染 `StylePreview` 组件
+
+**构建验证:**
+- ✅ `pnpm build` 成功 (17.6s)
+
+### 文件列表
+
+**新增文件:**
+- `apps/web/actions/styles/get-design-tokens.ts`
+- `apps/web/components/preview/style-preview/index.tsx`
+- `apps/web/components/preview/style-preview/preview-header.tsx`
+- `apps/web/components/preview/style-preview/preview-sidebar.tsx`
+- `apps/web/components/preview/style-preview/preview-content.tsx`
+- `apps/web/components/preview/style-preview/preview-footer.tsx`
+- `apps/web/components/preview/style-preview/styles.module.css`
+- `apps/web/components/preview/style-preview/index.ts`
+- `apps/web/lib/design-tokens-utils.ts`
+
+**修改文件:**
+- `apps/web/app/styles/[id]/page.tsx`
+
+**下一步:** 运行 `code-review` 进行代码审查

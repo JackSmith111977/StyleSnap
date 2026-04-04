@@ -3,6 +3,7 @@ import { getStyle, incrementViewCount, getRelatedStyles } from '@/actions/styles
 import { getComments } from '@/actions/comments'
 import { checkIsLiked } from '@/actions/likes'
 import { checkIsFavorite } from '@/actions/favorites'
+import { getStyleDesignTokens } from '@/actions/styles/get-design-tokens'
 import { StyleDetail } from '@/components/style-detail'
 import { CodeSnippetDisplay } from '@/components/style-code-snippet'
 import { LikeButton } from '@/components/like-button'
@@ -11,6 +12,7 @@ import { CommentList } from '@/components/comment-list'
 import { CommentForm } from '@/components/comment-form'
 import { RelatedStyles } from '@/components/related-styles'
 import { LivePreviewEditor } from '@/components/preview'
+import { StylePreview } from '@/components/preview/style-preview'
 import { ShareButton } from '@/components/share'
 import Link from 'next/link'
 import { Eye, Heart, MessageCircle, Share2 } from 'lucide-react'
@@ -78,6 +80,10 @@ export default async function StyleDetailPage({ params }: StyleDetailPageProps) 
     const favoriteStatus = await checkIsFavorite(id)
     isFavorite = favoriteStatus.success ? favoriteStatus.data?.isFavorite ?? false : false
   }
+
+  // 获取设计变量（用于风格预览组件）
+  const designTokensResult = await getStyleDesignTokens(id)
+  const designTokens = designTokensResult.success ? designTokensResult.data : undefined
 
   return (
     <div className="min-h-screen bg-background">
@@ -152,6 +158,14 @@ export default async function StyleDetailPage({ params }: StyleDetailPageProps) 
 
         {/* 设计变量展示 */}
         <StyleDetail style={style} />
+
+        {/* 风格预览组件 */}
+        {designTokens && (
+          <div className="mt-8">
+            <h2 className="text-2xl font-bold mb-6">风格预览</h2>
+            <StylePreview tokens={designTokens} />
+          </div>
+        )}
 
         {/* 代码示例 - Tabs 切换 */}
         <div className="mt-8">
