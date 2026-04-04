@@ -76,10 +76,10 @@ development_status:
   epic-5-e2e-tests: done
 
   # Epic 6: 高级功能与增强
-  epic-6: done
+  epic-6: in-progress
   6-1-live-preview-editor: done
   6-2-user-submission-flow: done
-  6-3-share-functionality: backlog
+  6-3-share-functionality: ready-for-dev
   6-4-follow-system: backlog
   6-5-user-collections: backlog
   6-6-code-export-options: backlog
