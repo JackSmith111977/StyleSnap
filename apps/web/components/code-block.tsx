@@ -10,7 +10,7 @@ import 'prismjs/components/prism-typescript'
 import 'prismjs/components/prism-bash'
 import 'prismjs/components/prism-json'
 import 'prismjs/themes/prism-tomorrow.css'
-import { Copy, Check } from 'lucide-react'
+import { Copy, Check, ChevronsDown, ChevronsUp } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 
@@ -19,14 +19,19 @@ interface CodeBlockProps {
   language: 'html' | 'css' | 'jsx' | 'tsx' | 'typescript' | 'javascript' | 'bash' | 'json'
   title?: string
   showLineNumbers?: boolean
-  maxHeight?: number  // 代码区域最大高度（px），默认不限制
+  maxHeight?: number  // 代码区域最大高度（px），默认 400
+  isExpandable?: boolean  // 是否显示展开/收起按钮，默认 true
 }
 
-export function CodeBlock({ code, language, title, showLineNumbers = true, maxHeight = 400 }: CodeBlockProps) {
+export function CodeBlock({ code, language, title, showLineNumbers = true, maxHeight = 400, isExpandable = true }: CodeBlockProps) {
   const [copied, setCopied] = useState(false)
   const [copyError, setCopyError] = useState<string | null>(null)
+  const [isExpanded, setIsExpanded] = useState(false)
   const codeRef = useRef<HTMLElement>(null)
   const preRef = useRef<HTMLPreElement>(null)
+
+  // 计算实际高度是否超过限制
+  const isOverflow = code.split('\n').length * 24 > maxHeight
 
   useEffect(() => {
     if (codeRef.current) {
@@ -109,7 +114,13 @@ export function CodeBlock({ code, language, title, showLineNumbers = true, maxHe
       </div>
 
       {/* 代码区域 */}
-      <div className="relative overflow-x-auto" style={{ maxHeight: `${maxHeight}px`, overflowY: 'auto' }}>
+      <div
+        className="relative overflow-x-auto"
+        style={{
+          maxHeight: isExpanded ? 'none' : `${maxHeight}px`,
+          overflowY: isExpanded ? 'visible' : 'auto',
+        }}
+      >
         {showLineNumbers ? (
           <div className="flex">
             {/* 行号 */}
@@ -135,6 +146,31 @@ export function CodeBlock({ code, language, title, showLineNumbers = true, maxHe
           </pre>
         )}
       </div>
+
+      {/* 展开/收起按钮 */}
+      {isExpandable && isOverflow && (
+        <div className="border-t bg-gray-800/50 px-4 py-2 text-center">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-7 px-3 text-xs text-gray-400 hover:text-gray-200"
+            onClick={() => setIsExpanded(!isExpanded)}
+            type="button"
+          >
+            {isExpanded ? (
+              <>
+                <ChevronsUp className="mr-1 h-3 w-3" />
+                收起代码
+              </>
+            ) : (
+              <>
+                <ChevronsDown className="mr-1 h-3 w-3" />
+                展开全部代码
+              </>
+            )}
+          </Button>
+        </div>
+      )}
     </div>
   )
 }
