@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, vi, beforeAll } from 'vitest';
 
 /**
  * Epic 4: 收藏与点赞 - Server Actions 单元测试
@@ -23,11 +23,31 @@ vi.mock('@/lib/sentry-capture', () => ({
   setSentryUser: vi.fn(),
 }));
 
-describe('toggleFavorite', () => {
-  const { createClient } = await import('@/lib/supabase/server');
-  const { getCurrentUser } = await import('@/lib/auth');
-  const { toggleFavorite } = await import('@/actions/favorites');
+// 延迟导入以减少顶层 await
+let createClient: any;
+let getCurrentUser: any;
+let toggleFavorite: any;
+let checkIsFavorite: any;
+let getMyFavorites: any;
+let toggleLike: any;
+let checkIsLiked: any;
 
+beforeAll(async () => {
+  const supabaseModule = await import('@/lib/supabase/server');
+  const authModule = await import('@/lib/auth');
+  const favoritesModule = await import('@/actions/favorites');
+  const likesModule = await import('@/actions/likes');
+
+  createClient = supabaseModule.createClient;
+  getCurrentUser = authModule.getCurrentUser;
+  toggleFavorite = favoritesModule.toggleFavorite;
+  checkIsFavorite = favoritesModule.checkIsFavorite;
+  getMyFavorites = favoritesModule.getMyFavorites;
+  toggleLike = likesModule.toggleLike;
+  checkIsLiked = likesModule.checkIsLiked;
+});
+
+describe('toggleFavorite', () => {
   const mockUser = {
     id: 'test-user-id',
     email: 'test@example.com',
@@ -104,10 +124,6 @@ describe('toggleFavorite', () => {
 });
 
 describe('checkIsFavorite', () => {
-  const { createClient } = await import('@/lib/supabase/server');
-  const { getCurrentUser } = await import('@/lib/auth');
-  const { checkIsFavorite } = await import('@/actions/favorites');
-
   const mockUser = {
     id: 'test-user-id',
     email: 'test@example.com',
@@ -175,10 +191,6 @@ describe('checkIsFavorite', () => {
 });
 
 describe('getMyFavorites', () => {
-  const { createClient } = await import('@/lib/supabase/server');
-  const { getCurrentUser } = await import('@/lib/auth');
-  const { getMyFavorites } = await import('@/actions/favorites');
-
   const mockUser = {
     id: 'test-user-id',
     email: 'test@example.com',
@@ -265,10 +277,6 @@ describe('getMyFavorites', () => {
 });
 
 describe('toggleLike', () => {
-  const { createClient } = await import('@/lib/supabase/server');
-  const { getCurrentUser } = await import('@/lib/auth');
-  const { toggleLike } = await import('@/actions/likes');
-
   const mockUser = {
     id: 'test-user-id',
     email: 'test@example.com',
@@ -329,10 +337,6 @@ describe('toggleLike', () => {
 });
 
 describe('checkIsLiked', () => {
-  const { createClient } = await import('@/lib/supabase/server');
-  const { getCurrentUser } = await import('@/lib/auth');
-  const { checkIsLiked } = await import('@/actions/likes');
-
   const mockUser = {
     id: 'test-user-id',
     email: 'test@example.com',
