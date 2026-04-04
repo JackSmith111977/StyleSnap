@@ -1,5 +1,65 @@
 # 需求变更记录
 
+## 2026-04-04 - F2.8 风格预览组件 - 完整设计变量系统增强
+
+### 变更类型
+需求增强
+
+### 变更内容
+
+| 项目 | 变更前 | 变更后 |
+|------|--------|--------|
+| PRD 版本 | 1.3 | 1.4 |
+| F2.8 配色方案 | 6 色（primary/secondary/background/surface/text/textMuted） | 8 色（+ border, accent） |
+| F2.8 字体系统 | 字体系（heading, body） | 完整参数（字体系 + 字重 + 行高） |
+| F2.8 圆角系统 | 未使用 | 3 档圆角（small/medium/large） |
+| F2.8 阴影系统 | 未使用 | 3 档阴影（light/medium/heavy） |
+| F2.8 间距系统 | 5 档（xs/sm/md/lg/xl） | 5 档全部应用到预览组件 |
+
+### 增强详情
+
+**配色方案扩展**
+- 新增 `border` 颜色 - 用于边框、分割线
+- 新增 `accent` 颜色 - 用于 hover 状态、焦点环、强调元素
+
+**字体系统完整参数**
+- 新增 `headingWeight`, `bodyWeight` - 字重控制
+- 新增 `headingLineHeight`, `bodyLineHeight` - 行高控制
+- 预览组件中标题/正文字体大小、字重、行高全部使用变量
+
+**圆角系统应用**
+- small (4px) - 按钮、小元素
+- medium (8px) - 卡片、输入框
+- large (16px) - 大容器、头像
+
+**阴影系统应用**
+- light - 轻微悬浮效果
+- medium - 卡片、导航栏阴影
+- heavy - 模态框、弹出层阴影
+
+**间距系统应用**
+- 所有间距位置使用变量（xs/sm/md/lg/xl）
+
+### 影响分析
+
+| 文档/模块 | 影响 |
+|-----------|------|
+| PRD.md | 更新 2.2.3 风格详情；更新第 5 节数据模型 |
+| Story 6.8 Spec | 更新验收标准、数据结构、实现任务 |
+| Server Action | 更新 `get-design-tokens.ts` 返回完整 tokens |
+| 预览组件 | 更新 CSS Variables 映射和所有 hardcoded 值 |
+| 数据库 | 执行 `init-style-design-tokens.sql` 填充现有风格数据 |
+
+### 变更记录
+```
+日期：2026-04-04
+类型：增强
+优先级：P0
+功能：F2.8 风格预览组件 - 完整设计变量系统
+```
+
+---
+
 ## 2026-04-04 - 新增 F2.8 风格预览组件功能
 
 ### 变更类型

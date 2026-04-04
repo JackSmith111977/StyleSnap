@@ -26,13 +26,18 @@ So that 我可以直观地看到该风格应用在网站时的完整效果（包
 **Then** 系统显示风格预览组件（固定尺寸、响应式布局）
 **And** 预览组件包含：导航栏、侧边栏、标题、正文、卡片、列表、页脚
 **And** 预览组件使用 CSS Variables + CSS Modules 实现
+**And** 预览组件完整体现该风格的所有设计变量（配色、字体、间距、圆角、阴影）
 
-### 2.2 设计变量应用
+### 2.2 完整设计变量应用
 
-**Given** 预览组件接收风格的设计变量
+**Given** 预览组件接收风格的完整设计变量
 **When** 组件渲染
 **Then** 系统使用 design tokens 渲染所有 UI 组件
-**And** 色板、字体、间距、圆角、阴影等变量正确应用
+**And** 配色方案正确应用（8 色：primary, secondary, background, surface, text, textMuted, border, accent）
+**And** 字体设置正确应用（字体系 + 字重 + 行高）
+**And** 间距系统正确应用（5 档：xs, sm, md, lg, xl）
+**And** 圆角系统正确应用（3 档：small, medium, large）
+**And** 阴影系统正确应用（3 档：light, medium, heavy）
 
 ### 2.3 深色模式支持
 
@@ -97,7 +102,7 @@ So that 我可以直观地看到该风格应用在网站时的完整效果（包
 ### 4.2 数据结构参考
 
 ```typescript
-// Design Tokens 数据结构
+// Design Tokens 数据结构（完整版）
 interface DesignTokens {
   colors: {
     primary: string        // 主色
@@ -107,27 +112,33 @@ interface DesignTokens {
     text: string           // 文字色
     textMuted: string      // 弱化文字色
     border: string         // 边框色
-    accent: string         // 强调色
+    accent: string         // 强调色（hover、焦点）
   }
-  typography: {
-    fontFamily: string
-    headingWeight: number
-    bodyWeight: number
-    scaleRatio: number
+  fonts: {
+    heading: string        // 标题字体系
+    body: string           // 正文字体系
+    mono: string           // 等宽字体
+    headingWeight: number  // 标题字重（如 700）
+    bodyWeight: number     // 正文字重（如 400）
+    headingLineHeight: number  // 标题行高（如 1.2）
+    bodyLineHeight: number     // 正文行高（如 1.5）
   }
   spacing: {
-    unit: string
-    scale: number[]
+    xs: number  // 4px
+    sm: number  // 8px
+    md: number  // 16px
+    lg: number  // 24px
+    xl: number  // 32px
   }
   borderRadius: {
-    small: string
-    medium: string
-    large: string
+    small: string   // 4px - 按钮、小元素
+    medium: string  // 8px - 卡片、输入框
+    large: string   // 16px - 大容器、头像
   }
   shadows: {
-    light: string
-    medium: string
-    heavy: string
+    light: string   // 轻微悬浮效果
+    medium: string  // 卡片、导航栏阴影
+    heavy: string   // 模态框、弹出层阴影
   }
   darkModeOverrides?: {
     colors?: Partial<DesignTokens['colors']>
@@ -174,40 +185,38 @@ apps/web/components/
 
 ### 5.1 数据库/后端任务
 
-- [x] **任务 1**: 创建 `getStyleDesignTokens` Server Action
+- [ ] **任务 1**: 更新 `getStyleDesignTokens` Server Action
   - 文件：`apps/web/actions/styles/get-design-tokens.ts`
-  - 功能：从 `style_design_tokens` 表获取设计变量
+  - 功能：从 `styles` 表获取完整设计变量（8 色、完整字体、圆角、阴影）
+  - 新增字段：color_palette.border, color_palette.accent, fonts.headingWeight/bodyWeight/headingLineHeight/bodyLineHeight, border_radius, shadows
 
 ### 5.2 前端组件任务
 
-- [x] **任务 2**: 创建 `StylePreview` 主组件
+- [ ] **任务 2**: 更新 `StylePreview` 主组件
   - 文件：`apps/web/components/preview/style-preview/index.tsx`
-  - 功能：接收 design tokens props，渲染完整预览
+  - 功能：接收完整 design tokens props，更新 CSS Variables 映射
 
-- [x] **任务 3**: 创建预览子组件
-  - `preview-header.tsx` - 导航栏预览
-  - `preview-sidebar.tsx` - 侧边栏预览
-  - `preview-content.tsx` - 内容区域（标题/正文/卡片/列表）
-  - `preview-footer.tsx` - 页脚预览
-
-- [x] **任务 4**: 创建 CSS Modules 样式
+- [ ] **任务 3**: 更新 CSS Modules 样式
   - 文件：`apps/web/components/preview/style-preview/styles.module.css`
-  - 功能：定义固定布局、响应式、CSS Variables 映射
+  - 功能：
+    - 新增 CSS Variables 定义（--preview-border, --preview-accent, --preview-font-weight-*, --preview-border-radius-*, --preview-shadow-*）
+    - 替换所有 hardcoded 值为 CSS 变量
 
-- [x] **任务 5**: 创建组件导出索引
-  - 文件：`apps/web/components/preview/style-preview/index.ts`
+- [ ] **任务 4**: 验证子组件样式应用
+  - 文件：`preview-header.tsx`, `preview-sidebar.tsx`, `preview-content.tsx`, `preview-footer.tsx`
+  - 功能：确认所有子组件使用 CSS Variables
 
-### 5.3 集成任务
+### 5.3 数据初始化任务
 
-- [x] **任务 6**: 集成到风格详情页
-  - 文件：`apps/web/app/styles/[id]/page.tsx`
-  - 功能：在详情页添加 `StylePreview` 组件
+- [ ] **任务 5**: 执行 SQL 脚本初始化现有风格数据
+  - 文件：`scripts/init-style-design-tokens.sql`
+  - 功能：为现有 styles 填充默认设计变量
 
 ### 5.4 测试任务
 
-- [ ] **任务 7**: 创建 E2E 测试
+- [ ] **任务 6**: 创建 E2E 测试
   - 文件：`apps/web/tests/e2e/story-6-8-style-preview.spec.ts`
-  - 功能：验证预览组件渲染正确性
+  - 功能：验证完整设计变量正确应用
 
 ---
 
@@ -333,15 +342,16 @@ apps/web/app/styles/[id]/page.tsx  # 添加 StylePreview 组件集成
 |------|------|----------|
 | 1.0 | 2026-04-04 | 初始版本 - Story Spec 创建 |
 | 1.1 | 2026-04-04 | 实施完成 - 创建所有组件并集成到风格详情页，构建验证通过 |
+| 1.2 | 2026-04-04 | 需求增强 - 完整设计变量系统（8 色配色、完整字体参数、圆角、阴影、间距） |
 
 ---
 
 ## 13. 实施记录
 
-### 已完成工作
+### 已完成工作（v1.1）
 
 **后端任务:**
-- ✅ 创建 `getStyleDesignTokens` Server Action - 从 `style_design_tokens` 表获取设计变量
+- ✅ 创建 `getStyleDesignTokens` Server Action - 从 `styles` 表获取设计变量
 
 **前端组件:**
 - ✅ 创建 `StylePreview` 主组件 - 固定尺寸、响应式布局
@@ -354,13 +364,23 @@ apps/web/app/styles/[id]/page.tsx  # 添加 StylePreview 组件集成
 
 **集成任务:**
 - ✅ 集成到风格详情页 `/styles/[id]/page.tsx`
-- ✅ 添加 `getStyleDesignTokens` 调用获取设计变量
-- ✅ 在详情页渲染 `StylePreview` 组件
 
 **构建验证:**
 - ✅ `pnpm build` 成功 (17.6s)
 
-### 文件列表
+### 待实施工作（v1.2 - 完整设计变量系统）
+
+**后端任务:**
+- [ ] 更新 `getStyleDesignTokens` 返回完整 tokens（8 色、完整字体、圆角、阴影）
+
+**前端组件:**
+- [ ] 更新 `StylePreview` CSS Variables 映射
+- [ ] 更新 `styles.module.css` 添加所有缺失变量并替换 hardcoded 值
+
+**数据初始化:**
+- [ ] 执行 SQL 脚本填充现有风格数据
+
+**文件列表**
 
 **新增文件:**
 - `apps/web/actions/styles/get-design-tokens.ts`
@@ -371,9 +391,8 @@ apps/web/app/styles/[id]/page.tsx  # 添加 StylePreview 组件集成
 - `apps/web/components/preview/style-preview/preview-footer.tsx`
 - `apps/web/components/preview/style-preview/styles.module.css`
 - `apps/web/components/preview/style-preview/index.ts`
-- `apps/web/lib/design-tokens-utils.ts`
 
 **修改文件:**
 - `apps/web/app/styles/[id]/page.tsx`
 
-**下一步:** 运行 `code-review` 进行代码审查
+**下一步:** 实施 v1.2 完整设计变量系统
