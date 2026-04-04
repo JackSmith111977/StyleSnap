@@ -208,15 +208,66 @@ apps/web/components/
 
 ### 5.3 数据初始化任务
 
-- [ ] **任务 5**: 执行 SQL 脚本初始化现有风格数据
-  - 文件：`scripts/init-style-design-tokens.sql`
+- [x] **任务 5**: 执行 SQL 脚本初始化现有风格数据
+  - 文件：`supabase/migrations/0022_init_style_design_tokens.sql`
   - 功能：为现有 styles 填充默认设计变量
+  - 状态：✅ 已完成 - 迁移脚本已创建，需在 Supabase 云端执行
 
 ### 5.4 测试任务
 
 - [ ] **任务 6**: 创建 E2E 测试
   - 文件：`apps/web/tests/e2e/story-6-8-style-preview.spec.ts`
   - 功能：验证完整设计变量正确应用
+
+### 5.5 v1.3 预览组件增强任务
+
+**背景**: 预览组件需要更好地展示设计变量场景，让用户能直观理解每个设计变量的效果
+
+- [x] **任务 7**: 配色方案场景展示
+  - 文件：`apps/web/components/preview/style-preview/preview-content.tsx`
+  - 功能：
+    - 主色应用场景：主色按钮、主色文字、主色背景
+    - 辅色应用场景：辅色按钮、辅色标签
+    - 强调色应用场景：链接 hover 状态、焦点环、强调边框
+  - 验收标准：
+    - [x] 展示至少 3 种主色应用场景
+    - [x] 展示至少 2 种辅色应用场景
+    - [x] 展示强调色的 hover 和 focus 状态效果
+
+- [x] **任务 8**: 字体系统场景展示
+  - 文件：`apps/web/components/preview/style-preview/preview-content.tsx`
+  - 功能：
+    - 展示标题字体系、字重、行高效果（H1/H2/H3）
+    - 展示正文字体系、字重、行高效果
+    - 展示等宽字体场景（代码块）
+  - 验收标准：
+    - [x] H1/H2/H3 使用不同的字重和行高
+    - [x] 正文段落展示标准行高
+    - [x] 代码块使用等宽字体
+
+- [x] **任务 9**: 间距系统展示
+  - 文件：`apps/web/components/preview/style-preview/preview-content.tsx`
+  - 功能：通过按钮组、卡片间隙等展示 5 档间距
+  - 验收标准：
+    - [x] 展示 xs/sm 间距（小组件内部）
+    - [x] 展示 md/lg 间距（卡片 padding、组件间隙）
+    - [x] 展示 xl 间距（大_section_间隔）
+
+- [x] **任务 10**: 圆角效果展示
+  - 文件：`apps/web/components/preview/style-preview/preview-content.tsx`
+  - 功能：通过多个卡片展示 small/medium/large 圆角效果
+  - 验收标准：
+    - [x] 按钮使用 small 圆角
+    - [x] 卡片使用 medium 圆角
+    - [x] 大容器/头像使用 large 圆角
+
+- [x] **任务 11**: 阴影效果展示
+  - 文件：`apps/web/components/preview/style-preview/preview-content.tsx`
+  - 功能：通过多个卡片展示 light/medium/heavy 阴影效果
+  - 验收标准：
+    - [x] 展示轻阴影（轻微悬浮）
+    - [x] 展示中阴影（卡片默认）
+    - [x] 展示重阴影（模态框效果）
 
 ---
 
@@ -368,31 +419,51 @@ apps/web/app/styles/[id]/page.tsx  # 添加 StylePreview 组件集成
 **构建验证:**
 - ✅ `pnpm build` 成功 (17.6s)
 
-### 待实施工作（v1.2 - 完整设计变量系统）
+### 已完成工作（v1.2 - 完整设计变量系统）
 
-**后端任务:**
-- [ ] 更新 `getStyleDesignTokens` 返回完整 tokens（8 色、完整字体、圆角、阴影）
+**类型定义更新:**
+- ✅ ColorTokens: 6 色 → 8 色（新增 border, accent）
+- ✅ FontTokens: 新增 headingWeight, bodyWeight, headingLineHeight, bodyLineHeight
+- ✅ 新增 BorderRadiusTokens (small/medium/large)
+- ✅ 新增 ShadowTokens (light/medium/heavy)
 
-**前端组件:**
-- [ ] 更新 `StylePreview` CSS Variables 映射
-- [ ] 更新 `styles.module.css` 添加所有缺失变量并替换 hardcoded 值
+**Server Action 更新:**
+- ✅ 读取所有设计变量字段
+- ✅ 返回完整 DesignTokens 数据结构
+
+**预览组件更新:**
+- ✅ 注入 26 个 CSS Variables
+
+**CSS 样式更新:**
+- ✅ 替换所有 hardcoded 值为 CSS 变量
+
+**构建验证:**
+- ✅ `pnpm build` 成功 (17.2s)
+- ✅ git 提交：8939889
+
+### 已完成工作（v1.3 - 预览场景增强）
+
+**Preview Content 增强:**
+- ✅ 配色方案展示：主色/辅色/强调色应用场景（按钮、背景、文字、边框、链接）
+- ✅ 字体系统展示：标题字体/正文/代码块，包含字重和行高信息
+- ✅ 间距系统展示：5 档间距可视化对比（XS/SM/MD/LG/XL）
+- ✅ 圆角效果展示：small/medium/large 圆角对比卡片
+- ✅ 阴影效果展示：light/medium/heavy 阴影对比卡片
+
+**CSS 样式新增:**
+- ✅ 配色展示样式（colorDemo, colorGrid, colorSwatch）
+- ✅ 间距展示样式（spacingDemo, spacingRow, spacingBox）
+- ✅ 圆角展示样式（borderRadiusDemo, borderRadiusCard）
+- ✅ 阴影展示样式（shadowDemo, shadowCard）
+- ✅ 字体展示样式（typographyDemo, fontSection, codeBlock）
+
+**构建验证:**
+- ✅ `pnpm build` 成功 (9.1s)
+
+### 待实施工作（v1.3 剩余）
+
+**测试任务:**
+- [ ] 创建 E2E 测试验证展示场景
 
 **数据初始化:**
-- [ ] 执行 SQL 脚本填充现有风格数据
-
-**文件列表**
-
-**新增文件:**
-- `apps/web/actions/styles/get-design-tokens.ts`
-- `apps/web/components/preview/style-preview/index.tsx`
-- `apps/web/components/preview/style-preview/preview-header.tsx`
-- `apps/web/components/preview/style-preview/preview-sidebar.tsx`
-- `apps/web/components/preview/style-preview/preview-content.tsx`
-- `apps/web/components/preview/style-preview/preview-footer.tsx`
-- `apps/web/components/preview/style-preview/styles.module.css`
-- `apps/web/components/preview/style-preview/index.ts`
-
-**修改文件:**
-- `apps/web/app/styles/[id]/page.tsx`
-
-**下一步:** 实施 v1.2 完整设计变量系统
+- [ ] 在 Supabase 云端执行迁移脚本 `0022_init_style_design_tokens.sql`
