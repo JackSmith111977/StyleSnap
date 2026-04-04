@@ -29,7 +29,7 @@ export default async function FavoritesPage({
     <div className="container mx-auto py-8 px-4">
       {/* 页面头部 */}
       <div className="mb-8 flex items-center gap-4">
-        <Link href="/dashboard">
+        <Link href="/">
           <Button variant="ghost" size="icon">
             <ArrowLeft className="h-4 w-4" />
           </Button>

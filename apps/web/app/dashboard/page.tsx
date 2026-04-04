@@ -79,7 +79,7 @@ export default async function DashboardPage(): Promise<React.JSX.Element> {
               浏览风格库
             </Link>
             <Link
-              href="/favorites"
+              href="/user/favorites"
               className="block text-sm text-primary hover:underline"
             >
               查看收藏

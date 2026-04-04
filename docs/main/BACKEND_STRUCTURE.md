@@ -790,7 +790,7 @@ export async function login(
 
   // 3. 缓存失效 + 跳转
   revalidatePath('/')
-  redirect('/dashboard')
+  redirect('/')
 }
 
 // src/actions/auth/register.ts

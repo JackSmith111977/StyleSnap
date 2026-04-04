@@ -34,7 +34,7 @@ export async function proxy(request: NextRequest) {
   await supabase.auth.getSession()
 
   // 受保护路由列表
-  const protectedPaths = ['/dashboard', '/profile', '/favorites', '/settings']
+  const protectedPaths = ['/user', '/settings']
   const adminPaths = ['/admin']
 
   const { pathname } = request.nextUrl
@@ -64,9 +64,9 @@ export async function proxy(request: NextRequest) {
     }
   }
 
-  // 已登录用户访问登录/注册页面，重定向到仪表板
+  // 已登录用户访问登录/注册页面，重定向到首页
   if (user && (pathname === '/login' || pathname === '/register')) {
-    return NextResponse.redirect(new URL('/dashboard', request.url))
+    return NextResponse.redirect(new URL('/', request.url))
   }
 
   return supabaseResponse

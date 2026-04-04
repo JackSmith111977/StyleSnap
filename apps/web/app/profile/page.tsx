@@ -27,7 +27,7 @@ export default async function ProfilePage() {
       {/* 顶部导航栏 */}
       <div className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto px-4 py-4">
-          <Link href="/dashboard">
+          <Link href="/">
             <Button variant="ghost" size="sm">
               <ArrowLeft className="mr-2 h-4 w-4" />
               返回

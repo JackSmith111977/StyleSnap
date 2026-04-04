@@ -48,11 +48,11 @@ export function UserMenu() {
             </div>
             <div className="p-2 space-y-1">
               <Link
-                href="/dashboard"
+                href="/"
                 className="block px-2 py-1.5 text-sm hover:bg-accent rounded"
                 onClick={() => setOpen(false)}
               >
-                仪表板
+                首页
               </Link>
               <Link
                 href="/profile"
@@ -60,6 +60,13 @@ export function UserMenu() {
                 onClick={() => setOpen(false)}
               >
                 个人资料
+              </Link>
+              <Link
+                href="/user/favorites"
+                className="block px-2 py-1.5 text-sm hover:bg-accent rounded"
+                onClick={() => setOpen(false)}
+              >
+                我的收藏
               </Link>
               <button
                 onClick={async () => {

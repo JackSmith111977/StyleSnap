@@ -32,9 +32,9 @@ export default function UnauthorizedPage() {
                 返回首页
               </Button>
             </Link>
-            <Link href="/dashboard" className="flex-1">
+            <Link href="/user/favorites" className="flex-1">
               <Button className="w-full">
-                仪表板
+                我的收藏
               </Button>
             </Link>
           </div>

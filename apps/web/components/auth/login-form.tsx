@@ -26,8 +26,8 @@ export function LoginForm() {
       if (result.error) {
         setError(result.error)
       } else if (result.success) {
-        // 登录成功，使用硬导航确保 cookie 被携带
-        window.location.href = '/dashboard'
+        // 登录成功，重定向到首页
+        window.location.href = '/'
       }
     } catch {
       setError('登录失败，请稍后重试')
