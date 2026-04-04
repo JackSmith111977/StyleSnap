@@ -56,6 +56,7 @@ export const createCommentSchema = z.object({
   styleId: styleIdSchema,
   content: z.string().min(1, '评论内容不能为空').max(1000, '评论内容最多 1000 字'),
   parentId: commentIdSchema.optional().nullable(),
+  replyToUserId: commentIdSchema.optional(),  // 新增：回复的目标用户 ID（扁平化存储方案）
 })
 
 // 删除评论参数验证
@@ -99,6 +100,64 @@ export const paginationSchema = z.object({
 
 // 排序参数验证
 export const sortSchema = z.enum(['newest', 'oldest', 'popular', 'liked']).default('newest')
+
+// ============== 风格提交相关 Schemas ==============
+
+// 设计变量验证（色板、字体、间距等）
+export const designTokensSchema = z.object({
+  colors: z.object({
+    primary: z.string().regex(/^#[0-9A-Fa-f]{6}$/, '主色格式错误'),
+    secondary: z.string().regex(/^#[0-9A-Fa-f]{6}$/, '辅色格式错误'),
+    background: z.string().regex(/^#[0-9A-Fa-f]{6}$/, '背景色格式错误'),
+    surface: z.string().regex(/^#[0-9A-Fa-f]{6}$/, '表面色格式错误'),
+    text: z.string().regex(/^#[0-9A-Fa-f]{6}$/, '文本色格式错误'),
+    textMuted: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'muted 文本色格式错误'),
+  }).optional(),
+  fonts: z.object({
+    heading: z.string().min(1, '标题字体不能为空'),
+    body: z.string().min(1, '正文字体不能为空'),
+    mono: z.string().min(1, '等宽字体不能为空'),
+  }).optional(),
+  spacing: z.object({
+    xs: z.number().min(1).max(16),
+    sm: z.number().min(2).max(24),
+    md: z.number().min(4).max(32),
+    lg: z.number().min(8).max(48),
+    xl: z.number().min(16).max(64),
+  }).optional(),
+})
+
+// 代码片段验证
+export const codeSnippetsSchema = z.object({
+  html: z.string().min(1, 'HTML 代码不能为空'),
+  css: z.string().min(1, 'CSS 代码不能为空'),
+  react: z.string().optional(),
+  tailwind: z.string().optional(),
+})
+
+// 风格提交表单验证
+export const submissionFormSchema = z.object({
+  title: z
+    .string()
+    .min(2, '标题至少 2 位字符')
+    .max(50, '标题最多 50 位字符'),
+  description: z
+    .string()
+    .min(10, '描述至少 10 位字符')
+    .max(500, '描述最多 500 位字符'),
+  categoryId: uuidSchema,
+  tags: z.array(z.string()).max(10, '最多添加 10 个标签').optional(),
+  designTokens: designTokensSchema,
+  codeSnippets: codeSnippetsSchema,
+})
+
+// 图片上传验证（客户端验证用）
+// 注意：FileList 是浏览器 API，在 Server 组件中不可用
+// 实际验证在 Server Action 中进行
+export const imageUploadSchema = z.object({
+  lightImage: z.any().optional(),
+  darkImage: z.any().optional(),
+})
 
 /**
  * 验证辅助函数

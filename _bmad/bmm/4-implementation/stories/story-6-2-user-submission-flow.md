@@ -2,7 +2,7 @@
 title: '用户提交流程 - Story 6.2'
 type: 'feature'
 created: '2026-04-04'
-status: 'ready-for-dev'
+status: 'done'
 context: ['_bmad/bmm/3-solutioning/epics.md', '_bmad/bmm/3-solutioning/architecture.md', '_bmad/bmm/4-implementation/artifacts/FRONTEND_GUIDELINES.md', '_bmad/bmm/3-solutioning/artifacts/database-schema.md']
 ---
 
@@ -129,3 +129,14 @@ context: ['_bmad/bmm/3-solutioning/epics.md', '_bmad/bmm/3-solutioning/architect
 ## Change Log
 
 - 2026-04-04: 创建 Story Spec
+- 2026-04-04: 实施完成 - 创建所有组件和 Server Action
+  - 新增 `lib/schemas.ts` - 添加 submissionFormSchema, designTokensSchema, codeSnippetsSchema
+  - 新增 `lib/storage.ts` - Supabase Storage 工具函数
+  - 新增 `actions/styles/submit.ts` - submitStyle Server Action
+  - 新增 `components/submit/image-upload.tsx` - 图片上传组件
+  - 新增 `components/submit/code-editor.tsx` - 代码编辑器组件
+  - 新增 `components/submit/style-submission-form.tsx` - 提交表单主组件
+  - 新增 `app/submit/page.tsx` - 提交页面
+  - 新增 `supabase/migrations/0020_add_submission_status.sql` - 审核状态迁移
+  - 安装依赖：react-hook-form, @hookform/resolvers
+  - 构建验证：pnpm build 成功 (12.8s)
