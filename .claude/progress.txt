@@ -45,15 +45,26 @@
   - 构建验证：pnpm build 成功 (12.8s)
   - git 提交：实施完成
 
-**任务：Story 6.3 分享功能 - Spec 创建**
+**任务：Story 6.3 分享功能 - 完整实现**
 - 状态：已完成
 - 开始时间：2026-04-04
 - 完成时间：2026-04-04
 - 输出：
-  - 创建 `_bmad/bmm/4-implementation/stories/story-6-3-share-functionality.md` - 完整的分享功能规格
-  - 包含：复制链接、生成分享图、社交媒体分享、UTM 追踪、二维码生成
-  - 更新 sprint-status.yaml - Story 6.3 状态改为 ready-for-dev
-  - git 提交：6e7b2e5
+  - 新增 `apps/web/lib/share.ts` - 分享工具函数（UTM 参数、分享链接生成）
+  - 新增 `apps/web/lib/qr-code.ts` - 二维码生成工具（SVG/Canvas/Base64）
+  - 新增 `apps/web/components/share/*` - 分享组件（按钮、弹窗、图片生成、社交媒体）
+  - 新增 `apps/web/app/styles/[id]/opengraph-image.tsx` - 动态 Open Graph 图片
+  - 集成到 `apps/web/app/styles/[id]/page.tsx` - 风格详情页添加分享按钮
+  - 安装依赖：qrcode-generator
+  - 构建验证：pnpm build 成功 (15.9s)
+  - 功能覆盖：
+    - 复制链接：带 UTM 参数的分享链接
+    - 生成分享图：1080x1080 PNG，含预览图/名称/二维码
+    - 社交媒体分享：Twitter、LinkedIn、微信、QQ
+    - Open Graph 图片：1200x630 动态生成
+    - Toast 通知：成功/失败反馈
+    - 降级方案：不支持 Clipboard API 时自动选中文本
+  - git 提交：7c829cc
   - 新增 `apps/web/components/submit/style-submission-form.tsx` - 提交表单主组件
   - 新增 `apps/web/app/submit/page.tsx` - 提交页面（登录检查、表单集成）
   - 新增 `supabase/migrations/0020_add_submission_status.sql` - 审核状态迁移
