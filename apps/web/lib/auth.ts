@@ -6,13 +6,10 @@ import { redirect } from 'next/navigation'
  * 如果未登录，返回 null
  */
 export async function getCurrentUser() {
-  try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    return user
-  } catch {
-    return null
-  }
+  const supabase = await createClient()
+  const result = await supabase.auth.getUser()
+
+  return result.data.user
 }
 
 /**

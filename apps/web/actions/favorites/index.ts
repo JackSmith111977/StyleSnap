@@ -95,25 +95,16 @@ export async function getMyFavorites(
   }
   error?: string
 }> {
-  console.log('[getMyFavorites] Start, page:', page)
-
   try {
     const supabase = await createClient()
     const user = await getCurrentUser()
 
-    // 使用字符串拼接避免日志格式化问题
-    const userInfo = user ? `id=${user.id}, email=${user.email}` : 'null'
-    console.log('[getMyFavorites] User:', userInfo)
-
     if (!user) {
-      console.log('[getMyFavorites] No user, returning error')
       return { success: false, error: '请先登录' }
     }
 
     const from = (page - 1) * limit
     const to = from + limit - 1
-
-    console.log('[getMyFavorites] Step 1: Querying favorites for user:', user.id, 'range:', from, '-', to)
 
     // 步骤 1: 先获取 favorites 表中的 style_id 列表（避免嵌套查询的 RLS 问题）
     const { data: favoritesData, error: favoritesError, count } = await supabase
@@ -123,22 +114,12 @@ export async function getMyFavorites(
       .order('created_at', { ascending: false })
       .range(from, to)
 
-    console.log('[getMyFavorites] Step 1 result:', {
-      hasData: !!favoritesData,
-      dataLength: favoritesData?.length,
-      hasError: !!favoritesError,
-      error: favoritesError ? { message: favoritesError.message, code: favoritesError.code, details: favoritesError.details } : null,
-      count
-    })
-
     if (favoritesError) {
-      console.error('[getMyFavorites] Step 1 error:', favoritesError)
       throw favoritesError
     }
 
     // 如果没有收藏，直接返回空结果
     if (!favoritesData || favoritesData.length === 0) {
-      console.log('[getMyFavorites] No favorites found, returning empty result')
       return {
         success: true,
         data: {
@@ -153,7 +134,6 @@ export async function getMyFavorites(
 
     // 提取 style_id 列表
     const styleIds = favoritesData.map(fav => fav.style_id)
-    console.log('[getMyFavorites] Step 2: Querying styles with IDs:', styleIds)
 
     // 步骤 2: 根据 style_id 列表查询完整的风格信息
     const { data: stylesData, error: stylesError } = await supabase
@@ -173,15 +153,7 @@ export async function getMyFavorites(
       `)
       .in('id', styleIds)
 
-    console.log('[getMyFavorites] Step 2 result:', {
-      hasData: !!stylesData,
-      dataLength: stylesData?.length,
-      hasError: !!stylesError,
-      error: stylesError ? { message: stylesError.message, code: stylesError.code, details: stylesError.details } : null
-    })
-
     if (stylesError) {
-      console.error('[getMyFavorites] Step 2 error:', stylesError)
       throw stylesError
     }
 
@@ -229,8 +201,6 @@ export async function getMyFavorites(
         tags: styleTagsData.map((st) => st.tag.name),
       }
     }).filter((s): s is FavoriteStyle => s !== null)
-
-    console.log('[getMyFavorites] Final result:', { stylesCount: styles.length, total: count })
 
     return {
       success: true,
