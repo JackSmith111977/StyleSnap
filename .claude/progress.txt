@@ -45,6 +45,27 @@
     - 验收检查清单
   - 下一步：运行 `bmad-dev-story` 开始实施
 
+**任务：Story 6.8 风格预览组件实施**
+- 状态：已完成
+- 开始时间：2026-04-04
+- 完成时间：2026-04-04
+- 输出：
+  - 新增 Server Action: `apps/web/actions/styles/get-design-tokens.ts`
+  - 新增预览组件:
+    - `apps/web/components/preview/style-preview/index.tsx` - 主组件
+    - `apps/web/components/preview/style-preview/preview-header.tsx` - 导航栏
+    - `apps/web/components/preview/style-preview/preview-sidebar.tsx` - 侧边栏
+    - `apps/web/components/preview/style-preview/preview-content.tsx` - 内容区
+    - `apps/web/components/preview/style-preview/preview-footer.tsx` - 页脚
+    - `apps/web/components/preview/style-preview/styles.module.css` - 样式
+    - `apps/web/components/preview/style-preview/index.ts` - 导出
+  - 新增工具函数：`apps/web/lib/design-tokens-utils.ts`
+  - 集成到风格详情页：`apps/web/app/styles/[id]/page.tsx`
+  - 构建验证：pnpm build 成功 (17.6s)
+  - Sprint 状态：ready-for-dev → in-progress → review
+  - git 提交：d27906c
+  - 下一步：运行 `code-review` 进行代码审查
+
 **任务：Story 6.1 实时预览编辑器 - 核心组件开发**
 - 状态：已完成
 - 开始时间：2026-04-04
