@@ -79,6 +79,7 @@ export function LikeButton({
       size={size}
       disabled={isPending}
       onClick={handleClick}
+      aria-label={isLiked ? '取消点赞' : '点赞'}
       className={cn(
         'transition-colors hover:bg-accent/50',
         isLiked && 'text-blue-500 hover:text-blue-600',
@@ -93,7 +94,7 @@ export function LikeButton({
         )}
       />
       {size !== 'icon' && (
-        <span className="ml-1">{count}</span>
+        <span data-testid="like-count" className="ml-1">{count}</span>
       )}
     </Button>
   )

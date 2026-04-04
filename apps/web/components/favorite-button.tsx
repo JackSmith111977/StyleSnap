@@ -65,6 +65,7 @@ export function FavoriteButton({
       size={size}
       disabled={isPending}
       onClick={handleClick}
+      aria-label={isFavorite ? '取消收藏' : '收藏'}
       className={cn(
         'transition-colors hover:bg-accent/50',
         isFavorite && 'text-red-500 hover:text-red-600',
@@ -78,6 +79,9 @@ export function FavoriteButton({
           isFavorite && 'fill-current animate-pulse'
         )}
       />
+      {size !== 'icon' && (
+        <span data-testid="favorite-count" className="ml-1">{count}</span>
+      )}
     </Button>
   )
 }
