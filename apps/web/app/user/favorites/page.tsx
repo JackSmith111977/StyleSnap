@@ -9,12 +9,13 @@ import { Heart, Palette, ArrowLeft } from 'lucide-react'
 export default async function FavoritesPage({
   searchParams,
 }: {
-  searchParams: { page?: string }
+  searchParams: Promise<{ page?: string }>
 }): Promise<React.JSX.Element> {
   // 要求登录
   await requireAuth()
 
-  const page = parseInt(searchParams.page ?? '1', 10)
+  const resolvedSearchParams = await searchParams
+  const page = parseInt(resolvedSearchParams.page ?? '1', 10)
   const limit = 12
 
   const result = await getMyFavorites(page, limit)

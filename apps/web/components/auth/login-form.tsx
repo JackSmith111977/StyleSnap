@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { login } from '@/actions/auth'
 import { Button } from '@/components/ui/button'
@@ -9,6 +10,7 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 
 export function LoginForm() {
+  const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string>()
 
@@ -26,8 +28,9 @@ export function LoginForm() {
       if (result.error) {
         setError(result.error)
       } else if (result.success) {
-        // 登录成功，重定向到首页
-        window.location.href = '/'
+        // 登录成功，使用 router.push 进行软导航以保留 cookie
+        router.push('/')
+        router.refresh()
       }
     } catch {
       setError('登录失败，请稍后重试')
