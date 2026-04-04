@@ -42,7 +42,7 @@ export async function getStyleDesignTokens(
       }
     }
 
-    // 将数据库格式转换为 DesignTokens 格式
+    // 将数据库格式转换为 DesignTokens 格式（完整版）
     const tokens: DesignTokens = {
       colors: {
         primary: style.color_palette?.primary || '#3B82F6',
@@ -51,11 +51,17 @@ export async function getStyleDesignTokens(
         surface: style.color_palette?.surface || '#F3F4F6',
         text: style.color_palette?.text || '#1F2937',
         textMuted: style.color_palette?.textMuted || '#6B7280',
+        border: style.color_palette?.border || '#E5E7EB',
+        accent: style.color_palette?.accent || '#60A5FA',
       },
       fonts: {
         heading: style.fonts?.heading || 'Inter, system-ui, sans-serif',
         body: style.fonts?.body || 'Inter, system-ui, sans-serif',
-        mono: 'Fira Code, monospace',
+        mono: style.fonts?.mono || 'Fira Code, monospace',
+        headingWeight: style.fonts?.headingWeight || 700,
+        bodyWeight: style.fonts?.bodyWeight || 400,
+        headingLineHeight: style.fonts?.headingLineHeight || 1.2,
+        bodyLineHeight: style.fonts?.bodyLineHeight || 1.5,
       },
       spacing: {
         xs: style.spacing?.xs || 4,
@@ -63,6 +69,16 @@ export async function getStyleDesignTokens(
         md: style.spacing?.md || 16,
         lg: style.spacing?.lg || 24,
         xl: style.spacing?.xl || 32,
+      },
+      borderRadius: {
+        small: style.border_radius?.small || '4px',
+        medium: style.border_radius?.medium || '8px',
+        large: style.border_radius?.large || '16px',
+      },
+      shadows: {
+        light: style.shadows?.light || '0 1px 2px rgba(0,0,0,0.05)',
+        medium: style.shadows?.medium || '0 4px 6px rgba(0,0,0,0.1)',
+        heavy: style.shadows?.heavy || '0 10px 15px rgba(0,0,0,0.15)',
       },
     }
 

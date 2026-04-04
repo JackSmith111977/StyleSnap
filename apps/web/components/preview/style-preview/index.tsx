@@ -18,21 +18,38 @@ interface StylePreviewProps {
  * 固定尺寸、响应式布局，展示风格应用效果
  */
 export function StylePreview({ tokens, className }: StylePreviewProps) {
-  // 生成 CSS 变量样式
+  // 生成完整 CSS 变量样式
   const previewStyles: React.CSSProperties = {
+    // 颜色变量（8 色）
     '--preview-primary': tokens.colors.primary,
     '--preview-secondary': tokens.colors.secondary,
     '--preview-background': tokens.colors.background,
     '--preview-surface': tokens.colors.surface,
     '--preview-text': tokens.colors.text,
     '--preview-text-muted': tokens.colors.textMuted,
+    '--preview-border': tokens.colors.border,
+    '--preview-accent': tokens.colors.accent,
+    // 字体变量
     '--preview-font-heading': tokens.fonts.heading,
     '--preview-font-body': tokens.fonts.body,
+    '--preview-font-weight-heading': tokens.fonts.headingWeight.toString(),
+    '--preview-font-weight-body': tokens.fonts.bodyWeight.toString(),
+    '--preview-font-line-height-heading': tokens.fonts.headingLineHeight.toString(),
+    '--preview-font-line-height-body': tokens.fonts.bodyLineHeight.toString(),
+    // 间距变量
     '--preview-spacing-xs': `${tokens.spacing.xs}px`,
     '--preview-spacing-sm': `${tokens.spacing.sm}px`,
     '--preview-spacing-md': `${tokens.spacing.md}px`,
     '--preview-spacing-lg': `${tokens.spacing.lg}px`,
     '--preview-spacing-xl': `${tokens.spacing.xl}px`,
+    // 圆角变量
+    '--preview-border-radius-small': tokens.borderRadius.small,
+    '--preview-border-radius-medium': tokens.borderRadius.medium,
+    '--preview-border-radius-large': tokens.borderRadius.large,
+    // 阴影变量
+    '--preview-shadow-light': tokens.shadows.light,
+    '--preview-shadow-medium': tokens.shadows.medium,
+    '--preview-shadow-heavy': tokens.shadows.heavy,
   } as React.CSSProperties
 
   return (

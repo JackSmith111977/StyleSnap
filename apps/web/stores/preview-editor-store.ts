@@ -6,24 +6,48 @@
 import { create } from 'zustand';
 
 /**
- * 颜色配置接口
+ * 颜色配置接口 - 8 色完整色板
  */
 export interface ColorTokens {
-  primary: string;
-  secondary: string;
-  background: string;
-  surface: string;
-  text: string;
-  textMuted: string;
+  primary: string;       // 主色
+  secondary: string;     // 辅色
+  background: string;    // 背景色
+  surface: string;       // 表面色
+  text: string;          // 文字色
+  textMuted: string;     // 弱化文字色
+  border: string;        // 边框色
+  accent: string;        // 强调色（hover、焦点）
 }
 
 /**
- * 字体配置接口
+ * 字体配置接口 - 完整参数
  */
 export interface FontTokens {
-  heading: string;
-  body: string;
-  mono: string;
+  heading: string;           // 标题字体系
+  body: string;              // 正文字体系
+  mono: string;              // 等宽字体
+  headingWeight: number;     // 标题字重（如 700）
+  bodyWeight: number;        // 正文字重（如 400）
+  headingLineHeight: number; // 标题行高（如 1.2）
+  bodyLineHeight: number;    // 正文行高（如 1.5）
+}
+
+/**
+ * 圆角配置接口 - 3 档
+ */
+export interface BorderRadiusTokens {
+  small: string;   // 4px - 按钮、小元素
+  medium: string;  // 8px - 卡片、输入框
+  large: string;   // 16px - 大容器、头像
+}
+
+/**
+ * 阴影配置接口 - 3 档
+ */
+export interface ShadowTokens {
+  light: string;   // 轻微悬浮效果
+  medium: string;  // 卡片、导航栏阴影
+  heavy: string;   // 模态框、弹出层阴影
 }
 
 /**
@@ -44,6 +68,8 @@ export interface DesignTokens {
   colors: ColorTokens;
   fonts: FontTokens;
   spacing: SpacingTokens;
+  borderRadius: BorderRadiusTokens;
+  shadows: ShadowTokens;
 }
 
 /**
@@ -57,11 +83,17 @@ export const DEFAULT_TOKENS: DesignTokens = {
     surface: '#F3F4F6',
     text: '#1F2937',
     textMuted: '#6B7280',
+    border: '#E5E7EB',
+    accent: '#60A5FA',
   },
   fonts: {
     heading: 'Inter, system-ui, sans-serif',
     body: 'Inter, system-ui, sans-serif',
     mono: 'Fira Code, monospace',
+    headingWeight: 700,
+    bodyWeight: 400,
+    headingLineHeight: 1.2,
+    bodyLineHeight: 1.5,
   },
   spacing: {
     xs: 4,
@@ -69,6 +101,16 @@ export const DEFAULT_TOKENS: DesignTokens = {
     md: 16,
     lg: 24,
     xl: 32,
+  },
+  borderRadius: {
+    small: '4px',
+    medium: '8px',
+    large: '16px',
+  },
+  shadows: {
+    light: '0 1px 2px rgba(0,0,0,0.05)',
+    medium: '0 4px 6px rgba(0,0,0,0.1)',
+    heavy: '0 10px 15px rgba(0,0,0,0.15)',
   },
 };
 

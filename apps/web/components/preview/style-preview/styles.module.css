@@ -2,7 +2,9 @@
 /* 使用 CSS Variables 实现样式隔离 */
 
 .previewContainer {
-  /* CSS Variables 作用域定义 */
+  /* CSS Variables 作用域定义 - 完整设计变量系统 */
+
+  /* 颜色变量（8 色） - 由 React 组件注入 */
   --preview-primary: #3B82F6;
   --preview-secondary: #10B981;
   --preview-background: #FFFFFF;
@@ -10,13 +12,32 @@
   --preview-text: #1F2937;
   --preview-text-muted: #6B7280;
   --preview-border: #E5E7EB;
+  --preview-accent: #60A5FA;
+
+  /* 字体变量 */
   --preview-font-heading: 'Inter', system-ui, sans-serif;
   --preview-font-body: 'Inter', system-ui, sans-serif;
+  --preview-font-weight-heading: 700;
+  --preview-font-weight-body: 400;
+  --preview-font-line-height-heading: 1.2;
+  --preview-font-line-height-body: 1.5;
+
+  /* 间距变量 */
   --preview-spacing-xs: 4px;
   --preview-spacing-sm: 8px;
   --preview-spacing-md: 16px;
   --preview-spacing-lg: 24px;
   --preview-spacing-xl: 32px;
+
+  /* 圆角变量 */
+  --preview-border-radius-small: 4px;
+  --preview-border-radius-medium: 8px;
+  --preview-border-radius-large: 16px;
+
+  /* 阴影变量 */
+  --preview-shadow-light: 0 1px 2px rgba(0,0,0,0.05);
+  --preview-shadow-medium: 0 4px 6px rgba(0,0,0,0.1);
+  --preview-shadow-heavy: 0 10px 15px rgba(0,0,0,0.15);
 
   /* 容器基础样式 */
   width: 100%;
@@ -24,9 +45,10 @@
   background-color: var(--preview-background);
   color: var(--preview-text);
   font-family: var(--preview-font-body);
-  line-height: 1.6;
+  font-weight: var(--preview-font-weight-body);
+  line-height: var(--preview-font-line-height-body);
   border: 1px solid var(--preview-border);
-  border-radius: 8px;
+  border-radius: var(--preview-border-radius-medium);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -57,8 +79,8 @@
 
 .logo {
   font-family: var(--preview-font-heading);
-  font-size: 20px;
-  font-weight: 700;
+  font-size: calc(var(--preview-spacing-xl) * 1.25);
+  font-weight: var(--preview-font-weight-heading);
   color: var(--preview-primary);
 }
 
@@ -70,12 +92,13 @@
 .navLink {
   color: var(--preview-text);
   text-decoration: none;
-  font-size: 14px;
+  font-size: calc(var(--preview-spacing-md) * 0.875);
+  font-weight: var(--preview-font-weight-body);
   transition: color 0.2s ease;
 }
 
 .navLink:hover {
-  color: var(--preview-primary);
+  color: var(--preview-accent);
 }
 
 /* ====================
@@ -95,8 +118,8 @@
 
 .sidebarTitle {
   font-family: var(--preview-font-heading);
-  font-size: 14px;
-  font-weight: 600;
+  font-size: calc(var(--preview-spacing-md) * 0.875);
+  font-weight: var(--preview-font-weight-heading);
   color: var(--preview-text);
   margin-bottom: var(--preview-spacing-sm);
 }
@@ -109,16 +132,16 @@
 
 .sidebarItem {
   padding: var(--preview-spacing-xs) var(--preview-spacing-sm);
-  font-size: 13px;
+  font-size: calc(var(--preview-spacing-md) * 0.8125);
   color: var(--preview-text-muted);
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: var(--preview-border-radius-small);
   transition: all 0.2s ease;
 }
 
 .sidebarItem:hover {
   background-color: var(--preview-background);
-  color: var(--preview-primary);
+  color: var(--preview-accent);
 }
 
 .tagCloud {
@@ -132,8 +155,8 @@
   padding: var(--preview-spacing-xs) var(--preview-spacing-sm);
   background-color: var(--preview-background);
   color: var(--preview-text-muted);
-  font-size: 12px;
-  border-radius: 12px;
+  font-size: calc(var(--preview-spacing-sm) * 0.75);
+  border-radius: var(--preview-border-radius-small);
   border: 1px solid var(--preview-border);
 }
 
@@ -153,16 +176,18 @@
 /* 标题样式 */
 .heading1 {
   font-family: var(--preview-font-heading);
-  font-size: 32px;
-  font-weight: 700;
+  font-size: calc(var(--preview-spacing-xl) * 2);
+  font-weight: var(--preview-font-weight-heading);
+  line-height: var(--preview-font-line-height-heading);
   color: var(--preview-text);
   margin-bottom: var(--preview-spacing-md);
 }
 
 .heading2 {
   font-family: var(--preview-font-heading);
-  font-size: 24px;
-  font-weight: 600;
+  font-size: calc(var(--preview-spacing-xl) * 1.5);
+  font-weight: var(--preview-font-weight-heading);
+  line-height: var(--preview-font-line-height-heading);
   color: var(--preview-text);
   margin-top: var(--preview-spacing-lg);
   margin-bottom: var(--preview-spacing-sm);
@@ -170,16 +195,17 @@
 
 .heading3 {
   font-family: var(--preview-font-heading);
-  font-size: 18px;
-  font-weight: 600;
+  font-size: calc(var(--preview-spacing-lg) * 0.75);
+  font-weight: var(--preview-font-weight-heading);
+  line-height: var(--preview-font-line-height-heading);
   color: var(--preview-text);
   margin-bottom: var(--preview-spacing-md);
 }
 
 /* 正文样式 */
 .bodyText {
-  font-size: 16px;
-  line-height: 1.7;
+  font-size: calc(var(--preview-spacing-lg));
+  line-height: var(--preview-font-line-height-body);
   color: var(--preview-text);
   margin-bottom: var(--preview-spacing-md);
 }
@@ -194,13 +220,13 @@
 .card {
   background-color: var(--preview-background);
   border: 1px solid var(--preview-border);
-  border-radius: 8px;
+  border-radius: var(--preview-border-radius-medium);
   overflow: hidden;
   transition: box-shadow 0.2s ease;
 }
 
 .card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--preview-shadow-medium);
 }
 
 .cardHeader {
@@ -210,8 +236,8 @@
 
 .cardTitle {
   font-family: var(--preview-font-heading);
-  font-size: 16px;
-  font-weight: 600;
+  font-size: calc(var(--preview-spacing-md));
+  font-weight: var(--preview-font-weight-heading);
   color: var(--preview-text);
   margin: 0;
 }
@@ -221,7 +247,8 @@
 }
 
 .cardBody p {
-  font-size: 14px;
+  font-size: calc(var(--preview-spacing-sm) * 0.875);
+  line-height: var(--preview-font-line-height-body);
   color: var(--preview-text-muted);
   margin: 0;
 }
@@ -237,8 +264,8 @@
   background-color: var(--preview-primary);
   color: white;
   border: none;
-  border-radius: 4px;
-  font-size: 14px;
+  border-radius: var(--preview-border-radius-small);
+  font-size: calc(var(--preview-spacing-sm) * 0.875);
   cursor: pointer;
   transition: opacity 0.2s ease;
 }
@@ -257,7 +284,8 @@
 .listItem {
   padding: var(--preview-spacing-sm) var(--preview-spacing-md);
   border-bottom: 1px solid var(--preview-border);
-  font-size: 14px;
+  font-size: calc(var(--preview-spacing-sm) * 0.875);
+  line-height: var(--preview-font-line-height-body);
   color: var(--preview-text);
 }
 
@@ -267,7 +295,7 @@
 
 .listItem::before {
   content: '•';
-  color: var(--preview-primary);
+  color: var(--preview-accent);
   font-weight: bold;
   display: inline-block;
   width: 1em;
