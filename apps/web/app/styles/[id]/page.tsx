@@ -10,6 +10,7 @@ import { FavoriteButton } from '@/components/favorite-button'
 import { CommentList } from '@/components/comment-list'
 import { CommentForm } from '@/components/comment-form'
 import { RelatedStyles } from '@/components/related-styles'
+import { LivePreviewEditor } from '@/components/preview'
 import Link from 'next/link'
 import { Eye, Heart, MessageCircle } from 'lucide-react'
 import { type Metadata } from 'next'
@@ -157,6 +158,12 @@ export default async function StyleDetailPage({ params }: StyleDetailPageProps) 
           />
         </div>
 
+        {/* 实时预览编辑器 */}
+        <div className="mt-12">
+          <h2 className="text-2xl font-bold mb-6">实时预览编辑器</h2>
+          <LivePreviewEditor styleName={style.title} />
+        </div>
+
         {/* 评论区域 */}
         <div className="mt-12">
           <h2 className="flex items-center gap-2 text-2xl font-bold mb-6">
@@ -188,7 +195,7 @@ export default async function StyleDetailPage({ params }: StyleDetailPageProps) 
 
         {/* 相关推荐 */}
         <div className="mt-12">
-          <RelatedStyles relatedStyles={relatedStyles} currentStyleId={style.id} />
+          <RelatedStyles relatedStyles={relatedStyles} />
         </div>
       </div>
     </div>

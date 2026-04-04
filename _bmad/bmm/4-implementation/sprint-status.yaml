@@ -76,8 +76,8 @@ development_status:
   epic-5-e2e-tests: done
 
   # Epic 6: 高级功能与增强
-  epic-6: backlog
-  6-1-live-preview-editor: backlog
+  epic-6: in-progress
+  6-1-live-preview-editor: done
   6-2-user-submission-flow: backlog
   6-3-share-functionality: backlog
   6-4-follow-system: backlog
