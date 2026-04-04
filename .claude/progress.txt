@@ -195,64 +195,50 @@
   - 更新 `sprint-status.yaml` - 状态改为 ready-for-dev
   - 更新 `epics.md` v1.7 - 新增 Story 6.4 Spec 记录
   - 创建 `supabase/migrations/0021_add_follow_system.sql` - 数据库迁移
-    - follows 表（关注关系）
-    - 索引优化
-    - RLS 策略
-    - 触发器同步计数
-    - toggle_follow 函数
-    - get_user_profile 函数
-    - get_following_feed 函数
-  - 创建 `apps/web/actions/follow/index.ts` - Server Actions
-    - toggleFollow - 切换关注状态
-    - getFollowStatus - 获取关注状态
-    - getFollowingFeed - 获取关注动态
-    - getUserProfile - 获取用户资料
+  - 创建 `apps/web/actions/follow/` - Server Actions
   - 创建 `apps/web/stores/follow-store.ts` - Zustand Store
   - 创建 `apps/web/components/follow/` - 关注系统组件
-    - follow-button.tsx - 关注按钮（乐观更新）
-    - follow-stats.tsx - 关注统计展示
-    - following-feed.tsx - 关注动态信息流
-    - author-card.tsx - 作者信息卡片
-    - index.ts - 组件导出
   - 创建 `apps/web/app/profile/[id]/page.tsx` - 个人主页
   - 更新 `apps/web/actions/styles/index.ts` - 添加 getUserStyles 函数
   - 更新 `apps/web/app/styles/[id]/page.tsx` - 集成作者卡片组件
   - 构建验证：pnpm build 成功 (20.1s)
+  - git 提交：c42143d
 
-**任务：Story 6.4 关注系统 - 数据库迁移**
+**任务：Story 6.5 用户合集 - 完整实现**
 - 状态：✅ 已完成
-- 完成时间：2026-04-05
-
-**任务：Story 6.4 关注系统 - Server Actions**
-- 状态：✅ 已完成
-- 完成时间：2026-04-05
-
-**任务：Story 6.4 关注系统 - Follow Store**
-- 状态：✅ 已完成
-- 完成时间：2026-04-05
-
-**任务：Story 6.4 关注系统 - UI 组件**
-- 状态：✅ 已完成
-- 完成时间：2026-04-05
-
-**任务：Story 6.4 关注系统 - 个人主页**
-- 状态：✅ 已完成
-- 完成时间：2026-04-05
-- 状态：已完成
 - 开始时间：2026-04-04
 - 完成时间：2026-04-04
 - 输出：
-  - 新增 `apps/web/lib/schemas.ts` - 提交表单 Zod Schema (submissionFormSchema, designTokensSchema, codeSnippetsSchema)
-  - 新增 `apps/web/lib/storage.ts` - Supabase Storage 工具函数（图片上传、URL 生成）
-  - 新增 `apps/web/actions/styles/submit.ts` - submitStyle Server Action（验证、上传、写入数据库）
-  - 新增 `apps/web/components/submit/image-upload.tsx` - 图片上传组件（拖拽上传、预览、进度显示）
-  - 新增 `apps/web/components/submit/code-editor.tsx` - 代码编辑器组件（语法高亮、语言切换）
-  - 新增 `apps/web/components/submit/style-submission-form.tsx` - 提交表单主组件
-  - 新增 `apps/web/app/submit/page.tsx` - 提交页面（登录检查、表单集成）
-  - 新增 `supabase/migrations/0020_add_submission_status.sql` - 审核状态迁移
-  - 安装依赖：react-hook-form, @hookform/resolvers
-  - 构建验证：pnpm build 成功 (12.8s)
-  - git 提交：实施完成
+  - 创建 `story-6-5-user-collections.md` - Story Spec 文档
+  - 更新 `sprint-status.yaml` - Story 6.5 状态改为 done
+  - 更新 `epics.md` - 新增 Story 6.5 Spec 记录
+  - 创建 `supabase/migrations/0022_add_collections.sql` - 数据库迁移
+    - collections 表（RLS 政策、20 个合集/用户限制）
+    - collection_styles 联结表（50 个风格/合集限制）
+    - RPC 函数：get_collection_detail, get_user_collections, add_style_to_collection, remove_style_from_collection
+    - 触发器：updated_at 自动更新
+  - 创建 `apps/web/actions/collections/` - Server Actions
+    - index.ts: createCollection, updateCollection, deleteCollection, getCollectionDetail, getUserCollections, getMyCollections, addStyleToCollection, removeStyleFromCollection, isStyleInCollection
+    - types.ts: Collection, CollectionDetail 接口，createCollectionSchema, updateCollectionSchema
+  - 创建 `apps/web/components/collection/` - UI 组件
+    - collection-card.tsx - 合集卡片（封面预览、公开/私密标识）
+    - collection-list.tsx - 合集列表（搜索功能）
+    - collection-form.tsx - 创建/编辑表单（公开/私密切换）
+    - add-style-modal.tsx - 添加风格弹窗
+    - collection-detail.tsx - 合集详情页（风格列表、添加/移除功能）
+    - index.ts - 组件导出索引
+  - 创建 UI 基础组件：
+    - apps/web/components/ui/badge.tsx - Badge 组件
+    - apps/web/components/ui/dialog.tsx - Dialog 组件 (Radix UI)
+    - apps/web/components/ui/switch.tsx - Switch 组件 (Radix UI)
+  - 创建页面：
+    - /collections - 用户合集列表页
+    - /collections/new - 创建新合集页
+    - /collections/[id] - 合集详情页
+    - /collections/[id]/edit - 编辑合集页
+  - 构建验证：pnpm build 成功 (19.2s)
+  - git 提交：e5b8c67
+  - 推送至远程仓库：feat/bmad
 
 **任务：Story 6.3 分享功能 - 完整实现**
 - 状态：已完成
