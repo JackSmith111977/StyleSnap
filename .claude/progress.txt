@@ -23,6 +23,20 @@
     - 阴影系统：3 档（light/medium/heavy）
   - 下一步：实施 v1.2 完整设计变量系统
 
+**任务：Story 6.8 v1.2 - 实施完整设计变量系统**
+- 状态：已完成
+- 开始时间：2026-04-04
+- 完成时间：2026-04-04
+- 输出：
+  - 更新 `preview-editor-store.ts` - 完整 DesignTokens 类型定义（8 色、完整字体参数、圆角、阴影）
+  - 更新 `get-design-tokens.ts` - 返回完整设计变量
+  - 更新 `index.tsx` - 注入 26 个 CSS Variables
+  - 更新 `styles.module.css` - 替换所有 hardcoded 值为 CSS 变量
+  - 创建 `0022_init_style_design_tokens.sql` - 数据初始化脚本
+  - 构建验证：pnpm build 成功 (17.2s)
+  - git 提交：8939889
+  - 下一步：在 Supabase 云端执行迁移脚本
+
 **任务：Story 6.8 风格预览组件实施**
 - 状态：已完成
 - 开始时间：2026-04-04
