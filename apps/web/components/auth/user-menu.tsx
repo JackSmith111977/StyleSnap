@@ -48,6 +48,13 @@ export function UserMenu() {
             </div>
             <div className="p-2 space-y-1">
               <Link
+                href="/dashboard"
+                className="block px-2 py-1.5 text-sm hover:bg-accent rounded"
+                onClick={() => setOpen(false)}
+              >
+                仪表板
+              </Link>
+              <Link
                 href="/"
                 className="block px-2 py-1.5 text-sm hover:bg-accent rounded"
                 onClick={() => setOpen(false)}
