@@ -28,15 +28,22 @@
   - git 提交：93769a6
 
 
-**任务：Story 6.2 用户提交流程 - Spec 创建**
+**任务：Story 6.2 用户提交流程 - 完整实现**
 - 状态：已完成
 - 开始时间：2026-04-04
 - 完成时间：2026-04-04
 - 输出：
-  - 创建 `_bmad/bmm/4-implementation/stories/story-6-2-user-submission-flow.md` - 完整的用户提交功能规格
-  - 包含：表单验证、图片上传、代码输入、审核流程
-  - 更新 sprint-status.yaml - Story 6.2 状态改为 ready-for-dev
-  - git 提交：ad553ab
+  - 新增 `apps/web/lib/schemas.ts` - 提交表单 Zod Schema (submissionFormSchema, designTokensSchema, codeSnippetsSchema)
+  - 新增 `apps/web/lib/storage.ts` - Supabase Storage 工具函数（图片上传、URL 生成）
+  - 新增 `apps/web/actions/styles/submit.ts` - submitStyle Server Action（验证、上传、写入数据库）
+  - 新增 `apps/web/components/submit/image-upload.tsx` - 图片上传组件（拖拽上传、预览、进度显示）
+  - 新增 `apps/web/components/submit/code-editor.tsx` - 代码编辑器组件（语法高亮、语言切换）
+  - 新增 `apps/web/components/submit/style-submission-form.tsx` - 提交表单主组件
+  - 新增 `apps/web/app/submit/page.tsx` - 提交页面（登录检查、表单集成）
+  - 新增 `supabase/migrations/0020_add_submission_status.sql` - 审核状态迁移
+  - 安装依赖：react-hook-form, @hookform/resolvers
+  - 构建验证：pnpm build 成功 (12.8s)
+  - git 提交：实施完成
 **任务：评论系统二级回复扁平化存储 E2E 测试**
 - 状态：已完成
 - 开始时间：2026-04-04
