@@ -273,6 +273,85 @@ export async function incrementViewCount(id: string): Promise<boolean> {
 }
 
 /**
+ * 获取用户提交的风格列表
+ */
+export const getUserStyles = cache(async (
+  userId: string,
+  page = 1,
+  limit = 12
+): Promise<{
+  success: boolean
+  data?: {
+    styles: Style[]
+    total: number
+    page: number
+    limit: number
+  }
+  error?: string
+}> => {
+  try {
+    const supabase = await createClient()
+
+    const from = (page - 1) * limit
+    const to = from + limit - 1
+
+    const { data, error, count } = await supabase
+      .from('styles')
+      .select(`
+        *,
+        category:categories!inner(
+          id,
+          name,
+          name_en,
+          icon
+        ),
+        style_tags:style_tags(
+          tag:tags(
+            name
+          )
+        )
+      `, { count: 'exact' })
+      .eq('user_id', userId)
+      .eq('status', 'published')
+      .order('created_at', { ascending: false })
+      .range(from, to)
+
+    if (error) {
+      throw error
+    }
+
+    const styles: Style[] = ((data as unknown[]) ?? []).map((item: unknown) => {
+      const typedItem = item as Record<string, unknown>
+      const styleTags = typedItem.style_tags as Array<{ tag: { name: string } }> | undefined
+      return {
+        ...typedItem,
+        tags: styleTags?.map((st) => st.tag.name) ?? [],
+        style_tags: undefined,
+        user_id: typedItem.author_id as string,
+        author_name: (typedItem.author_id as string) || null,
+        author_avatar: null,
+      }
+    }) as Style[]
+
+    return {
+      success: true,
+      data: {
+        styles,
+        total: count ?? 0,
+        page,
+        limit,
+      },
+    }
+  } catch (error) {
+    console.error('获取用户风格列表失败:', error)
+    return {
+      success: false,
+      error: '获取用户风格列表失败',
+    }
+  }
+})
+
+/**
  * 获取相关推荐风格（按分类或标签匹配）
  * @param styleId 当前风格 ID
  * @param limit 返回数量限制，默认 4

@@ -91,10 +91,12 @@ development_status:
   # Epic 6: 高级功能与增强
   epic-6: in-progress
   6-1-real-time-preview-editor: done
-  6-2-user-submission-flow: backlog
-  6-3-sharing-feature: backlog
-  6-4-follow-system: backlog
+  6-2-user-submission-flow: done
+  6-3-sharing-feature: done
+  6-4-follow-system: done
   6-5-user-collections: backlog
   6-6-code-export-options: backlog
   6-7-preview-styles: backlog
+  6-8-style-preview-component: backlog
+  6-9-style-preview-modal: ready-for-dev
   epic-6-retrospective: optional

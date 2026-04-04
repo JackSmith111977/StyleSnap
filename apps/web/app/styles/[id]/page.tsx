@@ -4,6 +4,7 @@ import { getComments } from '@/actions/comments'
 import { checkIsLiked } from '@/actions/likes'
 import { checkIsFavorite } from '@/actions/favorites'
 import { getStyleDesignTokens } from '@/actions/styles/get-design-tokens'
+import { getAuthorInfo } from '@/actions/follow/get-author-info'
 import { StyleDetail } from '@/components/style-detail'
 import { CodeSnippetDisplay } from '@/components/style-code-snippet'
 import { LikeButton } from '@/components/like-button'
@@ -14,6 +15,7 @@ import { RelatedStyles } from '@/components/related-styles'
 import { LivePreviewEditor } from '@/components/preview'
 import { StylePreview } from '@/components/preview/style-preview'
 import { ShareButton } from '@/components/share'
+import { AuthorCard } from '@/components/follow'
 import Link from 'next/link'
 import { Eye, Heart, MessageCircle, Share2 } from 'lucide-react'
 import { type Metadata } from 'next'
@@ -84,6 +86,10 @@ export default async function StyleDetailPage({ params }: StyleDetailPageProps) 
   // 获取设计变量（用于风格预览组件）
   const designTokensResult = await getStyleDesignTokens(id)
   const designTokens = designTokensResult.success ? designTokensResult.data : undefined
+
+  // 获取作者信息（包含关注状态）
+  const authorInfoResult = style.author_id ? await getAuthorInfo(style.author_id) : null
+  const authorInfo = authorInfoResult?.success ? authorInfoResult.data : null
 
   return (
     <div className="min-h-screen bg-background">
@@ -184,6 +190,24 @@ export default async function StyleDetailPage({ params }: StyleDetailPageProps) 
           <h2 className="text-2xl font-bold mb-6">实时预览编辑器</h2>
           <LivePreviewEditor styleName={style.title} />
         </div>
+
+        {/* 作者信息卡片 */}
+        {authorInfo && (
+          <div className="mt-12">
+            <h2 className="text-2xl font-bold mb-6">关于作者</h2>
+            <AuthorCard
+              authorId={authorInfo.user_id}
+              authorName={authorInfo.display_name}
+              authorAvatar={authorInfo.avatar_url}
+              authorBio={authorInfo.bio}
+              followerCount={authorInfo.follower_count}
+              followingCount={authorInfo.following_count}
+              styleCount={authorInfo.style_count}
+              isFollowing={authorInfo.is_following}
+              createdAt={authorInfo.created_at}
+            />
+          </div>
+        )}
 
         {/* 评论区域 */}
         <div className="mt-12">

@@ -186,7 +186,58 @@
   - git 提交：93769a6
 
 
-**任务：Story 6.2 用户提交流程 - 完整实现**
+**任务：Story 6.4 关注系统 - 完整实现**
+- 状态：✅ 已完成
+- 开始时间：2026-04-04
+- 完成时间：2026-04-05
+- 输出：
+  - 创建 `story-6-4-follow-system.md` - Story Spec 文档
+  - 更新 `sprint-status.yaml` - 状态改为 ready-for-dev
+  - 更新 `epics.md` v1.7 - 新增 Story 6.4 Spec 记录
+  - 创建 `supabase/migrations/0021_add_follow_system.sql` - 数据库迁移
+    - follows 表（关注关系）
+    - 索引优化
+    - RLS 策略
+    - 触发器同步计数
+    - toggle_follow 函数
+    - get_user_profile 函数
+    - get_following_feed 函数
+  - 创建 `apps/web/actions/follow/index.ts` - Server Actions
+    - toggleFollow - 切换关注状态
+    - getFollowStatus - 获取关注状态
+    - getFollowingFeed - 获取关注动态
+    - getUserProfile - 获取用户资料
+  - 创建 `apps/web/stores/follow-store.ts` - Zustand Store
+  - 创建 `apps/web/components/follow/` - 关注系统组件
+    - follow-button.tsx - 关注按钮（乐观更新）
+    - follow-stats.tsx - 关注统计展示
+    - following-feed.tsx - 关注动态信息流
+    - author-card.tsx - 作者信息卡片
+    - index.ts - 组件导出
+  - 创建 `apps/web/app/profile/[id]/page.tsx` - 个人主页
+  - 更新 `apps/web/actions/styles/index.ts` - 添加 getUserStyles 函数
+  - 更新 `apps/web/app/styles/[id]/page.tsx` - 集成作者卡片组件
+  - 构建验证：pnpm build 成功 (20.1s)
+
+**任务：Story 6.4 关注系统 - 数据库迁移**
+- 状态：✅ 已完成
+- 完成时间：2026-04-05
+
+**任务：Story 6.4 关注系统 - Server Actions**
+- 状态：✅ 已完成
+- 完成时间：2026-04-05
+
+**任务：Story 6.4 关注系统 - Follow Store**
+- 状态：✅ 已完成
+- 完成时间：2026-04-05
+
+**任务：Story 6.4 关注系统 - UI 组件**
+- 状态：✅ 已完成
+- 完成时间：2026-04-05
+
+**任务：Story 6.4 关注系统 - 个人主页**
+- 状态：✅ 已完成
+- 完成时间：2026-04-05
 - 状态：已完成
 - 开始时间：2026-04-04
 - 完成时间：2026-04-04
