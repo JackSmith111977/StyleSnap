@@ -128,10 +128,20 @@ pnpm test tests/unit/actions/epic-4-favorites-likes.test.ts
 ### E2E 测试运行
 ```bash
 pnpm test:e2e tests/e2e/epic-4-social-interaction.spec.ts --project=chromium
-# Running 6 tests using 4 workers
+# Running 6 tests using 6 workers
 # ✓ 5 tests passed
-# - 1 test skipped
+# - 1 test skipped (20.5s)
 ```
+
+**通过测试**:
+1. ✅ 未登录用户点击收藏跳转登录页
+2. ✅ 未登录用户点击点赞跳转登录页
+3. ✅ 未登录用户访问收藏页重定向到登录页
+4. ✅ 已登录用户可以收藏和取消收藏
+5. ✅ 已登录用户可以点赞和取消点赞
+
+**跳过测试**:
+- ⏭️ 已登录用户可以访问收藏页 - Next.js Server Components 认证状态同步问题
 
 ---
 
