@@ -29,7 +29,7 @@ export function CodeSnippetDisplay({ snippets }: CodeSnippetDisplayProps) {
   }
 
   // 默认选择第一个片段
-  const defaultValue = validSnippets[0].language
+  const defaultValue = validSnippets[0]?.language ?? 'html'
 
   return (
     <div className="space-y-6">

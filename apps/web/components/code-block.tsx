@@ -120,15 +120,15 @@ export function CodeBlock({ code, language, title, showLineNumbers = true }: Cod
               ))}
             </div>
             {/* 代码 */}
-            <pre className="flex-1 py-4 pl-4" ref={preRef}>
-              <code ref={codeRef} className={`language-${language}`}>
+            <pre className="flex-1 py-4 pl-4" ref={preRef} suppressHydrationWarning>
+              <code ref={codeRef} className={`language-${language}`} suppressHydrationWarning>
                 {code}
               </code>
             </pre>
           </div>
         ) : (
-          <pre className="py-4">
-            <code ref={codeRef} className={`language-${language}`}>
+          <pre className="py-4" ref={preRef} suppressHydrationWarning>
+            <code ref={codeRef} className={`language-${language}`} suppressHydrationWarning>
               {code}
             </code>
           </pre>
