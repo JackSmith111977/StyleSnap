@@ -95,43 +95,94 @@ export async function getMyFavorites(
   }
   error?: string
 }> {
+  console.log('[getMyFavorites] Start, page:', page)
+
   try {
     const supabase = await createClient()
     const user = await getCurrentUser()
 
+    // 使用字符串拼接避免日志格式化问题
+    const userInfo = user ? `id=${user.id}, email=${user.email}` : 'null'
+    console.log('[getMyFavorites] User:', userInfo)
+
     if (!user) {
+      console.log('[getMyFavorites] No user, returning error')
       return { success: false, error: '请先登录' }
     }
 
     const from = (page - 1) * limit
     const to = from + limit - 1
 
-    const { data, error, count } = await supabase
+    console.log('[getMyFavorites] Step 1: Querying favorites for user:', user.id, 'range:', from, '-', to)
+
+    // 步骤 1: 先获取 favorites 表中的 style_id 列表（避免嵌套查询的 RLS 问题）
+    const { data: favoritesData, error: favoritesError, count } = await supabase
       .from('favorites')
-      .select(
-        `
-        style:styles(
-          id,
-          title,
-          description,
-          category_id,
-          status,
-          favorite_count,
-          like_count,
-          view_count,
-          created_at,
-          category:categories(id, name, name_en, icon),
-          style_tags:style_tags(tag:tags(name))
-        )
-      `,
-        { count: 'exact' }
-      )
+      .select('style_id, created_at', { count: 'exact' })
       .eq('user_id', user.id)
-      .order('created_at', { ascending: false, foreignTable: 'favorites' })
+      .order('created_at', { ascending: false })
       .range(from, to)
 
-    if (error) {
-      throw error
+    console.log('[getMyFavorites] Step 1 result:', {
+      hasData: !!favoritesData,
+      dataLength: favoritesData?.length,
+      hasError: !!favoritesError,
+      error: favoritesError ? { message: favoritesError.message, code: favoritesError.code, details: favoritesError.details } : null,
+      count
+    })
+
+    if (favoritesError) {
+      console.error('[getMyFavorites] Step 1 error:', favoritesError)
+      throw favoritesError
+    }
+
+    // 如果没有收藏，直接返回空结果
+    if (!favoritesData || favoritesData.length === 0) {
+      console.log('[getMyFavorites] No favorites found, returning empty result')
+      return {
+        success: true,
+        data: {
+          styles: [],
+          total: count ?? 0,
+          page,
+          limit,
+          totalPages: Math.ceil((count ?? 0) / limit),
+        },
+      }
+    }
+
+    // 提取 style_id 列表
+    const styleIds = favoritesData.map(fav => fav.style_id)
+    console.log('[getMyFavorites] Step 2: Querying styles with IDs:', styleIds)
+
+    // 步骤 2: 根据 style_id 列表查询完整的风格信息
+    const { data: stylesData, error: stylesError } = await supabase
+      .from('styles')
+      .select(`
+        id,
+        title,
+        description,
+        category_id,
+        status,
+        favorite_count,
+        like_count,
+        view_count,
+        created_at,
+        category:categories(id, name, name_en, icon),
+        style_tags:style_tags(tag:tags(name))
+      `)
+      .in('id', styleIds)
+
+    console.log('[getMyFavorites] Step 2 result:', {
+      hasData: !!stylesData,
+      dataLength: stylesData?.length,
+      hasError: !!stylesError,
+      error: stylesError ? { message: stylesError.message, code: stylesError.code, details: stylesError.details } : null
+    })
+
+    if (stylesError) {
+      console.error('[getMyFavorites] Step 2 error:', stylesError)
+      throw stylesError
     }
 
     // 类型定义
@@ -149,46 +200,37 @@ export async function getMyFavorites(
       tags?: string[]
     }
 
-    const styles: FavoriteStyle[] =
-      (data as unknown as Array<{
-        style: {
-          id: string
-          title: string
-          description: string | null
-          category_id: string
-          status: string
-          favorite_count: number
-          like_count: number
-          view_count: number
-          created_at: string
-          category?: { name: string; name_en: string; icon: string | null } | Array<{ name: string; name_en: string; icon: string | null }>
-          style_tags?: Array<Array<{ tag: { name: string } }>>
+    // 按 favorites 的顺序排序（因为 stylesData 可能顺序不同）
+    const stylesMap = new Map(stylesData?.map(style => [style.id, style]) ?? [])
+    const styles: FavoriteStyle[] = styleIds.map(id => {
+      const style = stylesMap.get(id)
+      if (!style) return null
+
+      // 处理 category 可能是数组的情况（Supabase 外键关联）
+      const category = Array.isArray(style.category) ? style.category[0] : style.category
+      // 处理 style_tags 可能是嵌套数组的情况
+      let styleTagsData: Array<{ tag: { name: string } }> = []
+      if (style.style_tags) {
+        if (Array.isArray(style.style_tags)) {
+          styleTagsData = style.style_tags.flat() as Array<{ tag: { name: string } }>
         }
-      }>).map((item) => {
-        const style = item.style
-        // 处理 category 可能是数组的情况（Supabase 外键关联）
-        const category = Array.isArray(style.category) ? style.category[0] : style.category
-        // 处理 style_tags 可能是嵌套数组的情况
-        let styleTagsData: Array<{ tag: { name: string } }> = []
-        if (style.style_tags) {
-          if (Array.isArray(style.style_tags)) {
-            styleTagsData = style.style_tags.flat() as Array<{ tag: { name: string } }>
-          }
-        }
-        return {
-          id: style.id,
-          title: style.title,
-          description: style.description,
-          category_id: style.category_id,
-          status: style.status,
-          favorite_count: style.favorite_count,
-          like_count: style.like_count,
-          view_count: style.view_count,
-          created_at: style.created_at,
-          category,
-          tags: styleTagsData.map((st) => st.tag.name),
-        }
-      }) ?? []
+      }
+      return {
+        id: style.id,
+        title: style.title,
+        description: style.description,
+        category_id: style.category_id,
+        status: style.status,
+        favorite_count: style.favorite_count,
+        like_count: style.like_count,
+        view_count: style.view_count,
+        created_at: style.created_at,
+        category,
+        tags: styleTagsData.map((st) => st.tag.name),
+      }
+    }).filter((s): s is FavoriteStyle => s !== null)
+
+    console.log('[getMyFavorites] Final result:', { stylesCount: styles.length, total: count })
 
     return {
       success: true,
