@@ -42,6 +42,7 @@
   /* 容器基础样式 */
   width: 100%;
   min-width: 320px;
+  height: 600px; /* 固定高度 */
   background-color: var(--preview-background);
   color: var(--preview-text);
   font-family: var(--preview-font-body);
@@ -58,7 +59,7 @@
 .previewBody {
   display: flex;
   flex: 1;
-  min-height: 400px;
+  overflow: hidden; /* 防止溢出 */
 }
 
 /* ====================
@@ -110,6 +111,7 @@
   border-right: 1px solid var(--preview-border);
   padding: var(--preview-spacing-md);
   flex-shrink: 0;
+  overflow-y: auto; /* 侧边栏可滚动 */
 }
 
 .sidebarSection {
@@ -137,11 +139,23 @@
   cursor: pointer;
   border-radius: var(--preview-border-radius-small);
   transition: all 0.2s ease;
+  user-select: none;
 }
 
 .sidebarItem:hover {
   background-color: var(--preview-background);
   color: var(--preview-accent);
+}
+
+.sidebarItemActive {
+  background-color: var(--preview-primary);
+  color: white;
+  font-weight: var(--preview-font-weight-heading);
+}
+
+.sidebarItemActive:hover {
+  background-color: var(--preview-primary);
+  opacity: 0.9;
 }
 
 .tagCloud {
@@ -166,7 +180,8 @@
 .previewContent {
   flex: 1;
   padding: var(--preview-spacing-lg);
-  overflow-y: auto;
+  overflow-y: auto; /* 内容区可滚动 */
+  height: 100%; /* 占满父容器高度 */
 }
 
 .contentSection {

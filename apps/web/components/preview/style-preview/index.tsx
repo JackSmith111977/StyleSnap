@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useState } from 'react'
 import { DesignTokens } from '@/stores/preview-editor-store'
 import styles from './styles.module.css'
 import { PreviewHeader } from './preview-header'
@@ -14,11 +14,18 @@ interface StylePreviewProps {
 }
 
 /**
+ * 预览部分类型
+ */
+type PreviewSection = 'all' | 'typography' | 'colors' | 'spacing' | 'borderRadius' | 'shadows' | 'fonts' | 'components'
+
+/**
  * 风格预览组件主组件
  * 固定尺寸、响应式布局，展示风格应用效果
  */
 export function StylePreview({ tokens, className }: StylePreviewProps) {
-  // 生成完整 CSS 变量样式
+  const [activeSection, setActiveSection] = useState<PreviewSection>('all')
+
+  // 生成内联样式
   const previewStyles: React.CSSProperties = {
     // 颜色变量（8 色）
     '--preview-primary': tokens.colors.primary,
@@ -62,11 +69,11 @@ export function StylePreview({ tokens, className }: StylePreviewProps) {
       <PreviewHeader />
 
       <div className={styles.previewBody}>
-        {/* 侧边栏 */}
-        <PreviewSidebar />
+        {/* 侧边栏 - 带导航功能 */}
+        <PreviewSidebar activeSection={activeSection} onSectionChange={setActiveSection} />
 
-        {/* 内容区域 */}
-        <PreviewContent />
+        {/* 内容区域 - 动态显示 */}
+        <PreviewContent activeSection={activeSection} />
       </div>
 
       {/* 页脚 */}

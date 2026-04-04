@@ -157,7 +157,7 @@ export default async function StyleDetailPage({ params }: StyleDetailPageProps) 
         </div>
 
         {/* 设计变量展示 */}
-        <StyleDetail style={style} />
+        {designTokens && <StyleDetail designTokens={designTokens} />}
 
         {/* 风格预览组件 */}
         {designTokens && (

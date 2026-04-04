@@ -6,6 +6,40 @@
 
 ### ✅ 已完成
 
+**任务：StyleDetail 组件使用 designTokens - 配色字体展示更新**
+- 状态：已完成
+- 开始时间：2026-04-04
+- 完成时间：2026-04-04
+- 输出：
+  - 重写 `apps/web/components/style-detail.tsx` - 使用 DesignTokens 接口
+  - 修改 `apps/web/app/styles/[id]/page.tsx` - 传递 designTokens 给 StyleDetail
+  - 新增展示组件：
+    - SpacingItem - 间距可视化
+    - BorderRadiusItem - 圆角可视化
+    - ShadowItem - 阴影可视化
+  - 字体系统增强：显示字重、行高、可复制字体栈
+  - 构建验证：pnpm build 成功 (17.6s)
+  - 数据一致性：StyleDetail 和 StylePreview 共用同一数据源
+
+**任务：Story 6.8 v1.4 风格预览组件 - 定高 + 侧边栏导航切换**
+- 状态：已完成
+- 开始时间：2026-04-04
+- 完成时间：2026-04-04
+- 输出：
+  - 修改 `apps/web/components/preview/style-preview/index.tsx` - 添加状态管理（activeSection）
+  - 修改 `apps/web/components/preview/style-preview/preview-sidebar.tsx` - 添加导航功能（8 个导航项）
+  - 修改 `apps/web/components/preview/style-preview/preview-content.tsx` - 支持动态显示/隐藏
+  - 修改 `apps/web/components/preview/style-preview/styles.module.css` - 固定高度 600px、滚动样式、激活状态样式
+  - 删除重复文件 `apps/web/components/preview/style-preview/index.ts` - 修复循环引用错误
+  - 构建验证：pnpm build 成功 (13.5s)
+  - 类型检查：无新增相关错误
+  - 功能实现：
+    - 固定高度：600px
+    - 侧边栏导航：全部 | 排版 | 配色 | 间距 | 圆角 | 阴影 | 字体 | 组件
+    - 点击切换：动态显示对应部分，其他隐藏
+    - 布局：侧边栏在预览容器内部左侧
+  - 下一步：更新 sprint-status.yaml，待 Epic 6 完成后统一审查
+
 **任务：BMad 需求变更流程 - F2.8 完整设计变量系统**
 - 状态：已完成
 - 开始时间：2026-04-04

@@ -3,19 +3,54 @@
 import React from 'react'
 import styles from './styles.module.css'
 
+type PreviewSection = 'all' | 'typography' | 'colors' | 'spacing' | 'borderRadius' | 'shadows' | 'fonts' | 'components'
+
+interface PreviewSidebarProps {
+  activeSection: PreviewSection
+  onSectionChange: (section: PreviewSection) => void
+}
+
 /**
- * 预览组件 - 侧边栏
+ * 导航项配置
+ */
+const NAV_ITEMS: { key: PreviewSection; label: string }[] = [
+  { key: 'all', label: '全部' },
+  { key: 'typography', label: '排版' },
+  { key: 'colors', label: '配色' },
+  { key: 'spacing', label: '间距' },
+  { key: 'borderRadius', label: '圆角' },
+  { key: 'shadows', label: '阴影' },
+  { key: 'fonts', label: '字体' },
+  { key: 'components', label: '组件' },
+]
+
+/**
+ * 预览组件 - 侧边栏（带导航功能）
  * 展示风格的侧边栏效果
  */
-export function PreviewSidebar() {
+export function PreviewSidebar({ activeSection, onSectionChange }: PreviewSidebarProps) {
   return (
     <aside className={styles.previewSidebar}>
       <div className={styles.sidebarSection}>
-        <h4 className={styles.sidebarTitle}>分类</h4>
+        <h4 className={styles.sidebarTitle}>导航</h4>
         <ul className={styles.sidebarList}>
-          <li className={styles.sidebarItem}>极简主义</li>
-          <li className={styles.sidebarItem}>科技未来</li>
-          <li className={styles.sidebarItem}>玻璃拟态</li>
+          {NAV_ITEMS.map((item) => (
+            <li
+              key={item.key}
+              className={`${styles.sidebarItem} ${activeSection === item.key ? styles.sidebarItemActive : ''}`}
+              onClick={() => onSectionChange(item.key)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault()
+                  onSectionChange(item.key)
+                }
+              }}
+            >
+              {item.label}
+            </li>
+          ))}
         </ul>
       </div>
 

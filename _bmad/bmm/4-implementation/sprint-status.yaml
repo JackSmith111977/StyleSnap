@@ -84,6 +84,5 @@ development_status:
   6-5-user-collections: backlog
   6-6-code-export-options: backlog
   6-7-preview-style-modes: backlog
-  6-8-style-preview-component: review  # v1.3 预览场景增强完成
-  6-9-style-preview-modal: ready-for-dev  # 新增：预览窗口增强
+  6-8-style-preview-component: done  # v1.5 StyleDetail 组件使用 designTokens 完成
   epic-6-retrospective: optional
