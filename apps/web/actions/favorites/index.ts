@@ -26,19 +26,27 @@ export interface ToggleFavoriteResult {
 /**
  * 切换收藏状态（原子操作）
  * 返回：是否已收藏、收藏计数
+ *
+ * @param styleId - 风格 ID
+ * @param collectionId - 可选：收藏时直接添加到指定合集
  */
 export async function toggleFavorite(
-  styleId: string
+  styleId: string,
+  collectionId?: string
 ): Promise<{ success: boolean; data?: ToggleFavoriteResult; error?: string }> {
   let validatedData: { styleId: string } | undefined
 
   try {
+    console.log('[toggleFavorite] 开始执行:', { styleId, collectionId })
     validatedData = validateOrThrow(toggleFavoriteSchema, { styleId })
 
     const supabase = await createClient()
     const user = await getCurrentUser()
 
+    console.log('[toggleFavorite] 当前用户:', user?.id ?? 'null')
+
     if (!user) {
+      console.log('[toggleFavorite] 用户未登录，返回错误')
       return { success: false, error: '请先登录' }
     }
 
@@ -47,27 +55,75 @@ export async function toggleFavorite(
       email: user.email ?? undefined,
     })
 
+    console.log('[toggleFavorite] 调用 RPC toggle_favorite_atomic')
     const { data, error } = await supabase.rpc('toggle_favorite_atomic', {
       p_style_id: validatedData.styleId,
       p_user_id: user.id,
     })
 
     if (error) {
+      console.error('[toggleFavorite] RPC 错误:', error)
       throw error
     }
 
-    const result = data as { is_favorite: boolean; count: number }
+    console.log('[toggleFavorite] RPC 返回结果:', data, 'type:', Array.isArray(data) ? 'array' : typeof data)
 
+    // RPC 返回的是数组 [{ is_favorite, count }]，取第一个元素
+    const rpcResult = Array.isArray(data) && data.length > 0 ? data[0] : null
+    if (!rpcResult) {
+      console.error('[toggleFavorite] RPC 返回空结果')
+      throw new Error('RPC 返回空结果')
+    }
+
+    const result = {
+      is_favorite: rpcResult.is_favorite as boolean,
+      count: Number(rpcResult.count) as number,
+    }
+    console.log('[toggleFavorite] 解析后的结果:', result)
+
+    // 如果指定了合集 ID 且收藏成功，同时添加到合集
+    if (collectionId && result.is_favorite) {
+      console.log('[toggleFavorite] 添加到合集:', collectionId)
+      const { error: collectionError } = await supabase
+        .from('style_collection_tags')
+        .insert({
+          user_id: user.id,
+          style_id: validatedData.styleId,
+          collection_id: collectionId,
+        })
+
+      // 忽略合集相关的错误（如合集不存在、已在合集中等）
+      // 不影响收藏操作本身的成功
+      if (collectionError && collectionError.code !== '23505') {
+        console.log('[toggleFavorite] 添加到合集错误:', collectionError)
+        // 记录错误但不影响返回结果
+        await captureActionError(collectionError, {
+          action: 'toggleFavorite.addCollection',
+          styleId,
+          collectionId,
+        })
+      }
+    }
+
+    console.log('[toggleFavorite] revalidate 路径')
     revalidateTag(`style-${validatedData.styleId}`, 'max')
     revalidatePath(`/styles/${validatedData.styleId}`, 'page')
     revalidatePath('/styles', 'page')
     revalidatePath('/favorites', 'page')
 
+    console.log('[toggleFavorite] 返回成功结果')
     return {
       success: true,
       data: { isFavorite: result.is_favorite, count: result.count },
     }
   } catch (error) {
+    console.error('[toggleFavorite] 捕获异常:', error)
+    if (error instanceof Error) {
+      console.error('[toggleFavorite] 异常详情:', {
+        message: error.message,
+        stack: error.stack
+      })
+    }
     await captureActionError(error, {
       action: 'toggleFavorite',
       styleId: validatedData?.styleId ?? styleId,
@@ -108,15 +164,21 @@ export async function getFavorites(
   error?: string
 }> {
   try {
+    console.log('[getFavorites] Called with:', { collectionId, page, limit })
+
     const supabase = await createClient()
     const user = await getCurrentUser()
 
+    console.log('[getFavorites] Current user:', user?.id ?? 'null')
+
     if (!user) {
+      console.log('[getFavorites] No user found, returning error')
       return { success: false, error: '请先登录' }
     }
 
     // 验证参数
     const validatedData = validateOrThrow(getFavoritesSchema, { collectionId, page, limit })
+    console.log('[getFavorites] Validated data:', validatedData)
     const from = (validatedData.page - 1) * validatedData.limit
 
     // 步骤 1: 获取 favorites 表中的 style_id 列表
@@ -126,25 +188,79 @@ export async function getFavorites(
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
 
+    console.log('[getFavorites] Collection filter:', {
+      collectionId: validatedData.collectionId,
+      isUncategorized: validatedData.collectionId === 'uncategorized'
+    })
+
     if (validatedData.collectionId) {
-      // 如果指定了合集 ID，先筛选 style_collection_tags
-      const { data: tagData, error: tagError } = await supabase
-        .from('style_collection_tags')
-        .select('style_id')
-        .eq('user_id', user.id)
-        .eq('collection_id', validatedData.collectionId)
+      if (validatedData.collectionId === 'uncategorized') {
+        // 特殊处理：获取未分类的收藏（不在任何合集中的 style_id）
+        console.log('[getFavorites] Fetching uncategorized favorites')
 
-      if (tagError) throw tagError
+        // 先获取所有收藏的 style_id
+        const { data: allFavoritesData, error: allFavoritesError } = await supabase
+          .from('favorites')
+          .select('style_id')
+          .eq('user_id', user.id)
 
-      if (!tagData || tagData.length === 0) {
-        return {
-          success: true,
-          data: { styles: [], total: 0, page: validatedData.page, limit: validatedData.limit, totalPages: 0 },
+        if (allFavoritesError) throw allFavoritesError
+
+        if (!allFavoritesData || allFavoritesData.length === 0) {
+          console.log('[getFavorites] No favorites found')
+          return {
+            success: true,
+            data: { styles: [], total: 0, page: validatedData.page, limit: validatedData.limit, totalPages: 0 },
+          }
         }
-      }
 
-      const styleIds = tagData.map(t => t.style_id)
-      favoritesQuery = favoritesQuery.in('style_id', styleIds)
+        const allStyleIds = allFavoritesData.map(f => f.style_id)
+
+        // 获取已关联合集的 style_id
+        const { data: taggedData, error: taggedError } = await supabase
+          .from('style_collection_tags')
+          .select('style_id')
+          .eq('user_id', user.id)
+          .in('style_id', allStyleIds)
+
+        if (taggedError) throw taggedError
+
+        const taggedStyleIds = new Set(taggedData?.map(t => t.style_id) || [])
+        const uncategorizedStyleIds = allStyleIds.filter(id => !taggedStyleIds.has(id))
+
+        console.log('[getFavorites] Uncategorized style IDs:', uncategorizedStyleIds.length)
+
+        if (uncategorizedStyleIds.length === 0) {
+          return {
+            success: true,
+            data: { styles: [], total: 0, page: validatedData.page, limit: validatedData.limit, totalPages: 0 },
+          }
+        }
+
+        // 使用过滤后的 style_id 列表查询
+        favoritesQuery = favoritesQuery.in('style_id', uncategorizedStyleIds)
+      } else {
+        // 如果指定了合集 ID（UUID），先筛选 style_collection_tags
+        console.log('[getFavorites] Fetching collection:', validatedData.collectionId)
+        const { data: tagData, error: tagError } = await supabase
+          .from('style_collection_tags')
+          .select('style_id')
+          .eq('user_id', user.id)
+          .eq('collection_id', validatedData.collectionId)
+
+        if (tagError) throw tagError
+
+        if (!tagData || tagData.length === 0) {
+          console.log('[getFavorites] No styles in collection')
+          return {
+            success: true,
+            data: { styles: [], total: 0, page: validatedData.page, limit: validatedData.limit, totalPages: 0 },
+          }
+        }
+
+        const styleIds = tagData.map(t => t.style_id)
+        favoritesQuery = favoritesQuery.in('style_id', styleIds)
+      }
     }
 
     favoritesQuery = favoritesQuery.range(from, from + validatedData.limit - 1)
@@ -271,6 +387,14 @@ export async function getFavorites(
       },
     }
   } catch (error) {
+    console.error('[getFavorites] Error:', error)
+    if (error instanceof Error) {
+      console.error('[getFavorites] Error details:', {
+        message: error.message,
+        stack: error.stack,
+        cause: error.cause
+      })
+    }
     await captureActionError(error, {
       action: 'getFavorites',
       collectionId,
@@ -282,6 +406,10 @@ export async function getFavorites(
 
 /**
  * 添加风格到合集
+ *
+ * 注意：使用数据库外键约束确保引用完整性
+ * - style_collection_tags.style_id 外键关联 favorites(user_id, style_id)
+ * - 如果收藏不存在，数据库约束会拒绝插入
  */
 export async function addStyleToCollection(
   styleId: string,
@@ -305,19 +433,8 @@ export async function addStyleToCollection(
       return { success: false, error: '合集不存在或无权操作' }
     }
 
-    // 验证收藏是否存在
-    const { data: favorite } = await supabase
-      .from('favorites')
-      .select('id')
-      .eq('user_id', user.id)
-      .eq('style_id', validatedData.styleId)
-      .single()
-
-    if (!favorite) {
-      return { success: false, error: '请先收藏该风格' }
-    }
-
     // 添加合集标签
+    // 注意：数据库外键约束会自动验证 (user_id, style_id) 是否存在于 favorites 表
     const { error: insertError } = await supabase
       .from('style_collection_tags')
       .insert({
@@ -327,6 +444,11 @@ export async function addStyleToCollection(
       })
 
     if (insertError) {
+      // 23503 = foreign_key_violation
+      if (insertError.code === '23503') {
+        return { success: false, error: '请先收藏该风格' }
+      }
+      // 23505 = unique_violation
       if (insertError.code === '23505') {
         return { success: false, error: '风格已在该合集中' }
       }
@@ -468,6 +590,60 @@ export async function getUserCollectionsSimple(): Promise<{
       action: 'getUserCollectionsSimple',
     })
     return { success: false, error: '获取合集列表失败' }
+  }
+}
+
+/**
+ * 获取用户未分类的收藏数量
+ */
+export async function getUncategorizedFavoritesCount(): Promise<{
+  success: boolean
+  data?: { count: number }
+  error?: string
+}> {
+  try {
+    const supabase = await createClient()
+    const user = await requireAuth()
+
+    // 获取所有收藏的 style_id
+    const { data: favoritesData, error: favoritesError } = await supabase
+      .from('favorites')
+      .select('style_id')
+      .eq('user_id', user.id)
+
+    if (favoritesError) {
+      throw favoritesError
+    }
+
+    if (!favoritesData || favoritesData.length === 0) {
+      return { success: true, data: { count: 0 } }
+    }
+
+    const styleIds = favoritesData.map(f => f.style_id)
+
+    // 获取已关联合集的 style_id（去重）
+    const { data: taggedData, error: taggedError } = await supabase
+      .from('style_collection_tags')
+      .select('style_id')
+      .eq('user_id', user.id)
+      .in('style_id', styleIds)
+
+    if (taggedError) {
+      throw taggedError
+    }
+
+    const taggedStyleIds = new Set(taggedData?.map(t => t.style_id) || [])
+    const uncategorizedCount = styleIds.filter(id => !taggedStyleIds.has(id)).length
+
+    return {
+      success: true,
+      data: { count: uncategorizedCount },
+    }
+  } catch (error) {
+    await captureActionError(error, {
+      action: 'getUncategorizedFavoritesCount',
+    })
+    return { success: false, error: '获取未分类数量失败' }
   }
 }
 
