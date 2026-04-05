@@ -50,12 +50,12 @@ export default async function CollectionsPage() {
             </p>
           </div>
 
-          <Button asChild>
-            <Link href="/collections/new">
+          <Link href="/collections/new">
+            <Button>
               <Plus className="mr-2 h-4 w-4" />
               创建合集
-            </Link>
-          </Button>
+            </Button>
+          </Link>
         </div>
 
         {/* 合集列表 */}
