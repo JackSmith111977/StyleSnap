@@ -168,9 +168,35 @@ export const getStyles = cache(async (
     query = query.in('id', filteredStyleIds)
   }
 
-  // 分类筛选
+  // 分类筛选：支持分类名称或 UUID
   if (category) {
-    query = query.eq('category_id', category)
+    // 判断传入的是 UUID 还是名称
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(category)
+
+    if (isUuid) {
+      // 直接是 UUID，直接使用
+      query = query.eq('category_id', category)
+    } else {
+      // 是分类名称，需要先查询分类表获取 UUID
+      const { data: categoryData } = await supabase
+        .from('categories')
+        .select('id')
+        .eq('name', category)
+        .single()
+
+      if (categoryData) {
+        query = query.eq('category_id', categoryData.id)
+      } else {
+        // 分类名称不存在，返回空结果
+        return {
+          styles: [],
+          total: 0,
+          page,
+          limit,
+          totalPages: 0,
+        }
+      }
+    }
   }
 
   // 搜索
