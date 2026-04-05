@@ -10,7 +10,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { createCollection, updateCollection } from '@/actions/collections'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
-import { Search } from 'lucide-react'
 import type { Collection } from '@/actions/collections/types'
 
 interface CollectionFormProps {

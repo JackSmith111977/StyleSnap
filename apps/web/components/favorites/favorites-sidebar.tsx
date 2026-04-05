@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Folder, FolderPlus, FolderOpen, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -22,7 +21,6 @@ interface FavoritesSidebarProps {
 export function FavoritesSidebar({ collections, totalUncategorized, onRequestCreate }: FavoritesSidebarProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const [activeMenu, setActiveMenu] = useState<'all' | 'uncategorized' | string>('all')
 
   const currentCollectionId = searchParams.get('collectionId')
 
@@ -31,15 +29,12 @@ export function FavoritesSidebar({ collections, totalUncategorized, onRequestCre
     if (collectionId === 'uncategorized') {
       console.log('[FavoritesSidebar] Navigating to uncategorized')
       router.push('/favorites?collectionId=uncategorized')
-      setActiveMenu('uncategorized')
     } else if (!collectionId) {
       console.log('[FavoritesSidebar] Navigating to all favorites')
       router.push('/favorites')
-      setActiveMenu('all')
     } else {
       console.log('[FavoritesSidebar] Navigating to collection:', collectionId)
       router.push(`/favorites?collectionId=${collectionId}`)
-      setActiveMenu(collectionId)
     }
   }
 

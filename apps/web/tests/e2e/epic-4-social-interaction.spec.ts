@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import type { Page } from '@playwright/test';
 
 /**
  * Epic 4: 社交互动 - 收藏与点赞
@@ -12,12 +13,12 @@ const TEST_STYLE = {
 
 // 测试账号
 const TEST_USER = {
-  email: process.env.TEST_USER_EMAIL || 'qq3526547131@gmail.com',
-  password: process.env.TEST_USER_PASSWORD || 'test1234',
+  email: process.env.TEST_USER_EMAIL ?? 'qq3526547131@gmail.com',
+  password: process.env.TEST_USER_PASSWORD ?? 'test1234',
 };
 
 // 辅助函数：登录
-async function login(page: any) {
+async function login(page: Page): Promise<void> {
   await page.goto('/login');
   await page.fill('input[name="email"]', TEST_USER.email);
   await page.fill('input[name="password"]', TEST_USER.password);

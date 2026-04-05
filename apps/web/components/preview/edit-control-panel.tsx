@@ -5,7 +5,7 @@
  * 包含颜色选择器、字体选择器、间距滑块等控制组件
  */
 
-import React, { useCallback } from 'react';
+import React from 'react';
 import { usePreviewEditorStore, FONT_OPTIONS } from '@/stores/preview-editor-store';
 import styles from './edit-control-panel.module.css';
 

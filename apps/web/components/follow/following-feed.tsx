@@ -47,7 +47,7 @@ export function FollowingFeed({ className }: FollowingFeedProps) {
       }
     }
 
-    loadFeed()
+    void loadFeed()
   }, [])
 
   if (loading) {

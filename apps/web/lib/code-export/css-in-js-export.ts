@@ -114,7 +114,7 @@ export const buttonStyles = (variant: 'primary' | 'secondary' = 'primary') => cs
   transition: all 0.2s ease;
 
   \${variant === 'primary'
-    ? `
+    ? \`
     background-color: var(--color-primary);
     color: var(--background);
     border-color: var(--color-primary);
@@ -122,8 +122,8 @@ export const buttonStyles = (variant: 'primary' | 'secondary' = 'primary') => cs
     &:hover {
       opacity: 0.9;
     }
-  `
-    : `
+  \`
+    : \`
     background-color: var(--surface);
     color: var(--text);
     border-color: var(--border);
@@ -131,7 +131,7 @@ export const buttonStyles = (variant: 'primary' | 'secondary' = 'primary') => cs
     &:hover {
       background-color: var(--border);
     }
-  `}
+  \`}
 \``
 }
 

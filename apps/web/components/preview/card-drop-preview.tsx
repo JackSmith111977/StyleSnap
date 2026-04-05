@@ -1,7 +1,6 @@
 'use client'
 
 import { ChevronDown, ChevronUp } from 'lucide-react'
-import { cn } from '@/lib/utils'
 import type { DesignTokens } from '@/types/design-tokens'
 
 interface CardDropPreviewProps {
@@ -16,8 +15,6 @@ interface CardDropPreviewProps {
 
 export function CardDropPreview({
   styleId,
-  styleName,
-  styleDescription,
   designTokens,
   codeSnippet,
   isExpanded,

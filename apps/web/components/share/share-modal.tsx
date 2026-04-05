@@ -1,10 +1,9 @@
 'use client'
 
 import { useState, useCallback, useEffect } from 'react'
-import { X, Link, Image, Share2 } from 'lucide-react'
+import { X, Image } from 'lucide-react'
 import { toast } from 'sonner'
 import { buildShareUrl, generateShareUrl, getSocialShareUrl } from '@/lib/share'
-import { downloadQRCode } from '@/lib/qr-code'
 import styles from './share.module.css'
 import { SocialShareButtons } from './social-share-buttons'
 import { ShareImageGenerator } from './share-image-generator'

@@ -1,5 +1,5 @@
-import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { redirect } from 'next/navigation'
 
 /**
  * 认证回调处理
@@ -17,11 +17,10 @@ export default async function AuthCallbackPage({
     type,
     token_hash,
     next,
-    error,
   } = await searchParams
 
-  if (error) {
-    console.error('Auth callback error:', error)
+  if (searchParams.error) {
+    console.error('Auth callback error:', searchParams.error)
     redirect(`/login?error=${encodeURIComponent('认证失败，请重试')}`)
   }
 

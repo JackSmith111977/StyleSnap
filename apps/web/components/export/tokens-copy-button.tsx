@@ -61,7 +61,7 @@ export function TokensCopyButton({ tokens, format = 'json' }: TokensCopyButtonPr
       setCopied(true)
       toast.success('设计变量已复制')
       setTimeout(() => setCopied(false), 2000)
-    } catch (error) {
+    } catch {
       toast.error('复制失败，请手动选中复制')
     }
   }

@@ -203,7 +203,7 @@ export function exportFullDesignTokens(
   tokens: DesignTokens,
   options: TokensExportOptions = {}
 ): { json: string; javascript: string; typescript: string; dtcg: string } {
-  const { format = 'json', includeMetadata = false } = options
+  const { includeMetadata = false } = options
 
   const tokensData = includeMetadata
     ? {

@@ -52,7 +52,7 @@ export function useAuth(): UseAuthReturn {
       } else {
         setAdminRole('user');
       }
-    } catch (error) {
+    } catch {
       setUser(null);
       setAdminRole('user');
       setLoading(false);

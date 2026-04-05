@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Download, X } from 'lucide-react'
+import { Download } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { toast } from 'sonner'
@@ -12,25 +12,18 @@ import type { ExportFormat, ExportRange, CssInJsLibrary } from '@/types/code-exp
 import type { DesignTokens } from '@/types/design-tokens'
 
 interface ExportModalProps {
-  styleId: string
   styleName: string
   designTokens: DesignTokens
-  codeSnippets: {
-    html?: string
-    css?: string
-    react?: string
-    tailwind?: string
-  }
 }
 
-export function ExportModal({ styleId, styleName, designTokens, codeSnippets }: ExportModalProps) {
+export function ExportModal({ styleName, designTokens }: ExportModalProps): JSX.Element {
   const [open, setOpen] = useState(false)
   const [format, setFormat] = useState<ExportFormat>('css')
   const [range, setRange] = useState<ExportRange>('full')
   const [cssInJsLibrary, setCssInJsLibrary] = useState<CssInJsLibrary>('styled-components')
   const [isExporting, setIsExporting] = useState(false)
 
-  const handleExport = async () => {
+  const handleExport = async (): Promise<void> => {
     setIsExporting(true)
 
     try {
@@ -60,8 +53,8 @@ export function ExportModal({ styleId, styleName, designTokens, codeSnippets }: 
 
       toast.success('导出成功！')
       setOpen(false)
-    } catch (error) {
-      console.error('Export failed:', error)
+    } catch {
+      console.error('Export failed')
       toast.error('导出失败，请重试')
     } finally {
       setIsExporting(false)

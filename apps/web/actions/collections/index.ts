@@ -5,9 +5,9 @@ import { getCurrentUser, requireAuth } from '@/lib/auth'
 import { captureActionError, setSentryUser } from '@/lib/sentry-capture'
 import { revalidatePath, revalidateTag } from 'next/cache'
 import { validateOrThrow, styleIdSchema } from '@/lib/schemas'
-import { z } from 'zod'
+import type { z } from 'zod'
 import type { Collection, CollectionDetail } from './types'
-import { createCollectionSchema, updateCollectionSchema } from './types'
+import type { createCollectionSchema, updateCollectionSchema } from './types'
 
 /**
  * 创建合集
@@ -187,7 +187,20 @@ export async function getCollectionDetail(
       throw error
     }
 
-    const collection = (data as any[])?.[0]
+    const collection = data?.[0] as {
+      id: string
+      user_id: string
+      name: string
+      description: string
+      cover_style_id: string | null
+      is_public: boolean
+      created_at: string
+      updated_at: string
+      style_count: number
+      owner_name: string | null
+      owner_avatar: string | null
+      styles: unknown[]
+    }
 
     if (!collection) {
       return { success: false, error: '合集不存在' }
@@ -207,7 +220,7 @@ export async function getCollectionDetail(
         style_count: Number(collection.style_count),
         owner_name: collection.owner_name,
         owner_avatar: collection.owner_avatar,
-        styles: collection.styles || [],
+        styles: collection.styles ?? [],
       },
     }
   } catch (error) {
@@ -254,18 +267,21 @@ export async function getUserCollections(
       throw error
     }
 
-    const collections: Collection[] = ((data as unknown[]) || []).map((item: any) => ({
-      id: item.id,
-      user_id: item.user_id,
-      name: item.name,
-      description: item.description,
-      cover_style_id: item.cover_style_id,
-      is_public: item.is_public,
-      created_at: item.created_at,
-      updated_at: item.updated_at,
-      style_count: Number(item.style_count),
-      cover_preview: item.cover_preview,
-    }))
+    const collections: Collection[] = ((data as unknown[]) ?? []).map((item: unknown) => {
+      const typedItem = item as Record<string, unknown>
+      return {
+        id: typedItem.id as string,
+        user_id: typedItem.user_id as string,
+        name: typedItem.name as string,
+        description: typedItem.description as string,
+        cover_style_id: typedItem.cover_style_id as string | null,
+        is_public: typedItem.is_public as boolean,
+        created_at: typedItem.created_at as string,
+        updated_at: typedItem.updated_at as string,
+        style_count: Number(typedItem.style_count),
+        cover_preview: typedItem.cover_preview as string | null,
+      }
+    })
 
     return {
       success: true,
@@ -299,7 +315,7 @@ export async function getMyCollections(
     const user = await requireAuth()
     return await getUserCollections(user.id, page, limit)
   } catch (error) {
-    if ((error as any).message === '请先登录') {
+    if (error instanceof Error && error.message === '请先登录') {
       return { success: false, error: '请先登录' }
     }
     await captureActionError(error, {
@@ -329,7 +345,7 @@ export async function addStyleToCollection(
     await requireAuth()
 
     // 使用 RPC 函数添加风格
-    const { data, error } = await supabase.rpc('add_style_to_collection', {
+    const { error } = await supabase.rpc('add_style_to_collection', {
       p_collection_id: validatedCollectionId,
       p_style_id: validatedStyleId,
     })

@@ -1,8 +1,5 @@
 'use client'
 
-import { useMemo } from 'react'
-import { cn } from '@/lib/utils'
-
 interface FollowStatsProps {
   followerCount: number
   followingCount: number

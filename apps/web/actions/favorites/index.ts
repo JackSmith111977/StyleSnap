@@ -4,8 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { getCurrentUser, requireAuth } from '@/lib/auth'
 import { captureActionError, setSentryUser } from '@/lib/sentry-capture'
 import { revalidatePath, revalidateTag } from 'next/cache'
-import { validateOrThrow, styleIdSchema, collectionIdSchema, getFavoritesSchema, addStyleToCollectionSchema, toggleFavoriteSchema } from '@/lib/schemas'
-import { z } from 'zod'
+import { validateOrThrow, styleIdSchema, getFavoritesSchema, addStyleToCollectionSchema, toggleFavoriteSchema } from '@/lib/schemas'
 
 // 导入 collections 的函数用于重新导出
 import {
@@ -321,7 +320,7 @@ export async function getFavorites(
         collectionTags = tagsData.map(t => ({
           style_id: t.style_id,
           collection_id: t.collection_id,
-          collection_name: (t.collections as any)?.name,
+          collection_name: (t.collections as { name: string } | null)?.name ?? '',
         }))
       }
     }
@@ -351,7 +350,7 @@ export async function getFavorites(
       if (style.style_tags) {
         if (Array.isArray(style.style_tags)) {
           const flatTags = style.style_tags.flat()
-          styleTagsData = flatTags.map((t: any) => ({ tag: { name: t.tag?.name || t.name } }))
+          styleTagsData = flatTags.map((t: { tag?: { name: string }; name?: string }) => ({ tag: { name: t.tag?.name ?? t.name ?? '' } }))
         }
       }
 
@@ -578,7 +577,7 @@ export async function getUserCollectionsSimple(): Promise<{
     const collections = (data || []).map(c => ({
       id: c.id,
       name: c.name,
-      style_count: (c.style_count as any[])?.[0]?.count ?? 0,
+      style_count: Array.isArray(c.style_count) ? (c.style_count[0] as { count?: number })?.count ?? 0 : 0,
     }))
 
     return {

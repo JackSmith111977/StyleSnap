@@ -15,13 +15,6 @@ interface PreviewContentProps {
  * v1.4 增强：固定高度、侧边栏导航切换
  */
 export function PreviewContent({ activeSection }: PreviewContentProps) {
-  // 判断是否显示某个部分
-  const shouldShow = (section: PreviewSection | PreviewSection[]): boolean => {
-    if (activeSection === 'all') return true
-    if (Array.isArray(activeSection)) return activeSection.includes(section as PreviewSection)
-    return activeSection === section
-  }
-
   return (
     <main className={styles.previewContent}>
       {/* 排版区域 - 标题和正文 */}

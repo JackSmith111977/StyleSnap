@@ -5,7 +5,7 @@
  */
 import { test as setup } from '@playwright/test';
 
-setup('准备测试数据', async ({ page }) => {
+setup('准备测试数据', async ({ page: _page }) => {
   console.log('准备测试数据...');
 
   // TODO: 在这里创建测试数据

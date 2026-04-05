@@ -14,7 +14,7 @@ export async function createZipFile(
   options: ZipGeneratorOptions = {}
 ): Promise<Blob> {
   const zip = new JSZip()
-  const { filename = 'style-export', includeReadme = true, readmeContent } = options
+  const { includeReadme = true, readmeContent } = options
 
   // 添加 README 文件
   if (includeReadme) {

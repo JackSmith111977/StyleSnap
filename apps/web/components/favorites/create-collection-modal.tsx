@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -25,14 +24,14 @@ export function CreateCollectionModal({
   open,
   onOpenChange,
   onSuccess,
-}: CreateCollectionModalProps) {
+}: CreateCollectionModalProps): JSX.Element {
   const router = useRouter()
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
   const [isCreating, setIsCreating] = useState(false)
   const [error, setError] = useState('')
 
-  const handleCreate = async () => {
+  const handleCreate = async (): Promise<void> => {
     if (!name.trim()) {
       setError('请输入合集名称')
       return

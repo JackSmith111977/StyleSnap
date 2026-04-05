@@ -7,7 +7,7 @@
 
 import React, { useState, useCallback, useEffect } from 'react';
 import { usePreviewEditorStore } from '@/stores/preview-editor-store';
-import { generateCssCode, generateCssVariablesCode } from '@/lib/design-tokens';
+import { generateCssCode } from '@/lib/design-tokens';
 import { PreviewPanel } from './preview-panel';
 import { EditControlPanel } from './edit-control-panel';
 import styles from './live-preview-editor.module.css';
@@ -72,7 +72,7 @@ export function LivePreviewEditor({ styleName = 'Custom Style' }: LivePreviewEdi
     try {
       await navigator.clipboard.writeText(exportedCode);
       alert('CSS copied to clipboard!');
-    } catch (err) {
+    } catch (_err) {
       // 降级处理：选中代码供手动复制
       const textarea = document.createElement('textarea');
       textarea.value = exportedCode;

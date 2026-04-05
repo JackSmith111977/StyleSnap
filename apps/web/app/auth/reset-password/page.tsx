@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, Suspense } from 'react'
+import { useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
 /**
@@ -12,7 +12,6 @@ import { useRouter, useSearchParams } from 'next/navigation'
 function ResetPasswordCallbackContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const [isProcessing, setIsProcessing] = useState(true)
 
   useEffect(() => {
     async function handleCallback() {
@@ -42,7 +41,7 @@ function ResetPasswordCallbackContent() {
       }
     }
 
-    handleCallback()
+    void handleCallback()
   }, [searchParams, router])
 
   return (

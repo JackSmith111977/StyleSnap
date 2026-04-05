@@ -12,7 +12,7 @@ interface EditCollectionPageProps {
 }
 
 export async function generateMetadata({ params }: EditCollectionPageProps): Promise<Metadata> {
-  const { id } = await params
+  await params
   return {
     title: `编辑合集 - StyleSnap`,
   }

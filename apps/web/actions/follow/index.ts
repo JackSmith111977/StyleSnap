@@ -186,22 +186,25 @@ export async function getFollowingFeed(
     }
 
     // 类型转换
-    const styles = ((data as unknown[]) || []).map((item: any) => ({
-      id: item.style_id,
-      name: item.style_name,
-      description: item.style_description,
-      preview_image_light: item.style_preview_light,
-      preview_image_dark: item.style_preview_dark,
-      category_id: item.category_id,
-      category_name: item.category_name,
-      author_id: item.author_id,
-      author_name: item.author_name,
-      author_avatar: item.author_avatar,
-      like_count: item.like_count,
-      favorite_count: item.favorite_count,
-      view_count: Number(item.view_count),
-      created_at: item.created_at,
-    }))
+    const styles = ((data as unknown[]) ?? []).map((item: unknown) => {
+      const typedItem = item as Record<string, unknown>
+      return {
+        id: typedItem.style_id as string,
+        name: typedItem.style_name as string,
+        description: typedItem.style_description as string | null,
+        preview_image_light: typedItem.style_preview_light as string | null,
+        preview_image_dark: typedItem.style_preview_dark as string | null,
+        category_id: typedItem.category_id as string,
+        category_name: typedItem.category_name as string,
+        author_id: typedItem.author_id as string,
+        author_name: typedItem.author_name as string,
+        author_avatar: typedItem.author_avatar as string | null,
+        like_count: typedItem.like_count as number,
+        favorite_count: typedItem.favorite_count as number,
+        view_count: Number(typedItem.view_count),
+        created_at: typedItem.created_at as string,
+      }
+    })
 
     return {
       success: true,
@@ -265,17 +268,18 @@ export async function getUserProfile(
       return { success: false, error: '用户不存在' }
     }
 
+    const typedProfile = profile as Record<string, unknown>
     return {
       success: true,
       data: {
-        user_id: (profile as any).user_id,
-        display_name: (profile as any).display_name,
-        avatar_url: (profile as any).avatar_url,
-        bio: (profile as any).bio,
-        style_count: Number((profile as any).style_count),
-        follower_count: (profile as any).follower_count,
-        following_count: (profile as any).following_count,
-        is_following: (profile as any).is_following,
+        user_id: typedProfile.user_id as string,
+        display_name: typedProfile.display_name as string | null,
+        avatar_url: typedProfile.avatar_url as string | null,
+        bio: typedProfile.bio as string | null,
+        style_count: Number(typedProfile.style_count),
+        follower_count: typedProfile.follower_count as number,
+        following_count: typedProfile.following_count as number,
+        is_following: typedProfile.is_following as boolean,
       },
     }
   } catch (error) {

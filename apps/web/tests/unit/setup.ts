@@ -1,10 +1,14 @@
-import '@testing-library/jest-dom/vitest';
+import { vi } from 'vitest';
+
+/**
+ * 获取风格 ID
+ */
 
 // 全局 Mock
-global.fetch = vi.fn();
+(global as unknown as { fetch: typeof fetch }).fetch = vi.fn();
 
 // 创建 Mock 函数
-function createMockFetch(data: unknown, ok = true) {
+function createMockFetch(data: unknown, ok = true): ReturnType<typeof vi.fn> {
   return vi.fn().mockResolvedValue({
     ok,
     json: () => Promise.resolve(data),

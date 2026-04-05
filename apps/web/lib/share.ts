@@ -36,13 +36,13 @@ export const SOCIAL_PLATFORMS: Record<string, SocialPlatform> = {
   linkedin: {
     id: 'linkedin',
     name: 'LinkedIn',
-    urlBuilder: (url, title) =>
+    urlBuilder: (url, _title) =>
       `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`,
   },
   wechat: {
     id: 'wechat',
     name: '微信',
-    urlBuilder: (url, title) => `weixin://`, // 微信需要特殊处理
+    urlBuilder: (_url, _title) => `weixin://`, // 微信需要特殊处理
   },
   qq: {
     id: 'qq',

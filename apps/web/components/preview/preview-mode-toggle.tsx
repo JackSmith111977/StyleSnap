@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -15,13 +14,13 @@ interface PreviewModeToggleProps {
   pageType: 'list' | 'detail'
 }
 
-const LIST_MODES: { id: PreviewMode; label: string; description: string }[] = [
+const LIST_MODES: Array<{ id: PreviewMode; label: string; description: string }> = [
   { id: 'card-drop', label: '卡片下拉预览', description: '点击卡片展开预览' },
   { id: 'detail-tabs', label: '详情三按钮', description: '跳转详情页查看' },
   { id: 'fullscreen', label: '全屏预览', description: '全屏沉浸浏览' },
 ]
 
-const DETAIL_MODES: { id: PreviewMode; label: string; description: string }[] = [
+const DETAIL_MODES: Array<{ id: PreviewMode; label: string; description: string }> = [
   { id: 'detail-tabs', label: '三按钮 Tab', description: '预览/变量/代码' },
   { id: 'fullscreen', label: '全屏预览', description: '沉浸浏览模式' },
 ]

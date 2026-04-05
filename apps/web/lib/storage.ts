@@ -50,7 +50,7 @@ export async function uploadImage(file: File, path: string): Promise<{ success: 
     }
 
     const storage = getStorageClient()
-    const { data, error } = await storage
+    const { data: _data, error } = await storage
       .from(STORAGE_CONFIG.bucket)
       .upload(path, file, {
         cacheControl: '3600',

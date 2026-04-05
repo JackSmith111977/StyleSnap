@@ -6,9 +6,8 @@
  */
 
 import React, { useState, useCallback } from 'react'
-import { useForm, FormProvider, SubmitHandler } from 'react-hook-form'
+import { useForm, FormProvider, type SubmitHandler } from 'react-hook-form'
 import { ImageUpload } from './image-upload'
-import { CodeEditor } from './code-editor'
 import { submitStyle } from '@/actions/styles/submit'
 import styles from './style-submission-form.module.css'
 
@@ -48,7 +47,7 @@ interface FormValues {
 }
 
 interface StyleSubmissionFormProps {
-  categories: { id: string; name: string }[]
+  categories: Array<{ id: string; name: string }>
   onSuccess?: () => void
 }
 
@@ -107,8 +106,8 @@ export function StyleSubmissionForm({
 
     try {
       // 上传图片
-      let uploadedLightUrl: string | null = null
-      let uploadedDarkUrl: string | null = null
+      const _uploadedLightUrl: string | null = null
+      const _uploadedDarkUrl: string | null = null
 
       if (lightImage) {
         const formData = new FormData()

@@ -1,4 +1,3 @@
-import { redirect } from 'next/navigation'
 import { requireAuth } from '@/lib/auth'
 import { CollectionForm } from '@/components/collection'
 import { Button } from '@/components/ui/button'

@@ -1,4 +1,4 @@
-import { notFound, redirect } from 'next/navigation'
+import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { getCurrentUser } from '@/lib/auth'
 import { getUserProfile } from '@/actions/follow'
@@ -9,7 +9,7 @@ import { StyleCard } from '@/components/style-card'
 import { EmptyState } from '@/components/empty-state'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { ArrowLeft, User, Calendar, Mail } from 'lucide-react'
+import { ArrowLeft, User, Calendar } from 'lucide-react'
 import { type Metadata } from 'next'
 import { FollowingFeed } from '@/components/follow/following-feed'
 
@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const user = await getCurrentUser()
 
   // 如果是当前用户，显示自己的名字
-  if (user && user.id === id) {
+  if (user?.id === id) {
     return {
       title: '个人主页 - StyleSnap',
     }

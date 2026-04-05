@@ -6,11 +6,16 @@ import { describe, it, expect } from 'vitest';
 
 describe('SearchBox Logic', () => {
   // 模拟防抖搜索逻辑
-  const createDebounceSearch = (delay: number) => {
+  const createDebounceSearch = (delay: number): {
+    handleSearch: (value: string) => { error: string | null };
+    searchFn: ReturnType<typeof vi.fn>;
+    clearTimeout: () => void;
+  } => {
     let timeoutId: NodeJS.Timeout | undefined;
-    const searchFn = vi.fn();
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const searchFn: ReturnType<typeof vi.fn> = vi.fn();
 
-    const handleSearch = (value: string) => {
+    const handleSearch = (value: string): { error: string | null } => {
       if (timeoutId) {
         clearTimeout(timeoutId);
       }
@@ -27,7 +32,8 @@ describe('SearchBox Logic', () => {
       return { error: null };
     };
 
-    return { handleSearch, searchFn, clearTimeout: () => timeoutId && clearTimeout(timeoutId) };
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    return { handleSearch, searchFn, clearTimeout: (): void => { timeoutId && clearTimeout(timeoutId); } };
   };
 
   describe('搜索验证', () => {
@@ -51,6 +57,7 @@ describe('SearchBox Logic', () => {
   describe('防抖功能', () => {
     it('应该使用防抖避免频繁搜索', async () => {
       vi.useFakeTimers();
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const { handleSearch, searchFn } = createDebounceSearch(300);
 
       // 快速输入多次

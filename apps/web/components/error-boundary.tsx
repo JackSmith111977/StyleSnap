@@ -18,11 +18,11 @@ interface State {
 export class ErrorBoundary extends Component<Props, State> {
   state = { hasError: false }
 
-  static getDerivedStateFromError() {
+  static getDerivedStateFromError(): State {
     return { hasError: true }
   }
 
-  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+  componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
     // 发送错误到 Sentry
     Sentry.captureException(error, {
       extra: {
@@ -34,7 +34,7 @@ export class ErrorBoundary extends Component<Props, State> {
     })
   }
 
-  render() {
+  render(): ReactNode {
     if (this.state.hasError) {
       return this.props.fallback ?? (
         <div className="p-4 text-center text-red-600">

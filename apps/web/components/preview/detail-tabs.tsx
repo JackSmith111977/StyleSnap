@@ -6,14 +6,14 @@ import type { DesignTokens } from '@/types/design-tokens'
 interface DetailTabsProps {
   styleId: string
   designTokens: DesignTokens
-  codeSnippets: {
+  codeSnippets: Array<{
     language: 'html' | 'css' | 'tsx' | 'typescript'
     title: string
     code: string | null
-  }[]
+  }>
 }
 
-export function DetailTabs({ styleId, designTokens, codeSnippets }: DetailTabsProps) {
+export function DetailTabs({ designTokens, codeSnippets }: DetailTabsProps) {
   return (
     <Tabs defaultValue="preview" className="w-full">
       <TabsList className="w-full justify-start">
@@ -97,11 +97,11 @@ function DesignTokensDetail({ tokens }: { tokens: DesignTokens }) {
 function CodeSnippetsDisplay({
   snippets,
 }: {
-  snippets: {
+  snippets: Array<{
     language: 'html' | 'css' | 'tsx' | 'typescript'
     title: string
     code: string | null
-  }[]
+  }>
 }) {
   const validSnippets = snippets.filter((s) => s.code && s.code.trim() !== '')
   const defaultValue = validSnippets[0]?.language ?? 'html'

@@ -25,7 +25,7 @@ export interface GenerateExportPackageOptions {
  * 生成导出包
  */
 export function generateExportPackage(options: GenerateExportPackageOptions): ExportPackage {
-  const { tokens, format, range, styleName, cssInJsLibrary = 'styled-components' } = options
+  const { tokens, range } = options
 
   // 生成所有格式的导出
   const cssFull = exportFullCss(tokens, {
@@ -40,7 +40,7 @@ export function generateExportPackage(options: GenerateExportPackageOptions): Ex
     includeComponents: true,
   })
 
-  const scssFull = exportFullScss(tokens, {
+  exportFullScss(tokens, {
     includeVariables: true,
     includeMixins: true,
     includeComponents: true,

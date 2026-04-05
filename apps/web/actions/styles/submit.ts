@@ -68,8 +68,8 @@ export async function submitStyle(
     const supabase = await createClient()
 
     // 4. 上传图片（如果提供）
-    let lightImageUrl: string | null = null
-    let darkImageUrl: string | null = null
+    const lightImageUrl: string | null = null
+    const darkImageUrl: string | null = null
 
     // 注意：Server Action 中无法直接接收 File 对象，需要单独的图片上传 endpoint
     // 这里假设图片已经通过其他方式上传并获取到 URL
@@ -89,8 +89,8 @@ export async function submitStyle(
       },
       code_html: data.codeSnippets.html,
       code_css: data.codeSnippets.css,
-      code_react: data.codeSnippets.react || null,
-      code_tailwind: data.codeSnippets.tailwind || null,
+      code_react: data.codeSnippets.react ?? null,
+      code_tailwind: data.codeSnippets.tailwind ?? null,
       // 颜色面板（兼容旧字段）
       color_palette: data.designTokens.colors ? {
         primary: data.designTokens.colors.primary,

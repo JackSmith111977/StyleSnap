@@ -122,7 +122,7 @@ export function ShareImageGenerator({
       let displayTitle = styleTitle
       if (ctx.measureText(styleTitle).width > maxWidth) {
         // 简单截断：找到合适的字符数
-        let chars = Math.floor((maxWidth / ctx.measureText(styleTitle).width) * styleTitle.length)
+        const chars = Math.floor((maxWidth / ctx.measureText(styleTitle).width) * styleTitle.length)
         displayTitle = styleTitle.substring(0, chars - 2) + '...'
       }
       ctx.fillText(displayTitle, 540, bottomY + 60)
@@ -178,7 +178,7 @@ export function ShareImageGenerator({
 
   // 组件挂载时自动生成
   useEffect(() => {
-    generateShareImage()
+    void generateShareImage()
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   // 处理下载

@@ -17,7 +17,7 @@ import { StylePreview } from '@/components/preview/style-preview'
 import { ShareButton } from '@/components/share'
 import { AuthorCard } from '@/components/follow'
 import Link from 'next/link'
-import { Eye, Heart, MessageCircle, Share2 } from 'lucide-react'
+import { Eye, Heart, MessageCircle } from 'lucide-react'
 import { type Metadata } from 'next'
 import { getCurrentUser } from '@/lib/auth'
 

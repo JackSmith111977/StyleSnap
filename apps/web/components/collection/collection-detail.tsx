@@ -10,7 +10,6 @@ import { toast } from 'sonner'
 import { AddStyleModal } from './add-style-modal'
 import type { CollectionDetail } from '@/actions/collections/types'
 import Link from 'next/link'
-import { cn } from '@/lib/utils'
 
 interface CollectionDetailProps {
   collection: CollectionDetail
@@ -100,7 +99,7 @@ export function CollectionDetailComponent({
                 variant="outline"
                 onClick={() => {
                   const url = `${window.location.origin}/collections/${collection.id}`
-                  navigator.clipboard.writeText(url)
+                  void navigator.clipboard.writeText(url)
                   toast.success('链接已复制')
                 }}
               >

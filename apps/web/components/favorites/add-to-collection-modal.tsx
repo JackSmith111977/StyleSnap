@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -43,7 +42,7 @@ export function AddToCollectionModal({
 
   useEffect(() => {
     if (open) {
-      loadCollections()
+      void loadCollections()
     }
   }, [open])
 

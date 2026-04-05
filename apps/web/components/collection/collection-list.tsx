@@ -2,10 +2,8 @@
 
 import { useState } from 'react'
 import { CollectionCard } from './collection-card'
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Plus, Search } from 'lucide-react'
-import Link from 'next/link'
+import { Search } from 'lucide-react'
 import type { Collection } from '@/actions/collections/types'
 
 interface CollectionListProps {

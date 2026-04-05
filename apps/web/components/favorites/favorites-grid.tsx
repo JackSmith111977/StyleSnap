@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import Link from 'next/link'
 import { Heart, ExternalLink, FolderPlus, MoreHorizontal } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -29,7 +28,7 @@ interface FavoritesGridProps {
   onRemoveFromFavorites: (styleId: string) => void
 }
 
-export function FavoritesGrid({ styles, onMoveToCollection, onRemoveFromFavorites }: FavoritesGridProps) {
+export function FavoritesGrid({ styles, onMoveToCollection, onRemoveFromFavorites }: FavoritesGridProps): JSX.Element {
   if (styles.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">

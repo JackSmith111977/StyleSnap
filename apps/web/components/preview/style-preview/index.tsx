@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { DesignTokens } from '@/stores/preview-editor-store'
+import { type DesignTokens } from '@/stores/preview-editor-store'
 import styles from './styles.module.css'
 import { PreviewHeader } from './preview-header'
 import { PreviewSidebar } from './preview-sidebar'

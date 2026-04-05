@@ -13,7 +13,7 @@ interface PreviewSidebarProps {
 /**
  * 导航项配置
  */
-const NAV_ITEMS: { key: PreviewSection; label: string }[] = [
+const NAV_ITEMS: Array<{ key: PreviewSection; label: string }> = [
   { key: 'all', label: '全部' },
   { key: 'typography', label: '排版' },
   { key: 'colors', label: '配色' },

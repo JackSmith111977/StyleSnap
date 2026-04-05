@@ -26,7 +26,7 @@ export default async function Image({
 
     // 获取预览图（如果有）
     const previewImages = style.preview_images as { light?: string; dark?: string } | null
-    const previewUrl = previewImages?.light || null
+    const _previewUrl = previewImages?.light || null
 
     return new ImageResponse(
       (

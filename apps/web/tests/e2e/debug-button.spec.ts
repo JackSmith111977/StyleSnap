@@ -1,4 +1,4 @@
-import { test } from '@playwright/test';
+import { type Page, test } from '@playwright/test';
 
 /**
  * 调试测试 - 查看风格详情页的按钮
@@ -9,7 +9,7 @@ const TEST_USER = {
   password: 'test1234',
 };
 
-async function login(page: any) {
+async function login(page: Page) {
   await page.goto('/login');
   await page.fill('input[name="email"]', TEST_USER.email);
   await page.fill('input[name="password"]', TEST_USER.password);

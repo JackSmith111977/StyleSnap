@@ -7,7 +7,7 @@ import { LogOut, User } from 'lucide-react'
 import Link from 'next/link'
 
 export function UserMenu() {
-  const { user, loading, signOut } = useAuth()
+  const { user, signOut } = useAuth()
   const [open, setOpen] = useState(false)
 
   if (!user) {

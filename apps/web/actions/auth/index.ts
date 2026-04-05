@@ -184,7 +184,7 @@ export async function register(
     // ============================================
     // 步骤 4: 检查 profile 是否已创建
     // ============================================
-    const { data: profileData, error: profileError } = await supabase
+    const { data: profileData } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', data.user.id)
@@ -219,7 +219,7 @@ export async function register(
     if (isNewUser && data.user && !data.user.email_confirmed_at) {
       try {
         await sendRegistrationEmails(validatedData.email, validatedData.username)
-      } catch (emailError) {
+      } catch {
         // 邮件发送失败不影响注册流程
       }
     }
