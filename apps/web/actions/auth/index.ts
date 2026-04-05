@@ -329,17 +329,18 @@ export async function resetPassword(
   email: string
 ): Promise<ResetPasswordResult> {
   try {
-    // 验证输入参数
     const validatedData = validateOrThrow(resetPasswordSchema, { email })
 
     const supabase = await createClient()
 
+    const redirectTo = `${env.NEXT_PUBLIC_SITE_URL}/auth/reset-password`
+
     const { error } = await supabase.auth.resetPasswordForEmail(validatedData.email, {
-      redirectTo: `${env.NEXT_PUBLIC_SITE_URL}/auth/reset-password`,
+      redirectTo,
     })
 
     if (error) {
-      console.error('密码重置失败:', error)
+      console.error('[密码重置] 失败:', error)
       return { error: '重置邮件发送失败' }
     }
 
@@ -348,8 +349,38 @@ export async function resetPassword(
     await captureActionError(error, {
       action: 'auth/resetPassword',
     })
-    console.error('密码重置异常:', error)
     return { error: '服务器错误，请稍后重试' }
+  }
+}
+
+/**
+ * 验证密码重置 token（Client Component 专用）
+ * 使用 PKCE flow 的 code 交换 session
+ */
+export async function verifyRecoveryToken(
+  code: string
+): Promise<{ error?: string; success?: boolean }> {
+  try {
+    const supabase = await createClient()
+
+    // PKCE flow: 使用 code 交换 session
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code)
+
+    if (error) {
+      return { error: error.message }
+    }
+
+    if (!data.user) {
+      return { error: '验证失败，用户不存在' }
+    }
+
+    // 验证成功后，session 已自动设置，现在需要重定向到 update-password
+    return { success: true }
+  } catch (error) {
+    await captureActionError(error, {
+      action: 'auth/verifyRecoveryToken',
+    })
+    return { error: '验证失败' }
   }
 }
 
