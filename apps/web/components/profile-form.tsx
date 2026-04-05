@@ -40,24 +40,41 @@ export function ProfileForm({ initialProfile }: ProfileFormProps) {
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
-    if (!file) return
+    console.log('[profile-form] handleAvatarChange 触发:', {
+      fileName: file?.name,
+      fileSize: file?.size,
+      fileType: file?.type,
+      hasFile: !!file,
+    })
 
+    if (!file) {
+      console.log('[profile-form] 没有选择文件')
+      return
+    }
+
+    console.log('[profile-form] 文件验证通过，设置 pending 状态')
     setAvatarUploadPending(true)
     setMessage(null)
 
     const formData = new FormData()
     formData.append('avatar', file)
+    console.log('[profile-form] FormData 已创建，准备调用 uploadAvatar')
 
     startTransition(async () => {
+      console.log('[profile-form] 开始调用 uploadAvatar Server Action')
       const result = await uploadAvatar(formData)
+      console.log('[profile-form] uploadAvatar 返回结果:', result)
       if (result.success) {
+        console.log('[profile-form] 上传成功，刷新页面')
         setMessage({ type: 'success', text: '头像上传成功' })
         // 刷新页面显示新头像
         window.location.reload()
       } else {
+        console.error('[profile-form] 上传失败:', result.error)
         setMessage({ type: 'error', text: result.error || '上传失败' })
       }
       setAvatarUploadPending(false)
+      console.log('[profile-form] 重置 pending 状态')
     })
   }
 
