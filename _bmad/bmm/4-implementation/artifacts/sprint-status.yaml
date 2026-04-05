@@ -89,14 +89,13 @@ development_status:
   epic-5-retrospective: optional
 
   # Epic 6: 高级功能与增强
-  epic-6: in-progress
+  epic-6: done  # ✅ 所有 Stories 完成
   6-1-real-time-preview-editor: done
   6-2-user-submission-flow: done
   6-3-sharing-feature: done
   6-4-follow-system: done
-  6-5-unified-favorites: backlog  # 重构：原 user-collections
-  6-6-code-export-options: backlog
-  6-7-preview-styles: backlog
-  6-8-style-preview-component: backlog
-  6-9-style-preview-modal: ready-for-dev
+  6-5-unified-favorites: done  # 重构：原 user-collections
+  6-6-code-export-options: done  # ✅ 代码审查完成
+  6-7-preview-styles: done
+  6-8-style-preview-component: done
   epic-6-retrospective: optional

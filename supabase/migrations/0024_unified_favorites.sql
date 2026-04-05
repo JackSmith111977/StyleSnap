@@ -52,7 +52,12 @@ CREATE TABLE IF NOT EXISTS style_collection_tags (
   style_id UUID NOT NULL REFERENCES styles(id) ON DELETE CASCADE,
   collection_id UUID NOT NULL REFERENCES collections(id) ON DELETE CASCADE,
   created_at TIMESTAMPTZ DEFAULT NOW(),
-  CONSTRAINT unique_user_style_collection UNIQUE(user_id, style_id, collection_id)
+  CONSTRAINT unique_user_style_collection UNIQUE(user_id, style_id, collection_id),
+  -- 复合外键：确保 (user_id, style_id) 必须存在于 favorites 表
+  -- 这消除了竞态条件：如果收藏不存在，插入会被拒绝
+  CONSTRAINT fk_favorites FOREIGN KEY (user_id, style_id)
+    REFERENCES favorites(user_id, style_id)
+    ON DELETE CASCADE
 );
 
 -- 创建索引

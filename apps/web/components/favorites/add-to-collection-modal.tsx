@@ -10,6 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { toast } from 'sonner'
 
 interface Collection {
   id: string
@@ -69,8 +70,9 @@ export function AddToCollectionModal({
       router.refresh()
       onSuccess?.()
       onOpenChange(false)
+      toast.success('已移动到合集')
     } else {
-      alert(result.error ?? '移动失败')
+      toast.error(result.error ?? '移动失败')
     }
 
     setIsMoving(false)
@@ -83,8 +85,9 @@ export function AddToCollectionModal({
     if (result.success) {
       router.refresh()
       onSuccess?.()
+      toast.success('已从合集移除')
     } else {
-      alert(result.error ?? '移除失败')
+      toast.error(result.error ?? '移除失败')
     }
   }
 

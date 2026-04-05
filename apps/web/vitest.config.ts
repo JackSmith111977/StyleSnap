@@ -10,13 +10,14 @@ export default defineConfig({
     setupFiles: ['./tests/unit/setup.ts'],
     include: ['tests/unit/**/*.test.ts', 'tests/unit/**/*.test.tsx'],
     coverage: {
+      provider: 'v8',
       reporter: ['text', 'json', 'html'],
       exclude: ['node_modules/', 'tests/'],
     },
   },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './apps/web'),
+      '@': path.resolve(__dirname, '.'),
     },
   },
 });

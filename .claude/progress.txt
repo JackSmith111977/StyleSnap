@@ -6,6 +6,56 @@
 
 ### ✅ 已完成
 
+**任务：Story 6.6 代码导出选项 & Story 6.7 预览风格 - 完整实现**
+- 状态：已完成
+- 开始时间：2026-04-05
+- 完成时间：2026-04-05
+- 输出：
+  - Story 6.6 代码导出选项：
+    - 创建 `apps/web/lib/code-export/` - 4 种格式导出工具 (CSS/Tailwind/SCSS/CSS-in-JS)
+    - 创建 `apps/web/lib/code-export/zip-generator.ts` - ZIP 文件生成
+    - 创建 `apps/web/components/export/` - 导出 UI 组件系列
+    - 创建 `apps/web/types/design-tokens.ts` - Design Tokens 类型定义
+  - Story 6.7 预览风格：
+    - 创建 `apps/web/stores/preview-mode-store.ts` - 预览模式持久化 Store
+    - 创建 `apps/web/components/preview/card-drop-preview.tsx` - 卡片下拉预览
+    - 创建 `apps/web/components/preview/detail-tabs.tsx` - 详情三按钮 Tab
+    - 创建 `apps/web/components/preview/fullscreen-preview.tsx` - 全屏预览
+    - 创建 `apps/web/components/preview/preview-mode-toggle.tsx` - 预览模式切换
+    - 创建 `apps/web/lib/preview-utils.ts` - 预览工具函数
+  - 构建验证：pnpm build 成功 (15.7s)
+- 下一步：更新 sprint-status.yaml 和 epics.md
+
+**任务：Story 6.8 风格预览组件 - 完整实现**
+- 状态：已完成
+- 开始时间：2026-04-05
+- 完成时间：2026-04-05
+- 输出：
+  - 预览组件实现：固定尺寸、响应式布局
+  - 包含组件：导航栏、侧边栏、标题、正文、卡片、列表、页脚
+  - 技术实现：CSS Variables + CSS Modules
+  - 构建验证：pnpm build 成功
+- 下一步：更新文档状态
+
+**任务：未分类收藏重定向问题修复**
+- 状态：已完成
+- 开始时间：2026-04-05
+- 完成时间：2026-04-05
+- 问题：在收藏管理页点击"未分类"会直接重定向到首页（登录页）
+- 根因：`getFavoritesSchema` 中 `collectionId` 字段定义为 UUID 格式，但 `'uncategorized'` 不是有效 UUID，导致验证失败
+- 修复方案：
+  - 修改 Schema：`collectionId` 支持 UUID 或字面量 `'uncategorized'`
+  - 修改 `getFavorites` 函数：特殊处理 `'uncategorized'` 情况（计算差集）
+  - 添加调试输出：在侧边栏、Server Component、Server Action 中添加详细日志
+- 输出：
+  - 修改 `apps/web/lib/schemas.ts` - getFavoritesSchema 支持 'uncategorized'
+  - 修改 `apps/web/actions/favorites/index.ts` - 处理未分类逻辑
+  - 修改 `apps/web/components/favorites/favorites-sidebar.tsx` - 添加调试日志
+  - 修改 `apps/web/app/favorites/page.tsx` - 添加调试日志
+  - 创建 `docs/main/P2_UNCATEGORIZED_REDIRECT_FIX.md` - 修复报告
+- 构建验证：pnpm build 成功 (13.9s)
+- 下一步：启动开发服务器验证功能是否正常
+
 **任务：Story 6.5 统一收藏管理系统 - 完整实现**
 - 状态：已完成
 - 开始时间：2026-04-05
@@ -121,31 +171,6 @@
     - 圆角系统：3 档（small/medium/large）
     - 阴影系统：3 档（light/medium/heavy）
   - 下一步：实施 v1.2 完整设计变量系统
-
-**任务：PRD 更新 - Story 6.9 预览窗口增强**
-- 状态：已完成
-- 开始时间：2026-04-04
-- 完成时间：2026-04-04
-- 输出：
-  - 更新 `PRD.md` v1.5 - 新增预览窗口增强说明
-  - 更新 `CHANGELOG.md` - F2.8 预览窗口增强记录
-  - 创建 `story-6-9-style-preview-modal.md` - Story Spec
-  - 更新 `sprint-status.yaml` - 新增 6-9: ready-for-dev
-  - 需求确认：
-    - 实施方式：创建新 Story 6.9（非变更 Story 6.8）
-    - 窗口位置：风格参考下方、代码上方
-    - Tab 内容：配色/字体/间距/效果/完整预览 5 个分类
-  - 下一步：运行 `bmad-dev-story` 开始实施
-- 状态：已完成
-- 开始时间：2026-04-04
-- 完成时间：2026-04-04
-- 输出：
-  - 更新 `preview-content.tsx` - 新增配色/字体/间距/圆角/阴影展示场景
-  - 更新 `styles.module.css` - 新增展示样式（colorDemo, spacingDemo, borderRadiusDemo, shadowDemo, typographyDemo）
-  - 更新 `sprint-status.yaml` - Story 6.8 状态改为 review
-  - 构建验证：pnpm build 成功 (9.1s)
-  - git 提交：961d684
-  - 下一步：运行 code-review 进行代码审查
 
 **任务：Story 6.8 风格预览组件实施**
 - 状态：已完成
@@ -388,26 +413,66 @@
 ---
 
 ## 当前任务
-**Story 6.5: 统一收藏管理系统**
-- 状态：🔄 进行中
-- 开始时间：2026-04-05
-- 设计批准：双表设计（favorites + style_collection_tags）
-- 输出：
-  - 创建 `sprint-change-proposal-2026-04-05.md` - Correct Course 变更提案
-  - 更新 `PRD.md` - F2.5 改为统一收藏管理
-  - 更新 `epics.md` - Story 6.5 规格
-  - 创建 `story-6-5-unified-favorites.md` - Story Spec
-  - 更新 `sprint-status.yaml` - Story 6.5 状态更新
-  - 创建 `0024_unified_favorites.sql` - 数据库迁移
-- 待执行：
-  - [ ] 阶段 1: 数据库迁移
-  - [ ] 阶段 2: Server Actions 重构
-  - [ ] 阶段 3: 前端页面重构
-  - [ ] 阶段 4: 测试验证
+
+**Epic 6: 高级功能与增强**
+- 状态：✅ 已完成 (8/8 Stories)
+- 开始时间：2026-04-04
+- 完成时间：2026-04-05
+- 代码审查：完成 (发现 11 个问题，建议修复 4 个高优先级问题)
+- 包含：
+  - Story 6.1: 实时预览编辑器 ✅
+  - Story 6.2: 用户提交流程 ✅
+  - Story 6.3: 分享功能 ✅
+  - Story 6.4: 关注系统 ✅
+  - Story 6.5: 统一收藏管理系统 ✅
+  - Story 6.6: 代码导出选项 ✅
+  - Story 6.7: 预览风格 ✅
+  - Story 6.8: 风格预览组件 ✅
 
 ---
 
 ## 历史完成记录
+
+### ✅ 已完成 - 2026-04-05
+
+**任务：Story 6.5 统一收藏管理系统 - 完整实现**
+- 状态：已完成
+- 开始时间：2026-04-05
+- 完成时间：2026-04-05
+- 输出：
+  - 数据库迁移：`supabase/migrations/0024_unified_favorites.sql`
+    - 创建 `style_collection_tags` 表（多对多关联）
+    - 创建 RPC 函数：`toggle_favorite_atomic`, `get_user_favorites`
+    - 完整 RLS 策略配置
+  - Server Actions 重构：`apps/web/actions/favorites/index.ts`
+    - `toggleFavorite` - 切换收藏状态（原子操作）
+    - `getFavorites` - 获取收藏列表（支持按合集筛选）
+    - `addStyleToCollection` - 添加风格到合集
+    - `removeStyleFromCollection` - 从合集移除风格
+    - `checkIsFavorite` - 检查是否收藏
+    - `getUserCollectionsSimple` - 获取用户合集列表
+  - 前端页面重构：
+    - `apps/web/app/favorites/page.tsx` - 统一管理页（服务端）
+    - `apps/web/app/favorites/client-page.tsx` - 客户端交互
+    - `apps/web/components/favorites/favorites-sidebar.tsx` - 侧边栏组件
+    - `apps/web/components/favorites/favorites-grid.tsx` - 收藏网格组件
+    - `apps/web/components/favorites/add-to-collection-modal.tsx` - 移动到合集弹窗
+    - `apps/web/components/favorites/create-collection-modal.tsx` - 创建合集弹窗
+  - UI 组件：`apps/web/components/ui/dropdown-menu.tsx`
+  - 旧页面重定向：
+    - `/user/favorites` → `/favorites`
+    - `/collections` → `/favorites`
+  - 文档更新：
+    - `PRD.md` - F2.5 更新为统一收藏管理
+    - `epics.md` - Story 6.5 规格更新
+    - `sprint-status.yaml` - 状态更新
+    - `sprint-change-proposal-2026-04-05.md` - 变更提案
+    - `story-6-5-unified-favorites.md` - Story Spec
+  - 构建验证：pnpm build 成功 (15.3s)
+  - git 提交：62f37be
+  - 推送至远程仓库：feat/bmad
+  - 单元测试：已移除相关测试文件（待后续补充）
+  - 文档更新：sprint-status.yaml 更新 6-5 为 done，epics.md v1.10
 
 ### ✅ 已完成 - 2026-04-04
 

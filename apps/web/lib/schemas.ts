@@ -115,7 +115,10 @@ export const removeStyleFromCollectionSchema = z.object({
 
 // 获取收藏列表参数验证
 export const getFavoritesSchema = z.object({
-  collectionId: collectionIdSchema.optional().nullable(),
+  collectionId: z.union([
+    collectionIdSchema,
+    z.literal('uncategorized'),
+  ]).optional().nullable(),
   page: z.coerce.number().min(1).default(1),
   limit: z.coerce.number().min(1).max(50).default(20),
 })
