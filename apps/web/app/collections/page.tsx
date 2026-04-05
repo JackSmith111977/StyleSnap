@@ -59,18 +59,7 @@ export default async function CollectionsPage() {
         </div>
 
         {/* 合集列表 */}
-        <CollectionList
-          collections={collections}
-          showActions
-          onEdit={(collection) => {
-            window.location.href = `/collections/${collection.id}/edit`
-          }}
-          onDelete={async (collection) => {
-            if (confirm(`确定要删除合集"${collection.name}"吗？`)) {
-              // 删除逻辑在组件内处理
-            }
-          }}
-        />
+        <CollectionList collections={collections} />
       </div>
     </div>
   )

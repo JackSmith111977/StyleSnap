@@ -49,11 +49,9 @@ export function CollectionList({
           />
         </div>
 
-        <Button asChild>
-          <Link href="/collections/new">
-            <Plus className="mr-2 h-4 w-4" />
-            创建合集
-          </Link>
+        <Button variant="outline" onClick={() => window.location.href = '/collections/new'}>
+          <Plus className="mr-2 h-4 w-4" />
+          创建合集
         </Button>
       </div>
 
