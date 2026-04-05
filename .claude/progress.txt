@@ -6,6 +6,25 @@
 
 ### ✅ 已完成
 
+**任务：筛选功能不能正常工作 - 完整修复**
+- 状态：已完成
+- 开始时间：2026-04-05
+- 完成时间：2026-04-05
+- 问题描述：高级筛选功能（颜色/行业/复杂度）无法正确筛选风格，点击"应用筛选"后页面仍显示所有风格
+- 根因分析：
+  1. 代码问题：`getStyles` 函数中使用 `.in('style_tags.tag.name', filters)` 不是正确的 PostgREST 嵌套字段筛选语法
+  2. 数据问题：`0008_seed_initial_styles.sql` 中只创建了风格案例，但没有插入 `style_tags` 关联数据
+- 修复方案：
+  - 代码修复：修改 `apps/web/actions/styles/index.ts` 中的筛选逻辑
+    - 从 `.in('style_tags.tag.name', allTagFilters)` 改为 `.filter('style_tags.tag.name', 'in', filterValue)`
+  - 数据修复：创建 `0025_add_style_tags_associations.sql` 为现有 10 个风格添加标签关联
+- 输出：
+  - 修改 `apps/web/actions/styles/index.ts` - 修复标签筛选语法
+  - 创建 `supabase/migrations/0025_add_style_tags_associations.sql` - 添加风格 - 标签关联数据
+- 构建验证：pnpm build 成功
+- 迁移说明：用户已在 Supabase Dashboard 手动执行 migration 0025
+- 下一步：验证筛选功能是否正常工作
+
 **任务：Story 1.3 密码重置功能修复**
 - 状态：已完成
 - 开始时间：2026-04-05

@@ -117,8 +117,11 @@ export const getStyles = cache(async (
   }
 
   // 高级筛选：标签
+  // 注意：使用 PostgREST 的嵌套字段筛选语法
+  // 格式：filter('关联表。字段', 'in', '(值 1，值 2)')
   if (allTagFilters.length > 0) {
-    query = query.in('style_tags.tag.name', allTagFilters)
+    const filterValue = `(${allTagFilters.join(',')})`
+    query = query.filter('style_tags.tag.name', 'in', filterValue)
   }
 
   // 排序
