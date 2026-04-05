@@ -13,6 +13,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { toast } from 'sonner'
 
 interface CreateCollectionModalProps {
   open: boolean
@@ -58,8 +59,10 @@ export function CreateCollectionModal({
       onOpenChange(false)
       setName('')
       setDescription('')
+      toast.success('合集已创建')
     } else {
       setError(result.error ?? '创建失败')
+      toast.error(result.error ?? '创建失败')
     }
 
     setIsCreating(false)

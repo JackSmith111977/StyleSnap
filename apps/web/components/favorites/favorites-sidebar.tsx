@@ -2,9 +2,10 @@
 
 import { useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Folder, FolderPlus, FolderOpen, Star, MoreHorizontal, Trash2 } from 'lucide-react'
+import { Folder, FolderPlus, FolderOpen, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { toast } from 'sonner'
 
 interface Collection {
   id: string
@@ -15,31 +16,35 @@ interface Collection {
 interface FavoritesSidebarProps {
   collections: Collection[]
   totalUncategorized: number
+  onRequestCreate?: () => void
 }
 
-export function FavoritesSidebar({ collections, totalUncategorized }: FavoritesSidebarProps) {
+export function FavoritesSidebar({ collections, totalUncategorized, onRequestCreate }: FavoritesSidebarProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const [isCreating, setIsCreating] = useState(false)
   const [activeMenu, setActiveMenu] = useState<'all' | 'uncategorized' | string>('all')
 
   const currentCollectionId = searchParams.get('collectionId')
 
   const handleNavigate = (collectionId?: string | null) => {
+    console.log('[FavoritesSidebar] handleNavigate called:', { collectionId, type: typeof collectionId })
     if (collectionId === 'uncategorized') {
+      console.log('[FavoritesSidebar] Navigating to uncategorized')
       router.push('/favorites?collectionId=uncategorized')
       setActiveMenu('uncategorized')
     } else if (!collectionId) {
+      console.log('[FavoritesSidebar] Navigating to all favorites')
       router.push('/favorites')
       setActiveMenu('all')
     } else {
+      console.log('[FavoritesSidebar] Navigating to collection:', collectionId)
       router.push(`/favorites?collectionId=${collectionId}`)
       setActiveMenu(collectionId)
     }
   }
 
   const handleCreateCollection = () => {
-    setIsCreating(true)
+    onRequestCreate?.()
   }
 
   const handleDeleteCollection = async (e: React.MouseEvent, collectionId: string, collectionName: string) => {
@@ -54,8 +59,9 @@ export function FavoritesSidebar({ collections, totalUncategorized }: FavoritesS
     if (result.success) {
       router.push('/favorites')
       router.refresh()
+      toast.success('合集已删除')
     } else {
-      alert(result.error ?? '删除失败')
+      toast.error(result.error ?? '删除失败')
     }
   }
 
