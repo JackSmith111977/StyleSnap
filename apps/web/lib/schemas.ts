@@ -98,6 +98,28 @@ export const paginationSchema = z.object({
   limit: z.coerce.number().min(1).max(50).default(20),
 })
 
+// 合集 ID 验证
+export const collectionIdSchema = uuidSchema.describe('合集 ID')
+
+// 添加风格到合集参数验证
+export const addStyleToCollectionSchema = z.object({
+  styleId: styleIdSchema,
+  collectionId: collectionIdSchema,
+})
+
+// 从合集移除风格参数验证
+export const removeStyleFromCollectionSchema = z.object({
+  styleId: styleIdSchema,
+  collectionId: collectionIdSchema,
+})
+
+// 获取收藏列表参数验证
+export const getFavoritesSchema = z.object({
+  collectionId: collectionIdSchema.optional().nullable(),
+  page: z.coerce.number().min(1).default(1),
+  limit: z.coerce.number().min(1).max(50).default(20),
+})
+
 // 排序参数验证
 export const sortSchema = z.enum(['newest', 'oldest', 'popular', 'liked']).default('newest')
 

@@ -28,7 +28,7 @@ let createClient: any;
 let getCurrentUser: any;
 let toggleFavorite: any;
 let checkIsFavorite: any;
-let getMyFavorites: any;
+let getFavorites: any;
 let toggleLike: any;
 let checkIsLiked: any;
 
@@ -42,7 +42,7 @@ beforeAll(async () => {
   getCurrentUser = authModule.getCurrentUser;
   toggleFavorite = favoritesModule.toggleFavorite;
   checkIsFavorite = favoritesModule.checkIsFavorite;
-  getMyFavorites = favoritesModule.getMyFavorites;
+  getFavorites = favoritesModule.getFavorites;
   toggleLike = likesModule.toggleLike;
   checkIsLiked = likesModule.checkIsLiked;
 });
@@ -190,7 +190,7 @@ describe('checkIsFavorite', () => {
   });
 });
 
-describe('getMyFavorites', () => {
+describe('getFavorites', () => {
   const mockUser = {
     id: 'test-user-id',
     email: 'test@example.com',
@@ -204,7 +204,7 @@ describe('getMyFavorites', () => {
   it('未登录用户返回错误', async () => {
     vi.mocked(getCurrentUser).mockResolvedValue(null);
 
-    const result = await getMyFavorites();
+    const result = await getFavorites(null, 1, 12);
 
     expect(result.success).toBe(false);
     expect(result.error).toBe('请先登录');
@@ -244,7 +244,7 @@ describe('getMyFavorites', () => {
       from: vi.fn().mockReturnValue(mockQuery),
     } as any);
 
-    const result = await getMyFavorites(1, 12);
+    const result = await getFavorites(null, 1, 12);
 
     expect(result.success).toBe(true);
     expect(result.data?.styles).toHaveLength(1);
@@ -268,7 +268,7 @@ describe('getMyFavorites', () => {
       from: vi.fn().mockReturnValue(mockQuery),
     } as any);
 
-    const result = await getMyFavorites();
+    const result = await getFavorites(null, 1, 12);
 
     expect(result.success).toBe(true);
     expect(result.data?.styles).toHaveLength(0);

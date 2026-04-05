@@ -1,10 +1,22 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import { getCurrentUser } from '@/lib/auth'
+import { getCurrentUser, requireAuth } from '@/lib/auth'
 import { captureActionError, setSentryUser } from '@/lib/sentry-capture'
 import { revalidatePath, revalidateTag } from 'next/cache'
-import { validateOrThrow, toggleFavoriteSchema, styleIdSchema } from '@/lib/schemas'
+import { validateOrThrow, styleIdSchema, collectionIdSchema, getFavoritesSchema, addStyleToCollectionSchema, toggleFavoriteSchema } from '@/lib/schemas'
+import { z } from 'zod'
+
+// 导入 collections 的函数用于重新导出
+import {
+  createCollection as _createCollection,
+  updateCollection as _updateCollection,
+  deleteCollection as _deleteCollection,
+  getCollectionDetail as _getCollectionDetail,
+  getUserCollections as _getUserCollections,
+  getMyCollections as _getMyCollections,
+  isStyleInCollection as _isStyleInCollection,
+} from '../collections'
 
 export interface ToggleFavoriteResult {
   isFavorite: boolean
@@ -12,7 +24,8 @@ export interface ToggleFavoriteResult {
 }
 
 /**
- * 切换收藏状态
+ * 切换收藏状态（原子操作）
+ * 返回：是否已收藏、收藏计数
  */
 export async function toggleFavorite(
   styleId: string
@@ -20,7 +33,6 @@ export async function toggleFavorite(
   let validatedData: { styleId: string } | undefined
 
   try {
-    // 验证输入参数
     validatedData = validateOrThrow(toggleFavoriteSchema, { styleId })
 
     const supabase = await createClient()
@@ -30,13 +42,11 @@ export async function toggleFavorite(
       return { success: false, error: '请先登录' }
     }
 
-    // 设置 Sentry 用户上下文
     await setSentryUser({
       id: user.id,
       email: user.email ?? undefined,
     })
 
-    // 使用数据库 RPC 函数实现原子更新
     const { data, error } = await supabase.rpc('toggle_favorite_atomic', {
       p_style_id: validatedData.styleId,
       p_user_id: user.id,
@@ -48,10 +58,10 @@ export async function toggleFavorite(
 
     const result = data as { is_favorite: boolean; count: number }
 
-    // 清除缓存 - 使用精确的 tag 而非全局 revalidate
     revalidateTag(`style-${validatedData.styleId}`, 'max')
     revalidatePath(`/styles/${validatedData.styleId}`, 'page')
     revalidatePath('/styles', 'page')
+    revalidatePath('/favorites', 'page')
 
     return {
       success: true,
@@ -67,11 +77,12 @@ export async function toggleFavorite(
 }
 
 /**
- * 获取用户的收藏列表
+ * 获取用户的收藏列表（支持按合集筛选）
  */
-export async function getMyFavorites(
+export async function getFavorites(
+  collectionId?: string | null,
   page = 1,
-  limit = 12
+  limit = 20
 ): Promise<{
   success: boolean
   data?: {
@@ -87,6 +98,7 @@ export async function getMyFavorites(
       created_at: string
       category?: { name: string; name_en: string; icon: string | null }
       tags?: string[]
+      collections?: Array<{ collection_id: string; collection_name: string }>
     }>
     total: number
     page: number
@@ -103,39 +115,62 @@ export async function getMyFavorites(
       return { success: false, error: '请先登录' }
     }
 
-    const from = (page - 1) * limit
-    const to = from + limit - 1
+    // 验证参数
+    const validatedData = validateOrThrow(getFavoritesSchema, { collectionId, page, limit })
+    const from = (validatedData.page - 1) * validatedData.limit
 
-    // 步骤 1: 先获取 favorites 表中的 style_id 列表（避免嵌套查询的 RLS 问题）
-    const { data: favoritesData, error: favoritesError, count } = await supabase
+    // 步骤 1: 获取 favorites 表中的 style_id 列表
+    let favoritesQuery = supabase
       .from('favorites')
       .select('style_id, created_at', { count: 'exact' })
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
-      .range(from, to)
+
+    if (validatedData.collectionId) {
+      // 如果指定了合集 ID，先筛选 style_collection_tags
+      const { data: tagData, error: tagError } = await supabase
+        .from('style_collection_tags')
+        .select('style_id')
+        .eq('user_id', user.id)
+        .eq('collection_id', validatedData.collectionId)
+
+      if (tagError) throw tagError
+
+      if (!tagData || tagData.length === 0) {
+        return {
+          success: true,
+          data: { styles: [], total: 0, page: validatedData.page, limit: validatedData.limit, totalPages: 0 },
+        }
+      }
+
+      const styleIds = tagData.map(t => t.style_id)
+      favoritesQuery = favoritesQuery.in('style_id', styleIds)
+    }
+
+    favoritesQuery = favoritesQuery.range(from, from + validatedData.limit - 1)
+
+    const { data: favoritesData, error: favoritesError, count } = await favoritesQuery
 
     if (favoritesError) {
       throw favoritesError
     }
 
-    // 如果没有收藏，直接返回空结果
     if (!favoritesData || favoritesData.length === 0) {
       return {
         success: true,
         data: {
           styles: [],
           total: count ?? 0,
-          page,
-          limit,
-          totalPages: Math.ceil((count ?? 0) / limit),
+          page: validatedData.page,
+          limit: validatedData.limit,
+          totalPages: Math.ceil((count ?? 0) / validatedData.limit),
         },
       }
     }
 
-    // 提取 style_id 列表
     const styleIds = favoritesData.map(fav => fav.style_id)
 
-    // 步骤 2: 根据 style_id 列表查询完整的风格信息
+    // 步骤 2: 查询完整的风格信息
     const { data: stylesData, error: stylesError } = await supabase
       .from('styles')
       .select(`
@@ -157,8 +192,26 @@ export async function getMyFavorites(
       throw stylesError
     }
 
-    // 类型定义
-    type FavoriteStyle = {
+    // 如果需要获取每个风格关联的合集信息
+    let collectionTags: Array<{ style_id: string; collection_id: string; collection_name: string }> = []
+    if (!validatedData.collectionId) {
+      const { data: tagsData } = await supabase
+        .from('style_collection_tags')
+        .select('style_id, collection_id, collections(name)')
+        .in('style_id', styleIds)
+        .eq('user_id', user.id)
+
+      if (tagsData) {
+        collectionTags = tagsData.map(t => ({
+          style_id: t.style_id,
+          collection_id: t.collection_id,
+          collection_name: (t.collections as any)?.name,
+        }))
+      }
+    }
+
+    const stylesMap = new Map(stylesData?.map(style => [style.id, style]) ?? [])
+    const styles: Array<{
       id: string
       title: string
       description: string | null
@@ -170,51 +223,57 @@ export async function getMyFavorites(
       created_at: string
       category?: { name: string; name_en: string; icon: string | null }
       tags?: string[]
-    }
+      collections?: Array<{ collection_id: string; collection_name: string }>
+    }> = []
 
-    // 按 favorites 的顺序排序（因为 stylesData 可能顺序不同）
-    const stylesMap = new Map(stylesData?.map(style => [style.id, style]) ?? [])
-    const styles: FavoriteStyle[] = styleIds.map(id => {
+    for (const id of styleIds) {
       const style = stylesMap.get(id)
-      if (!style) return null
+      if (!style) continue
 
-      // 处理 category 可能是数组的情况（Supabase 外键关联）
       const category = Array.isArray(style.category) ? style.category[0] : style.category
-      // 处理 style_tags 可能是嵌套数组的情况
       let styleTagsData: Array<{ tag: { name: string } }> = []
       if (style.style_tags) {
         if (Array.isArray(style.style_tags)) {
-          styleTagsData = style.style_tags.flat() as Array<{ tag: { name: string } }>
+          const flatTags = style.style_tags.flat()
+          styleTagsData = flatTags.map((t: any) => ({ tag: { name: t.tag?.name || t.name } }))
         }
       }
-      return {
+
+      // 获取该风格关联的所有合集
+      const styleCollections = collectionTags
+        .filter(t => t.style_id === id)
+        .map(t => ({ collection_id: t.collection_id, collection_name: t.collection_name }))
+
+      styles.push({
         id: style.id,
         title: style.title,
-        description: style.description,
+        description: style.description ?? null,
         category_id: style.category_id,
         status: style.status,
         favorite_count: style.favorite_count,
         like_count: style.like_count,
         view_count: style.view_count,
         created_at: style.created_at,
-        category,
+        category: category ? { name: category.name, name_en: category.name_en, icon: category.icon } : undefined,
         tags: styleTagsData.map((st) => st.tag.name),
-      }
-    }).filter((s): s is FavoriteStyle => s !== null)
+        collections: styleCollections,
+      })
+    }
 
     return {
       success: true,
       data: {
         styles,
         total: count ?? 0,
-        page,
-        limit,
-        totalPages: Math.ceil((count ?? 0) / limit),
+        page: validatedData.page,
+        limit: validatedData.limit,
+        totalPages: Math.ceil((count ?? 0) / validatedData.limit),
       },
     }
   } catch (error) {
     await captureActionError(error, {
-      action: 'getMyFavorites',
+      action: 'getFavorites',
+      collectionId,
       page,
     })
     return { success: false, error: '获取收藏列表失败' }
@@ -222,16 +281,120 @@ export async function getMyFavorites(
 }
 
 /**
- * 检查用户是否收藏了某个风格
+ * 添加风格到合集
+ */
+export async function addStyleToCollection(
+  styleId: string,
+  collectionId: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const validatedData = validateOrThrow(addStyleToCollectionSchema, { styleId, collectionId })
+
+    const supabase = await createClient()
+    const user = await requireAuth()
+
+    // 验证合集是否属于当前用户
+    const { data: collection, error: collectionError } = await supabase
+      .from('collections')
+      .select('id, user_id')
+      .eq('id', validatedData.collectionId)
+      .eq('user_id', user.id)
+      .single()
+
+    if (collectionError || !collection) {
+      return { success: false, error: '合集不存在或无权操作' }
+    }
+
+    // 验证收藏是否存在
+    const { data: favorite } = await supabase
+      .from('favorites')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('style_id', validatedData.styleId)
+      .single()
+
+    if (!favorite) {
+      return { success: false, error: '请先收藏该风格' }
+    }
+
+    // 添加合集标签
+    const { error: insertError } = await supabase
+      .from('style_collection_tags')
+      .insert({
+        user_id: user.id,
+        style_id: validatedData.styleId,
+        collection_id: validatedData.collectionId,
+      })
+
+    if (insertError) {
+      if (insertError.code === '23505') {
+        return { success: false, error: '风格已在该合集中' }
+      }
+      throw insertError
+    }
+
+    revalidatePath(`/favorites`, 'page')
+    revalidatePath(`/collections/${validatedData.collectionId}`, 'page')
+    revalidateTag(`collections-${user.id}`, 'max')
+
+    return { success: true }
+  } catch (error) {
+    await captureActionError(error, {
+      action: 'addStyleToCollection',
+      styleId,
+      collectionId,
+    })
+    return { success: false, error: '添加失败，请重试' }
+  }
+}
+
+/**
+ * 从合集移除风格
+ */
+export async function removeStyleFromCollection(
+  styleId: string,
+  collectionId: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const validatedData = validateOrThrow(addStyleToCollectionSchema, { styleId, collectionId })
+
+    const supabase = await createClient()
+    const user = await requireAuth()
+
+    // 删除合集标签
+    const { error } = await supabase
+      .from('style_collection_tags')
+      .delete()
+      .eq('user_id', user.id)
+      .eq('style_id', validatedData.styleId)
+      .eq('collection_id', validatedData.collectionId)
+
+    if (error) {
+      throw error
+    }
+
+    revalidatePath(`/favorites`, 'page')
+    revalidatePath(`/collections/${validatedData.collectionId}`, 'page')
+
+    return { success: true }
+  } catch (error) {
+    await captureActionError(error, {
+      action: 'removeStyleFromCollection',
+      styleId,
+      collectionId,
+    })
+    return { success: false, error: '移除失败，请重试' }
+  }
+}
+
+/**
+ * 检查风格是否在指定合集中
  */
 export async function checkIsFavorite(
   styleId: string
 ): Promise<{ success: boolean; data?: { isFavorite: boolean }; error?: string }> {
-  let validatedData: string | undefined
-
   try {
-    // 验证输入参数
-    validatedData = validateOrThrow(styleIdSchema, styleId)
+    const validatedData = validateOrThrow(styleIdSchema, styleId)
 
     const supabase = await createClient()
     const user = await getCurrentUser()
@@ -258,8 +421,61 @@ export async function checkIsFavorite(
   } catch (error) {
     await captureActionError(error, {
       action: 'checkIsFavorite',
-      styleId: validatedData ?? styleId,
+      styleId,
     })
-    return { success: false, error: '检查收藏状态失败' }
+    return { success: false, error: '检查失败' }
   }
 }
+
+/**
+ * 获取用户的合集列表（用于下拉选择）
+ */
+export async function getUserCollectionsSimple(): Promise<{
+  success: boolean
+  data?: Array<{ id: string; name: string; style_count: number }>
+  error?: string
+}> {
+  try {
+    const supabase = await createClient()
+    const user = await requireAuth()
+
+    const { data, error } = await supabase
+      .from('collections')
+      .select(`
+        id,
+        name,
+        style_count:style_collection_tags(count)
+      `)
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+
+    if (error) {
+      throw error
+    }
+
+    const collections = (data || []).map(c => ({
+      id: c.id,
+      name: c.name,
+      style_count: (c.style_count as any[])?.[0]?.count ?? 0,
+    }))
+
+    return {
+      success: true,
+      data: collections,
+    }
+  } catch (error) {
+    await captureActionError(error, {
+      action: 'getUserCollectionsSimple',
+    })
+    return { success: false, error: '获取合集列表失败' }
+  }
+}
+
+// 重新导出 collections 相关的 CRUD 操作
+export const createCollection = _createCollection
+export const updateCollection = _updateCollection
+export const deleteCollection = _deleteCollection
+export const getCollectionDetail = _getCollectionDetail
+export const getUserCollections = _getUserCollections
+export const getMyCollections = _getMyCollections
+export const isStyleInCollection = _isStyleInCollection

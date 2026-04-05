@@ -425,7 +425,7 @@ export async function isStyleInCollection(
     }
 
     const { data, error } = await supabase
-      .from('collection_styles')
+      .from('style_collection_tags')
       .select('id')
       .eq('collection_id', validatedCollectionId)
       .eq('style_id', validatedStyleId)

@@ -344,6 +344,26 @@
 
 ---
 
+## 当前任务
+**Story 6.5: 统一收藏管理系统**
+- 状态：🔄 进行中
+- 开始时间：2026-04-05
+- 设计批准：双表设计（favorites + style_collection_tags）
+- 输出：
+  - 创建 `sprint-change-proposal-2026-04-05.md` - Correct Course 变更提案
+  - 更新 `PRD.md` - F2.5 改为统一收藏管理
+  - 更新 `epics.md` - Story 6.5 规格
+  - 创建 `story-6-5-unified-favorites.md` - Story Spec
+  - 更新 `sprint-status.yaml` - Story 6.5 状态更新
+  - 创建 `0024_unified_favorites.sql` - 数据库迁移
+- 待执行：
+  - [ ] 阶段 1: 数据库迁移
+  - [ ] 阶段 2: Server Actions 重构
+  - [ ] 阶段 3: 前端页面重构
+  - [ ] 阶段 4: 测试验证
+
+---
+
 ## 历史完成记录
 
 ### ✅ 已完成 - 2026-04-04

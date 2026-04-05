@@ -42,6 +42,9 @@ export default async function CollectionDetailPage({ params }: CollectionDetailP
   }
 
   const collection = result.data
+  if (!collection) {
+    notFound()
+  }
   const isOwner = user?.id === collection.user_id
 
   return (

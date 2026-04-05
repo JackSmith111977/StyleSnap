@@ -1,12 +1,45 @@
--- Migration: 0022_add_collections.sql
+-- Migration: 0023_add_collections.sql
 -- Description: 添加用户合集系统数据库支持
 -- Created: 2026-04-05
+-- Modified: 2026-04-05 - 修复字段名 (preview_light/preview_dark) 并添加幂等性支持
+
+-- ============================================================================
+-- 清理步骤：先删除已存在的对象（支持重新执行）
+-- ============================================================================
+
+-- 删除旧的策略（如果存在）
+DROP POLICY IF EXISTS "allows_view_public_collections" ON collections;
+DROP POLICY IF EXISTS "allows_view_own_collections" ON collections;
+DROP POLICY IF EXISTS "allows_insert_authenticated" ON collections;
+DROP POLICY IF EXISTS "allows_update_owner" ON collections;
+DROP POLICY IF EXISTS "allows_delete_owner" ON collections;
+DROP POLICY IF EXISTS "allows_view_public_collection_styles" ON collection_styles;
+DROP POLICY IF EXISTS "allows_modify_owner" ON collection_styles;
+DROP POLICY IF EXISTS "allows_delete_owner" ON collection_styles;
+
+-- 删除旧的函数（如果存在）- 使用 CASCADE 自动删除依赖
+DROP FUNCTION IF EXISTS get_collection_detail(UUID, UUID) CASCADE;
+DROP FUNCTION IF EXISTS get_user_collections(UUID, UUID, INTEGER, INTEGER) CASCADE;
+DROP FUNCTION IF EXISTS add_style_to_collection(UUID, UUID) CASCADE;
+DROP FUNCTION IF EXISTS remove_style_from_collection(UUID, UUID) CASCADE;
+DROP FUNCTION IF EXISTS update_collections_updated_at() CASCADE;
+DROP FUNCTION IF EXISTS check_collection_style_limit() CASCADE;
+DROP FUNCTION IF EXISTS check_user_collection_limit() CASCADE;
+
+-- 删除旧的触发器（如果存在）
+DROP TRIGGER IF EXISTS on_collections_update ON collections;
+DROP TRIGGER IF EXISTS on_collection_styles_insert ON collection_styles;
+DROP TRIGGER IF EXISTS on_collections_insert ON collections;
+
+-- 删除旧的表（如果存在）- CASCADE 会自动删除依赖的触发器和函数
+DROP TABLE IF EXISTS collection_styles CASCADE;
+DROP TABLE IF EXISTS collections CASCADE;
 
 -- ============================================================================
 -- 1. 创建合集表
 -- ============================================================================
 
-CREATE TABLE IF NOT EXISTS collections (
+CREATE TABLE collections (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   name VARCHAR(100) NOT NULL,
@@ -25,7 +58,7 @@ CREATE TABLE IF NOT EXISTS collections (
 -- 2. 创建合集 - 风格关联表
 -- ============================================================================
 
-CREATE TABLE IF NOT EXISTS collection_styles (
+CREATE TABLE collection_styles (
   collection_id UUID REFERENCES collections(id) ON DELETE CASCADE,
   style_id UUID REFERENCES styles(id) ON DELETE CASCADE,
   created_at TIMESTAMPTZ DEFAULT NOW(),
@@ -212,28 +245,32 @@ RETURNS TABLE (
   owner_avatar TEXT,
   styles JSONB
 ) AS $$
+DECLARE
+  v_collection collections;
 BEGIN
+  -- 获取合集记录
+  SELECT c.* INTO v_collection
+  FROM collections c
+  WHERE c.id = p_collection_id
+  AND (c.is_public = true OR c.user_id = p_viewer_id);
+
   -- 检查权限
-  IF NOT EXISTS (
-    SELECT 1 FROM collections
-    WHERE id = p_collection_id
-    AND (is_public = true OR user_id = p_viewer_id)
-  ) THEN
+  IF v_collection.id IS NULL THEN
     RAISE EXCEPTION '无权访问此合集';
   END IF;
 
   RETURN QUERY
   SELECT
-    c.id,
-    c.user_id,
-    c.name::TEXT,
-    c.description::TEXT,
-    c.cover_style_id,
-    c.is_public,
-    c.created_at,
-    c.updated_at,
+    v_collection.id,
+    v_collection.user_id,
+    v_collection.name::TEXT,
+    v_collection.description::TEXT,
+    v_collection.cover_style_id,
+    v_collection.is_public,
+    v_collection.created_at,
+    v_collection.updated_at,
     COUNT(cs.style_id)::BIGINT as style_count,
-    p.display_name::TEXT as owner_name,
+    p.full_name::TEXT as owner_name,
     p.avatar_url::TEXT as owner_avatar,
     COALESCE(
       JSONB_AGG(
@@ -241,19 +278,18 @@ BEGIN
           'id', s.id,
           'name', s.name,
           'description', s.description,
-          'preview_image_light', s.preview_image_light,
-          'preview_image_dark', s.preview_image_dark,
+          'preview_light', s.preview_light,
+          'preview_dark', s.preview_dark,
           'category_id', s.category_id
         )
       ) FILTER (WHERE s.id IS NOT NULL),
       '[]'::JSONB
     ) as styles
-  FROM collections c
-  LEFT JOIN profiles p ON c.user_id = p.user_id
-  LEFT JOIN collection_styles cs ON c.id = cs.collection_id
+  FROM collection_styles cs
   LEFT JOIN styles s ON cs.style_id = s.id
-  WHERE c.id = p_collection_id
-  GROUP BY c.id, p.display_name, p.avatar_url;
+  LEFT JOIN profiles p ON v_collection.user_id = p.id
+  WHERE cs.collection_id = p_collection_id
+  GROUP BY v_collection.id, p.full_name, p.avatar_url;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
@@ -289,13 +325,13 @@ BEGIN
     c.created_at,
     c.updated_at,
     COUNT(cs.style_id)::BIGINT as style_count,
-    (s.preview_image_light)::TEXT as cover_preview
+    (s.preview_light)::TEXT as cover_preview
   FROM collections c
   LEFT JOIN collection_styles cs ON c.id = cs.collection_id
   LEFT JOIN styles s ON c.cover_style_id = s.id
   WHERE c.user_id = p_user_id
   AND (c.is_public = true OR c.user_id = p_viewer_id)
-  GROUP BY c.id, s.preview_image_light
+  GROUP BY c.id, s.preview_light
   ORDER BY c.updated_at DESC
   LIMIT p_limit OFFSET p_offset;
 END;

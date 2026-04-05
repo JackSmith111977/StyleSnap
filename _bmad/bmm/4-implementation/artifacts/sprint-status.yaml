@@ -94,7 +94,7 @@ development_status:
   6-2-user-submission-flow: done
   6-3-sharing-feature: done
   6-4-follow-system: done
-  6-5-user-collections: backlog
+  6-5-unified-favorites: backlog  # 重构：原 user-collections
   6-6-code-export-options: backlog
   6-7-preview-styles: backlog
   6-8-style-preview-component: backlog
