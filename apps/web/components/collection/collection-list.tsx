@@ -37,9 +37,9 @@ export function CollectionList({
 
   return (
     <div className={className}>
-      {/* 头部操作栏 */}
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="relative flex-1 max-w-md">
+      {/* 搜索栏 */}
+      <div className="mb-6">
+        <div className="relative max-w-md">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="搜索合集..."
@@ -48,11 +48,6 @@ export function CollectionList({
             className="pl-10"
           />
         </div>
-
-        <Button variant="outline" onClick={() => window.location.href = '/collections/new'}>
-          <Plus className="mr-2 h-4 w-4" />
-          创建合集
-        </Button>
       </div>
 
       {/* 合集网格 */}
