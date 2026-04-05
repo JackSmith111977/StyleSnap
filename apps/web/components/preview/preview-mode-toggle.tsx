@@ -9,8 +9,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { LayoutTemplate } from 'lucide-react'
-import { usePreviewModeStore } from '@/stores/preview-mode-store'
-import type { PreviewMode } from '@/stores/preview-mode-store'
+import { usePreviewModeStore, type PreviewMode } from '@/stores/preview-mode-store'
 
 interface PreviewModeToggleProps {
   pageType: 'list' | 'detail'

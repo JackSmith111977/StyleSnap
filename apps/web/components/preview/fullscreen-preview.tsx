@@ -1,13 +1,13 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { X, Maximize2 } from 'lucide-react'
+import { X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { StylePreview } from './style-preview'
-import type { DesignTokens } from '@/stores/preview-editor-store'
+import type { DesignTokens } from '@/types/design-tokens'
 
 interface FullscreenPreviewProps {
-  designTokens: DesignTokensType
+  designTokens: DesignTokens
   styleName: string
   styleDescription?: string | null
   isOpen: boolean

@@ -2,12 +2,12 @@
  * 预览工具函数
  */
 
-import type { DesignTokens } from '@/stores/preview-editor-store'
+import type { DesignTokens } from '@/types/design-tokens'
 
 /**
  * 生成设计变量摘要文本
  */
-export function generateTokensSummary(tokens: DesignTokensType): string {
+export function generateTokensSummary(tokens: DesignTokens): string {
   const colors = Object.values(tokens.colorPalette).join(', ')
   return `配色：${colors} | 字体：${tokens.fonts.heading} | 间距：${Object.values(tokens.spacing).join('/')}`
 }

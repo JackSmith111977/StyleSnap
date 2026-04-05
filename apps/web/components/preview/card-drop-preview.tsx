@@ -1,15 +1,14 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import type { DesignTokens } from '@/stores/preview-editor-store'
+import type { DesignTokens } from '@/types/design-tokens'
 
 interface CardDropPreviewProps {
   styleId: string
   styleName: string
   styleDescription?: string | null
-  designTokens: DesignTokensType
+  designTokens: DesignTokens
   codeSnippet?: string
   isExpanded: boolean
   onToggle: () => void

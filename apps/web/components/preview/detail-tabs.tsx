@@ -1,14 +1,11 @@
 'use client'
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Button } from '@/components/ui/button'
-import { Maximize2, X } from 'lucide-react'
-import { StylePreview } from './style-preview'
-import type { DesignTokens } from '@/stores/preview-editor-store'
+import type { DesignTokens } from '@/types/design-tokens'
 
 interface DetailTabsProps {
   styleId: string
-  designTokens: DesignTokensType
+  designTokens: DesignTokens
   codeSnippets: {
     language: 'html' | 'css' | 'tsx' | 'typescript'
     title: string
@@ -34,13 +31,13 @@ export function DetailTabs({ styleId, designTokens, codeSnippets }: DetailTabsPr
       </TabsContent>
 
       <TabsContent value="code" className="mt-4">
-        <CodeSnippetDisplay snippets={codeSnippets} />
+        <CodeSnippetsDisplay snippets={codeSnippets} />
       </TabsContent>
     </Tabs>
   )
 }
 
-function DesignTokensDetail({ tokens }: { tokens: DesignTokensType }) {
+function DesignTokensDetail({ tokens }: { tokens: DesignTokens }) {
   return (
     <div className="space-y-6">
       {/* 配色方案 */}
@@ -97,7 +94,7 @@ function DesignTokensDetail({ tokens }: { tokens: DesignTokensType }) {
   )
 }
 
-function CodeSnippetDisplay({
+function CodeSnippetsDisplay({
   snippets,
 }: {
   snippets: {
@@ -108,6 +105,14 @@ function CodeSnippetDisplay({
 }) {
   const validSnippets = snippets.filter((s) => s.code && s.code.trim() !== '')
   const defaultValue = validSnippets[0]?.language ?? 'html'
+
+  if (validSnippets.length === 0) {
+    return (
+      <div className="text-center py-8 text-muted-foreground">
+        暂无代码片段
+      </div>
+    )
+  }
 
   return (
     <Tabs defaultValue={defaultValue} className="w-full">
