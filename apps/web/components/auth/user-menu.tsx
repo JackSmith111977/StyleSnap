@@ -10,8 +10,6 @@ export function UserMenu() {
   const { user, loading, signOut } = useAuth()
   const [open, setOpen] = useState(false)
 
-  console.log('[UserMenu] render:', { user: user?.email, loading, hasUser: !!user })
-
   if (!user) {
     return (
       <div className="flex gap-2">

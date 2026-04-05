@@ -70,6 +70,7 @@ export async function login(
     await captureActionError(error, {
       action: 'auth/login',
     })
+    console.error('[登录] 异常:', error)
     return { error: '服务器错误，请稍后重试' }
   }
 }

@@ -4,6 +4,8 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { login } from '@/actions/auth'
+import { createClient } from '@/lib/supabase/client'
+import { useAuthStore } from '@/stores/auth-store'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -11,6 +13,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 
 export function LoginForm() {
   const router = useRouter()
+  const { setUser } = useAuthStore()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string>()
 
@@ -19,23 +22,50 @@ export function LoginForm() {
     setError(undefined)
     setLoading(true)
 
+    console.log('[LoginForm] 提交登录表单')
+
     const formData = new FormData(e.currentTarget)
     const email = formData.get('email') as string
     const password = formData.get('password') as string
 
+    console.log('[LoginForm] 调用 login Server Action')
+
     try {
       const result = await login(email, password)
+      console.log('[LoginForm] login 返回:', result)
+
       if (result.error) {
+        console.warn('[LoginForm] 登录失败:', result.error)
         setError(result.error)
       } else if (result.success) {
-        // 登录成功，使用 router.push 进行软导航以保留 cookie
+        console.log('[LoginForm] 登录成功，开始同步 session')
+        // 登录成功后，手动同步 session 到客户端
+        // Server Action 设置的 cookie 不会自动触发 onAuthStateChange 事件
+        // 需要手动调用 getSession() 从 cookie 读取并同步 session
+        const supabase = createClient()
+        console.log('[LoginForm] 调用 getSession()')
+        const { data: sessionData } = await supabase.auth.getSession()
+        console.log('[LoginForm] getSession() 返回:', {
+          hasSession: !!sessionData.session,
+          userId: sessionData.session?.user?.id,
+        })
+
+        // 关键修复：直接更新 Zustand store，让全局状态立即同步
+        console.log('[LoginForm] 更新 AuthStore')
+        if (sessionData.session) {
+          setUser(sessionData.session.user)
+        }
+
+        // 导航到首页（不需要 router.refresh()，因为 store 已经更新）
+        console.log('[LoginForm] 导航到首页')
         router.push('/')
-        router.refresh()
       }
-    } catch {
+    } catch (err) {
+      console.error('[LoginForm] 登录异常:', err)
       setError('登录失败，请稍后重试')
     } finally {
       setLoading(false)
+      console.log('[LoginForm] 表单提交完成')
     }
   }
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
 /**
@@ -9,7 +9,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
  *
  * Supabase PKCE flow 使用 code 参数
  */
-export default function AuthResetPasswordPage() {
+function ResetPasswordCallbackContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [isProcessing, setIsProcessing] = useState(true)
@@ -52,5 +52,23 @@ export default function AuthResetPasswordPage() {
         <p className="text-gray-600">请稍候</p>
       </div>
     </div>
+  )
+}
+
+/**
+ * 主组件 - 使用 Suspense 边界包裹
+ */
+export default function AuthResetPasswordPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-xl font-semibold mb-4">加载中...</h1>
+          <p className="text-gray-600">请稍候</p>
+        </div>
+      </div>
+    }>
+      <ResetPasswordCallbackContent />
+    </Suspense>
   )
 }
