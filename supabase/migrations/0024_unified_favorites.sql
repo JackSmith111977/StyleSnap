@@ -136,6 +136,10 @@ CREATE POLICY "allows_view_public_collection_tags"
 -- 步骤 6: 创建 RPC 函数（可选，用于简化 Server Actions）
 -- ============================================================================
 
+-- 删除旧函数（如果存在）- 必须先删除才能改变返回类型
+DROP FUNCTION IF EXISTS toggle_favorite_atomic(UUID, UUID) CASCADE;
+DROP FUNCTION IF EXISTS get_user_favorites(UUID, UUID, INTEGER, INTEGER) CASCADE;
+
 -- 切换收藏状态（返回是否已收藏和收藏计数）
 CREATE OR REPLACE FUNCTION toggle_favorite_atomic(p_style_id UUID, p_user_id UUID)
 RETURNS TABLE(is_favorite BOOLEAN, count BIGINT) AS $$
