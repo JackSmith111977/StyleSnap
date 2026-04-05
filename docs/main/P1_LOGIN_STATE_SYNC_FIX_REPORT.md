@@ -135,5 +135,108 @@ export function createClient() {
 
 ---
 
+## 经验总结与回顾
+
+### 问题时间线
+
+| 阶段 | 现象 | 诊断方向 |
+|------|------|----------|
+| 初始 | 登录后进入主页，导航栏不显示登录状态 | Cookie 配置问题？ |
+| 尝试 1 | 添加 `cookieOptions` 配置 | ❌ 未解决问题 |
+| 深入 | 发现 `location.reload()` 有效，`router.refresh()` 无效 | Client Component 生命周期问题 |
+| 根因 | `useEffect` 只在 mount 时执行 | ✅ 定位正确原因 |
+| 修复 | 使用 Zustand 全局状态 | ✅ 无需刷新即可同步 |
+
+### 关键认知转折
+
+| 假设 | 实际 |
+|------|------|
+| ❌ cookie 读取失败 | ✅ cookie 已正确设置，`getSession()` 能读取 |
+| ❌ 需要配置 `cookieOptions` | ✅ 默认配置即可工作 |
+| ❌ `router.refresh()` 会刷新一切 | ✅ 只刷新 Server Component，不触发 Client Component useEffect |
+| ✅ 全局状态可避免刷新 | ✅ Zustand 响应式更新，无需页面刷新 |
+
+### 技术链路分析
+
+#### 问题链路（修复前）
+```
+1. Server Action 登录 → 设置 httpOnly cookie ✅
+2. router.refresh() → 页面刷新 ⚠️
+3. useAuth Hook useEffect → ❌ 不重新执行（已在 mount 时执行过）
+4. getSession() → ❌ 未被调用
+5. hasSession: false → ❌ 导航栏显示未登录
+```
+
+#### 为什么 `location.reload()` 有效
+```
+1. 完整页面重载 → 所有组件重新 mount
+2. useEffect 重新执行 → 调用 getSession()
+3. cookie 被读取 → session 恢复
+4. 导航栏显示已登录 ✅
+```
+
+#### 修复后链路
+```
+1. Server Action 登录 → 设置 httpOnly cookie ✅
+2. getSession() → 从 cookie 读取 session ✅
+3. setUser() → 更新 Zustand store ✅
+4. router.push('/') → 导航到首页
+5. useAuth 从 store 读取 → 立即显示登录状态 ✅
+```
+
+### 核心经验
+
+#### 1. Next.js 路由刷新的本质差异
+- `router.refresh()` → 重新执行 Server Component，**不触发** Client Component re-mount
+- `location.reload()` → 完整页面重载，**所有组件重新 mount**
+- **影响**：Client Component 的 `useEffect` 只在 mount 时执行一次
+
+#### 2. Supabase SSR 认证同步机制
+- Server Action 设置 httpOnly cookie → 客户端 JS **无法直接读取**
+- Client Component 必须调用 `getSession()` → 通过 Supabase SDK 从 cookie 读取
+- **陷阱**：Server Action 完成后不会自动触发客户端 session 同步
+
+#### 3. 全局状态管理的价值
+- **问题**：跨组件状态同步（LoginForm → UserMenu）
+- **方案**：Zustand 响应式 store
+- **优势**：
+  - 避免页面刷新
+  - 状态变更立即传播
+  - 代码简洁，无额外依赖
+
+#### 4. 调试方法论
+1. **添加日志** → 追踪完整执行链路
+2. **对比行为** → `router.refresh()` vs `location.reload()`
+3. **定位差异** → 找出为什么一个有效一个无效
+4. **验证假设** → 不盲目修改，先确认根因
+
+#### 5. 技术文档的重要性
+- Supabase SSR 官方文档明确说明：
+  > "Server Actions do not automatically sync session to the client"
+- 如果早查阅文档，可能直接定位问题，少走弯路
+
+### 可复用的模式
+
+```typescript
+// Server Action 登录成功后
+const result = await login(email, password)
+
+if (result.success) {
+  // 1. 从 cookie 读取 session
+  const { data: sessionData } = await supabase.auth.getSession()
+  
+  // 2. 直接更新全局状态
+  setUser(sessionData.session.user)
+  
+  // 3. 导航（无需刷新）
+  router.push('/')
+}
+```
+
+**适用场景**：任何 Server Action 修改认证状态后需要同步到客户端的场景。
+
+---
+
 **修复时间**: 2026-04-05T09:35:00Z  
-**修复状态**: ✅ 已完成
+**修复状态**: ✅ 已完成  
+**经验总结写入时间**: 2026-04-05T10:45:00Z
