@@ -87,6 +87,63 @@ export const getStyles = cache(async (
     allTagFilters.push(...complexities.map(c => c.startsWith('#') ? c : `#${c}`))
   }
 
+  // 如果有标签筛选，先获取符合条件的 style_id 列表
+  let filteredStyleIds: string[] | null = null
+  if (allTagFilters.length > 0) {
+    // 第一步：查询标签表获取标签 ID
+    const { data: tagsData, error: tagsError } = await supabase
+      .from('tags')
+      .select('id')
+      .in('name', allTagFilters)
+
+    if (tagsError) {
+      console.error('查询标签表失败:', {
+        message: tagsError.message,
+        code: tagsError.code
+      })
+      throw new Error('获取风格列表失败')
+    }
+
+    if (!tagsData || tagsData.length === 0) {
+      return {
+        styles: [],
+        total: 0,
+        page,
+        limit,
+        totalPages: 0,
+      }
+    }
+
+    const tagIds = tagsData.map(t => t.id)
+
+    // 第二步：查询 style_tags 获取风格 ID
+    const { data: styleTagsData, error: styleTagsError } = await supabase
+      .from('style_tags')
+      .select('style_id')
+      .in('tag_id', tagIds)
+
+    if (styleTagsError) {
+      console.error('查询风格标签关联失败:', {
+        message: styleTagsError.message,
+        code: styleTagsError.code
+      })
+      throw new Error('获取风格列表失败')
+    }
+
+    filteredStyleIds = styleTagsData ? [...new Set(styleTagsData.map(st => st.style_id))] : []
+
+    // 如果没有匹配的风格，直接返回空结果
+    if (filteredStyleIds.length === 0) {
+      return {
+        styles: [],
+        total: 0,
+        page,
+        limit,
+        totalPages: 0,
+      }
+    }
+  }
+
   // 构建查询
   let query = supabase
     .from('styles')
@@ -106,6 +163,11 @@ export const getStyles = cache(async (
     `, { count: 'exact' })
     .eq('status', 'published')
 
+  // 应用风格 ID 筛选（如果有标签筛选）
+  if (filteredStyleIds && filteredStyleIds.length > 0) {
+    query = query.in('id', filteredStyleIds)
+  }
+
   // 分类筛选
   if (category) {
     query = query.eq('category_id', category)
@@ -114,14 +176,6 @@ export const getStyles = cache(async (
   // 搜索
   if (search) {
     query = query.or(`title.ilike.%${search}%,description.ilike.%${search}%`)
-  }
-
-  // 高级筛选：标签
-  // 注意：使用 PostgREST 的嵌套字段筛选语法
-  // 格式：filter('关联表。字段', 'in', '(值 1，值 2)')
-  if (allTagFilters.length > 0) {
-    const filterValue = `(${allTagFilters.join(',')})`
-    query = query.filter('style_tags.tag.name', 'in', filterValue)
   }
 
   // 排序
@@ -144,17 +198,22 @@ export const getStyles = cache(async (
   const { data, error, count } = await query
 
   if (error) {
-    console.error('获取风格列表失败:', error)
+    console.error('获取风格列表失败:', {
+      message: error.message,
+      code: error.code,
+      details: error.details,
+      hint: error.hint
+    })
     throw new Error('获取风格列表失败')
   }
 
   // 转换数据格式 - 使用类型断言避免 Supabase 类型推断问题
   const styles: Style[] = ((data as unknown[]) ?? []).map((item: unknown) => {
     const typedItem = item as Record<string, unknown>
-    const styleTags = typedItem.style_tags as Array<{ tag: { name: string } }> | undefined
+    const styleTags = typedItem.style_tags as Array<{ tag: { name: string } | null }> | undefined
     return {
       ...typedItem,
-      tags: styleTags?.map((st) => st.tag.name) ?? [],
+      tags: styleTags?.filter(st => st?.tag?.name).map((st) => st.tag!.name) ?? [],
       style_tags: undefined, // 移除中间表数据
     }
   }) as Style[]

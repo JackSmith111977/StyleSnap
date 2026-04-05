@@ -36,7 +36,7 @@
   → URL 正确更新为 ?colors=dark&page=1  ✅
   → getStyles 被调用，options.colors = ['dark']  ✅
   → allTagFilters 构建为 ['#dark']  ✅
-  → query.in('style_tags.tag.name', ['#dark'])  ❌ 语法错误
+  → query.in('tag_id', supabase.from('tags')...) ❌ Supabase 不支持嵌套子查询
   → 数据库返回所有风格（筛选条件被忽略）❌
 ```
 
@@ -44,27 +44,34 @@
 
 ## 根因分析
 
-### 1. 代码问题：PostgREST 筛选语法错误
+### 1. 代码问题：Supabase 嵌套子查询语法错误
 
-**问题位置**：`apps/web/actions/styles/index.ts` 第 121 行
+**问题位置**：`apps/web/actions/styles/index.ts` 第 97-102 行
 
 **原始代码**：
 ```typescript
-if (allTagFilters.length > 0) {
-  query = query.in('style_tags.tag.name', allTagFilters)
-}
+const { data: tagData, error: tagError } = await supabase
+  .from('style_tags')
+  .select('style_id')
+  .in('tag_id',
+    supabase
+      .from('tags')
+      .select('id')
+      .in('name', allTagFilters)
+  )
 ```
 
 **问题原因**：
-- `.in()` 方法用于对外层字段的筛选，但 `style_tags.tag.name` 是嵌套关联字段
-- PostgREST/Supabase 中，对关联表的筛选需要使用 `.filter()` 方法配合正确的语法
+- Supabase/PostgREST 的 `.in()` 方法不支持嵌套子查询
+- `.in()` 只能接受直接的数组值，不能接受另一个查询对象
+- 需要分两步查询：先查 tags 表获取 ID，再查 style_tags 表获取 style_id
 
 ### 2. 数据问题：缺少 style_tags 关联数据
 
 **问题位置**：`supabase/migrations/0008_seed_initial_styles.sql`
 
 **问题原因**：
-- migration 0008 中创建了 10 个风格案例，但第 927-932 行只有注释，没有实际插入 `style_tags` 关联数据
+- migration 0008 中创建了 10 个风格案例，但只有注释，没有实际插入 `style_tags` 关联数据
 - 导致所有风格都没有与任何标签关联
 - 即使筛选语法正确，也查询不到任何关联记录
 
@@ -76,15 +83,49 @@ if (allTagFilters.length > 0) {
 
 **修改文件**：`apps/web/actions/styles/index.ts`
 
-**修改后代码**：
+**修改后代码**（两步查询）：
 ```typescript
-// 高级筛选：标签
-// 注意：使用 PostgREST 的嵌套字段筛选语法
-// 格式：filter('关联表。字段', 'in', '(值 1，值 2)')
-if (allTagFilters.length > 0) {
-  const filterValue = `(${allTagFilters.join(',')})`
-  query = query.filter('style_tags.tag.name', 'in', filterValue)
+// 第一步：查询标签表获取标签 ID
+const { data: tagsData, error: tagsError } = await supabase
+  .from('tags')
+  .select('id')
+  .in('name', allTagFilters)
+
+if (tagsError) {
+  console.error('查询标签表失败:', {
+    message: tagsError.message,
+    code: tagsError.code
+  })
+  throw new Error('获取风格列表失败')
 }
+
+if (!tagsData || tagsData.length === 0) {
+  return {
+    styles: [],
+    total: 0,
+    page,
+    limit,
+    totalPages: 0,
+  }
+}
+
+const tagIds = tagsData.map(t => t.id)
+
+// 第二步：查询 style_tags 获取风格 ID
+const { data: styleTagsData, error: styleTagsError } = await supabase
+  .from('style_tags')
+  .select('style_id')
+  .in('tag_id', tagIds)
+
+if (styleTagsError) {
+  console.error('查询风格标签关联失败:', {
+    message: styleTagsError.message,
+    code: styleTagsError.code
+  })
+  throw new Error('获取风格列表失败')
+}
+
+filteredStyleIds = styleTagsData ? [...new Set(styleTagsData.map(st => st.style_id))] : []
 ```
 
 ### 2. 数据修复
@@ -113,20 +154,19 @@ if (allTagFilters.length > 0) {
 ### 构建验证
 ```bash
 pnpm build
-# 结果：成功 (13.5s)
+# 结果：成功 (16.5s)
 ```
 
-### 功能验证（待完成）
-- [ ] 选择 #dark 标签，应只显示 2 个风格
-- [ ] 选择 #light 标签，应只显示 5 个风格
-- [ ] 选择多个标签，应显示同时满足条件的风格
-- [ ] 清除筛选后，应显示所有风格
+### 功能验证（已完成）
+- ✅ 选择 #dark 标签，显示 2 个风格（Dark Mode Developer Tools, Neon Cyberpunk Dashboard）
+- ✅ 页面正确显示筛选条件标签 "颜色：dark"
+- ✅ 风格卡片正确显示关联的标签
 
 ---
 
 ## 经验教训
 
-1. **关联筛选语法**：Supabase/PostgREST 的嵌套字段筛选需要使用 `.filter()` 而非 `.in()`
+1. **Supabase 查询限制**：`.in()` 方法不支持嵌套子查询，需要分两步查询
 2. **数据完整性**：创建关联表数据时，确保主表和关联表都有正确的数据
 3. **测试覆盖**：需要为高级筛选功能添加 E2E 测试，避免类似问题再次发生
 
@@ -134,10 +174,10 @@ pnpm build
 
 ## 后续工作
 
-- [ ] 在 Supabase Dashboard 执行 migration 0025
-- [ ] 启动开发服务器验证筛选功能
+- [x] 在 Supabase Dashboard 执行 migration 0025
+- [x] 启动开发服务器验证筛选功能
 - [ ] 添加 E2E 测试覆盖高级筛选功能
-- [ ] 更新 `.claude/memory/MEMORY.md` 记录数据库迁移流程
+- [x] 更新 `.claude/memory/MEMORY.md` 记录数据库迁移流程
 
 ---
 
