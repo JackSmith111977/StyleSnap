@@ -4,7 +4,7 @@ import { getCurrentUser } from '@/lib/auth'
 import { getMyFavorites } from '@/actions/favorites'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Heart, Palette, ArrowLeft } from 'lucide-react'
+import { Heart, Palette, ArrowLeft, FolderPlus, Folder } from 'lucide-react'
 
 export default async function FavoritesPage({
   searchParams,
@@ -30,41 +30,86 @@ export default async function FavoritesPage({
   return (
     <div className="container mx-auto py-8 px-4">
       {/* 页面头部 */}
-      <div className="mb-8 flex items-center gap-4">
-        <Link href="/">
-          <Button variant="ghost" size="icon">
-            <ArrowLeft className="h-4 w-4" />
+      <div className="mb-8 flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Link href="/">
+            <Button variant="ghost" size="icon">
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+          </Link>
+          <div>
+            <h1 className="text-3xl font-bold">我的收藏</h1>
+            <p className="text-muted-foreground">
+              共收藏 {total} 个风格
+            </p>
+          </div>
+        </div>
+
+        {/* 管理合集入口 */}
+        <Link href="/collections">
+          <Button variant="outline">
+            <Folder className="mr-2 h-4 w-4" />
+            管理合集
           </Button>
         </Link>
-        <div>
-          <h1 className="text-3xl font-bold">我的收藏</h1>
-          <p className="text-muted-foreground">
-  共收藏 {total} 个风格
-          </p>
-        </div>
       </div>
 
       {/* 空状态 */}
       {styles.length === 0 ? (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Heart className="h-5 w-5" />
-              暂无收藏
-            </CardTitle>
-            <CardDescription>
-              去风格库探索更多设计风格吧
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Link href="/styles">
-              <Button>
-                <Palette className="mr-2 h-4 w-4" />
-                浏览风格库
-              </Button>
-            </Link>
-          </CardContent>
-        </Card>
+        <div className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Heart className="h-5 w-5" />
+                暂无收藏
+              </CardTitle>
+              <CardDescription>
+                去风格库探索更多设计风格吧
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex gap-2">
+                <Link href="/styles">
+                  <Button>
+                    <Palette className="mr-2 h-4 w-4" />
+                    浏览风格库
+                  </Button>
+                </Link>
+                <Link href="/collections/new">
+                  <Button variant="outline">
+                    <FolderPlus className="mr-2 h-4 w-4" />
+                    创建合集
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* 合集介绍卡片 */}
+          <Card>
+            <CardHeader>
+              <CardTitle>什么是合集？</CardTitle>
+            </CardHeader>
+            <CardContent className="text-muted-foreground">
+              <p>
+                合集是自定义的风格分组，你可以按项目、主题或场景组织喜欢的风格。
+                比如「电商项目参考」「深色主题 UI」「极简主义风格」等。
+              </p>
+              <div className="mt-4 flex gap-2">
+                <Link href="/collections">
+                  <Button variant="link" className="px-0">
+                    查看我的合集
+                  </Button>
+                </Link>
+                <Link href="/collections/new">
+                  <Button variant="link" className="px-0">
+                    创建第一个合集
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       ) : (
         <>
           {/* 风格列表 */}
