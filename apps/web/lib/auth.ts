@@ -6,21 +6,8 @@ import { redirect } from 'next/navigation'
  * 如果未登录，返回 null
  */
 export async function getCurrentUser() {
-  console.log('[getCurrentUser] 开始执行')
   const supabase = await createClient()
-  console.log('[getCurrentUser] Supabase 客户端已创建')
-
   const result = await supabase.auth.getUser()
-  console.log('[getCurrentUser] getUser() 返回:', {
-    hasUser: !!result.data.user,
-    userId: result.data.user?.id,
-    email: result.data.user?.email,
-    error: result.error ? {
-      message: result.error.message,
-      code: result.error.code,
-      status: result.error.status,
-    } : null,
-  })
 
   return result.data.user
 }

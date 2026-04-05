@@ -184,19 +184,10 @@ export async function uploadAvatar(
   file: FormData
 ): Promise<{ success: boolean; data?: { avatar_url: string }; error?: string }> {
   try {
-    console.log('[uploadAvatar] ========== 开始上传头像 ==========')
     const supabase = await createClient()
-    console.log('[uploadAvatar] Supabase 客户端已创建')
-
     const user = await getCurrentUser()
-    console.log('[uploadAvatar] getCurrentUser 返回:', {
-      hasUser: !!user,
-      userId: user?.id,
-      email: user?.email,
-    })
 
     if (!user) {
-      console.error('[uploadAvatar] 用户未登录，返回错误')
       return { success: false, error: '请先登录' }
     }
 
@@ -207,82 +198,43 @@ export async function uploadAvatar(
     })
 
     const avatarFile = file.get('avatar') as File
-    console.log('[uploadAvatar] 从 FormData 获取文件:', {
-      fileName: avatarFile?.name,
-      fileSize: avatarFile?.size,
-      fileType: avatarFile?.type,
-      hasFile: !!avatarFile,
-    })
-
     if (!avatarFile) {
-      console.error('[uploadAvatar] 没有获取到文件')
       return { success: false, error: '请选择文件' }
     }
 
     // 验证文件类型
     const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
-    console.log('[uploadAvatar] 验证文件类型:', {
-      actualType: avatarFile.type,
-      allowedTypes,
-      isValid: allowedTypes.includes(avatarFile.type),
-    })
     if (!allowedTypes.includes(avatarFile.type)) {
-      console.error('[uploadAvatar] 文件类型不支持')
       return { success: false, error: '只支持 JPG、PNG、GIF、WebP 格式' }
     }
 
     // 验证文件大小（最大 2MB）
     const maxSize = 2 * 1024 * 1024
-    console.log('[uploadAvatar] 验证文件大小:', {
-      actualSize: avatarFile.size,
-      maxSize,
-      isValid: avatarFile.size <= maxSize,
-    })
     if (avatarFile.size > maxSize) {
-      console.error('[uploadAvatar] 文件超出大小限制')
       return { success: false, error: '文件大小不能超过 2MB' }
     }
 
     // 生成文件名
     const fileExt = avatarFile.name.split('.').pop()
     const fileName = `${user.id}-${Date.now()}.${fileExt}`
-    console.log('[uploadAvatar] 生成的文件名:', fileName)
 
     // 上传到 Supabase Storage
-    console.log('[uploadAvatar] 开始上传到 Supabase Storage user-avatars bucket')
     const { error: uploadError } = await supabase.storage
       .from('user-avatars')
       .upload(fileName, avatarFile, { upsert: true })
 
-    console.log('[uploadAvatar] Storage upload 返回:', {
-      hasError: !!uploadError,
-      error: uploadError ? {
-        message: uploadError.message,
-        code: uploadError.code,
-        statusCode: uploadError.statusCode,
-      } : null,
-    })
-
     if (uploadError) {
-      console.error('[uploadAvatar] 上传失败:', uploadError)
       throw uploadError
     }
 
     // 获取公开 URL
-    console.log('[uploadAvatar] 获取公开 URL')
     const { data: urlData } = supabase.storage
       .from('user-avatars')
       .getPublicUrl(fileName)
 
-    console.log('[uploadAvatar] getPublicUrl 返回:', {
-      hasUrl: !!urlData?.publicUrl,
-      url: urlData?.publicUrl,
-    })
-
     const avatar_url = urlData.publicUrl
 
     // 更新用户资料
-    console.log('[uploadAvatar] 开始更新 profiles 表')
     const { error: updateError } = await supabase
       .from('profiles')
       .update({
@@ -291,36 +243,19 @@ export async function uploadAvatar(
       })
       .eq('id', user.id)
 
-    console.log('[uploadAvatar] profiles.update 返回:', {
-      hasError: !!updateError,
-      error: updateError ? {
-        message: updateError.message,
-        code: updateError.code,
-      } : null,
-    })
-
     if (updateError) {
-      console.error('[uploadAvatar] 更新 profiles 失败:', updateError)
       throw updateError
     }
 
     // 清除缓存
-    console.log('[uploadAvatar] 调用 revalidatePath')
     revalidatePath('/profile')
     revalidatePath('/dashboard')
 
-    console.log('[uploadAvatar] ========== 上传成功 ==========')
     return {
       success: true,
       data: { avatar_url },
     }
   } catch (error) {
-    console.error('[uploadAvatar] ========== 异常捕获 ==========')
-    console.error('[uploadAvatar] 错误详情:', {
-      name: (error as Error).name,
-      message: (error as Error).message,
-      stack: (error as Error).stack,
-    })
     await captureActionError(error, {
       action: 'uploadAvatar',
     })
