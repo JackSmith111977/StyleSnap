@@ -3,7 +3,9 @@
 import { createClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 import type { DesignTokens, StyleStatus } from '@/stores/workspace-store';
+import { DEFAULT_TOKENS } from '@/stores/workspace-store';
 import { captureActionError } from '@/lib/sentry-capture';
+import { validateOrThrow, saveStyleDraftSchema } from '@/lib/schemas';
 
 /**
  * 风格接口（简化版）
@@ -102,7 +104,8 @@ export async function getUserStyles(
 
     // 搜索
     if (search) {
-      query = query.or(`name.ilike.%${search}%,description.ilike.%${search}%`);
+      // 注意：远程数据库使用 'title' 而非 'name'
+      query = query.or(`title.ilike.%${search}%,description.ilike.%${search}%`);
     }
 
     // 排序
@@ -118,14 +121,16 @@ export async function getUserStyles(
       const typedItem = item as Record<string, unknown>;
       return {
         id: typedItem.id as string,
-        name: typedItem.name as string,
+        // 注意：远程数据库使用 'title' 而非 'name'
+        name: typedItem.title as string,
         description: typedItem.description as string | null,
         category_id: typedItem.category_id as string,
         status: (typedItem.status as StyleStatus) || 'draft',
         created_at: typedItem.created_at as string,
         updated_at: typedItem.updated_at as string,
-        submitted_at: typedItem.submitted_at as string | null,
-        reviewer_comments: typedItem.reviewer_comments as string | null,
+        // 注意：远程数据库可能缺少 submitted_at 和 reviewer_comments 列
+        submitted_at: (typedItem.submitted_at as string) || null,
+        reviewer_comments: (typedItem.reviewer_comments as string) || null,
         category: typedItem.category as
           | {
               id: string;
@@ -172,6 +177,13 @@ export async function saveStyleDraft(
   }
 ): Promise<SaveStyleDraftResponse> {
   try {
+    // 验证输入参数
+    validateOrThrow(saveStyleDraftSchema, {
+      styleId,
+      designTokens,
+      basics,
+    });
+
     const supabase = await createClient();
 
     // 获取当前用户
@@ -208,11 +220,16 @@ export async function saveStyleDraft(
     }
 
     // 更新风格
+    // 注意：远程数据库使用独立字段而非 design_tokens
     const { error: updateError } = await supabase.from('styles').update({
-      name: basics.name,
+      title: basics.name,
       description: basics.description,
       category_id: basics.category,
-      design_tokens: designTokens as unknown as ReturnType<typeof JSON.stringify>,
+      color_palette: designTokens.colorPalette,
+      fonts: designTokens.fonts,
+      spacing: designTokens.spacing,
+      border_radius: designTokens.borderRadius,
+      shadows: designTokens.shadows,
       status: 'draft',
       updated_at: new Date().toISOString(),
     }).eq('id', styleId);
@@ -283,15 +300,20 @@ export async function createNewStyle(
     }
 
     // 创建风格
+    // 注意：远程数据库使用独立字段而非 design_tokens
     const { data, error } = await supabase
       .from('styles')
       .insert({
-        name,
+        title: name,
         description: '',
         category_id: category.id,
         author_id: user.id,
         status: 'draft',
-        design_tokens: null,
+        color_palette: DEFAULT_TOKENS.colorPalette,
+        fonts: DEFAULT_TOKENS.fonts,
+        spacing: DEFAULT_TOKENS.spacing,
+        border_radius: DEFAULT_TOKENS.borderRadius,
+        shadows: DEFAULT_TOKENS.shadows,
       })
       .select('id')
       .single();
@@ -426,15 +448,27 @@ export async function getStyleDetail(
       throw error;
     }
 
+    // 从独立字段构建 DesignTokens
+    const designTokens: DesignTokens | null = (data as any).color_palette
+      ? {
+          colorPalette: (data as any).color_palette || DEFAULT_TOKENS.colorPalette,
+          fonts: (data as any).fonts || DEFAULT_TOKENS.fonts,
+          spacing: (data as any).spacing || DEFAULT_TOKENS.spacing,
+          borderRadius: (data as any).border_radius || DEFAULT_TOKENS.borderRadius,
+          shadows: (data as any).shadows || DEFAULT_TOKENS.shadows,
+        }
+      : null;
+
     return {
       success: true,
       data: {
         id: data.id,
-        name: data.name,
+        // 远程数据库使用 'title' 而非 'name'
+        name: (data as any).title || data.title,
         description: data.description,
         category_id: data.category_id,
         status: data.status as StyleStatus,
-        design_tokens: data.design_tokens as DesignTokens | null,
+        design_tokens: designTokens,
         created_at: data.created_at,
         updated_at: data.updated_at,
       },

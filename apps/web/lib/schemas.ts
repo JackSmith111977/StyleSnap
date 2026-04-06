@@ -128,28 +128,60 @@ export const sortSchema = z.enum(['newest', 'oldest', 'popular', 'liked']).defau
 
 // ============== 风格提交相关 Schemas ==============
 
-// 设计变量验证（色板、字体、间距等）
+// 颜色配置验证（8 色完整色板）
+export const colorTokensSchema = z.object({
+  primary: z.string().regex(/^#[0-9A-Fa-f]{6}$/, '主色格式错误'),
+  secondary: z.string().regex(/^#[0-9A-Fa-f]{6}$/, '辅色格式错误'),
+  background: z.string().regex(/^#[0-9A-Fa-f]{6}$/, '背景色格式错误'),
+  surface: z.string().regex(/^#[0-9A-Fa-f]{6}$/, '表面色格式错误'),
+  text: z.string().regex(/^#[0-9A-Fa-f]{6}$/, '文本色格式错误'),
+  textMuted: z.string().regex(/^#[0-9A-Fa-f]{6}$/, '弱化文字色格式错误'),
+  border: z.string().regex(/^#[0-9A-Fa-f]{6}$/, '边框色格式错误'),
+  accent: z.string().regex(/^#[0-9A-Fa-f]{6}$/, '强调色格式错误'),
+})
+
+// 字体配置验证
+export const fontTokensSchema = z.object({
+  heading: z.string().min(1, '标题字体不能为空'),
+  body: z.string().min(1, '正文字体不能为空'),
+  mono: z.string().min(1, '等宽字体不能为空'),
+  headingWeight: z.number().min(100).max(900),
+  bodyWeight: z.number().min(100).max(900),
+  headingLineHeight: z.number().min(1).max(2),
+  bodyLineHeight: z.number().min(1).max(2),
+})
+
+// 间距配置验证（基于 4px 基准）
+export const spacingTokensSchema = z.object({
+  xs: z.number().min(1).max(16),
+  sm: z.number().min(2).max(24),
+  md: z.number().min(4).max(32),
+  lg: z.number().min(8).max(48),
+  xl: z.number().min(16).max(64),
+})
+
+// 圆角配置验证
+export const borderRadiusTokensSchema = z.object({
+  small: z.string().regex(/^\d+px$/, '小圆角格式错误'),
+  medium: z.string().regex(/^\d+px$/, '中圆角格式错误'),
+  large: z.string().regex(/^\d+px$/, '大圆角格式错误'),
+})
+
+// 阴影配置验证
+export const shadowTokensSchema = z.object({
+  light: z.string().min(1, '轻微阴影不能为空'),
+  medium: z.string().min(1, '中等阴影不能为空'),
+  heavy: z.string().min(1, '重度阴影不能为空'),
+})
+
+// 设计变量验证（完整配置）
 export const designTokensSchema = z.object({
-  colors: z.object({
-    primary: z.string().regex(/^#[0-9A-Fa-f]{6}$/, '主色格式错误'),
-    secondary: z.string().regex(/^#[0-9A-Fa-f]{6}$/, '辅色格式错误'),
-    background: z.string().regex(/^#[0-9A-Fa-f]{6}$/, '背景色格式错误'),
-    surface: z.string().regex(/^#[0-9A-Fa-f]{6}$/, '表面色格式错误'),
-    text: z.string().regex(/^#[0-9A-Fa-f]{6}$/, '文本色格式错误'),
-    textMuted: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'muted 文本色格式错误'),
-  }).optional(),
-  fonts: z.object({
-    heading: z.string().min(1, '标题字体不能为空'),
-    body: z.string().min(1, '正文字体不能为空'),
-    mono: z.string().min(1, '等宽字体不能为空'),
-  }).optional(),
-  spacing: z.object({
-    xs: z.number().min(1).max(16),
-    sm: z.number().min(2).max(24),
-    md: z.number().min(4).max(32),
-    lg: z.number().min(8).max(48),
-    xl: z.number().min(16).max(64),
-  }).optional(),
+  colorPalette: colorTokensSchema,
+  fonts: fontTokensSchema,
+  spacing: spacingTokensSchema,
+  borderRadius: borderRadiusTokensSchema,
+  shadows: shadowTokensSchema,
+  darkModeOverrides: z.any().optional(),
 })
 
 // 代码片段验证
@@ -174,6 +206,18 @@ export const submissionFormSchema = z.object({
   tags: z.array(z.string()).max(10, '最多添加 10 个标签').optional(),
   designTokens: designTokensSchema,
   codeSnippets: codeSnippetsSchema,
+})
+
+// 保存草稿参数验证
+export const saveStyleDraftSchema = z.object({
+  styleId: uuidSchema,
+  designTokens: designTokensSchema,
+  basics: z.object({
+    name: z.string().min(1, '风格名称不能为空').max(50, '风格名称最多 50 位'),
+    description: z.string().max(500, '描述最多 500 位'),
+    category: uuidSchema,
+    tags: z.array(z.string()).max(10, '最多添加 10 个标签'),
+  }),
 })
 
 // 图片上传验证（客户端验证用）
