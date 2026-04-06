@@ -41,6 +41,12 @@ export function Header() {
             分类
           </Link>
           <Link
+            href="/workspace"
+            className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+          >
+            工作台
+          </Link>
+          <Link
             href="/about"
             className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
           >
