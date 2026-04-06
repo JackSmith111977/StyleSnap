@@ -128,10 +128,13 @@ export function ShadowControl({
   const handleParamChange = useCallback(
     (param: keyof typeof current, value: number | string) => {
       const newParams = { ...current, [param]: value };
-      setLocalValues((prev) => ({
-        ...prev,
-        [activeShadow]: newParams,
-      }));
+      // 使用 startTransition 包裹状态更新，降低优先级，避免中断拖动
+      React.startTransition(() => {
+        setLocalValues((prev) => ({
+          ...prev,
+          [activeShadow]: newParams,
+        }));
+      });
 
       // 200ms 防抖
       const timer = setTimeout(() => {

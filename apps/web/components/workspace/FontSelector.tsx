@@ -96,7 +96,10 @@ export function FontSelector({
   // 处理滑块变化（带防抖）
   const handleSliderChange = useCallback(
     (key: 'headingWeight' | 'bodyWeight' | 'headingLineHeight' | 'bodyLineHeight', value: number) => {
-      setLocalValues((prev) => ({ ...prev, [key]: value }));
+      // 使用 startTransition 包裹状态更新，降低优先级，避免中断拖动
+      React.startTransition(() => {
+        setLocalValues((prev) => ({ ...prev, [key]: value }));
+      });
       const timer = setTimeout(() => {
         onChange({ [key]: value } as Partial<FontSelectorProps>);
       }, 200);

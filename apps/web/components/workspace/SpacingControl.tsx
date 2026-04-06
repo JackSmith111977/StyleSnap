@@ -64,7 +64,10 @@ export function SpacingControl({
   const handleSpacingChange = useCallback(
     (key: 'xs' | 'sm' | 'md' | 'lg' | 'xl', value: number) => {
       const clampedValue = Math.max(0, Math.min(100, value)); // 限制 0-100px
-      setLocalValues((prev) => ({ ...prev, [key]: clampedValue }));
+      // 使用 startTransition 包裹状态更新，降低优先级，避免中断拖动
+      React.startTransition(() => {
+        setLocalValues((prev) => ({ ...prev, [key]: clampedValue }));
+      });
 
       // 100ms 防抖
       const timer = setTimeout(() => {

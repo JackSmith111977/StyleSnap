@@ -60,7 +60,10 @@ export function BorderRadiusControl({
   const handleRadiusChange = useCallback(
     (key: keyof BorderRadiusControlProps, value: number) => {
       const clampedValue = Math.max(0, Math.min(64, value)); // 限制 0-64px
-      setLocalValues((prev) => ({ ...prev, [key]: clampedValue }));
+      // 使用 startTransition 包裹状态更新，降低优先级，避免中断拖动
+      React.startTransition(() => {
+        setLocalValues((prev) => ({ ...prev, [key]: clampedValue }));
+      });
 
       // 100ms 防抖
       const timer = setTimeout(() => {
