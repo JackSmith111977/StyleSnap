@@ -34,7 +34,7 @@
 | 0023 | `0023_add_collections.sql` | ❌ 待执行 | - | 合集功能 |
 | 0024 | `0024_unified_favorites.sql` | ❌ 待执行 | - | 统一收藏功能 |
 | 0025 | `0025_add_style_tags_associations.sql` | ❌ 待执行 | - | 风格标签关联 |
-| 0026 | `0026_sync_design_tokens_to_jsonb.sql` | 📝 已创建 | - | 数据同步迁移（独立字段 → design_tokens） |
+| 0026 | `0026_sync_design_tokens_to_jsonb.sql` | ✅ 已完成 | 2026-04-06 | 数据同步迁移（独立字段 → design_tokens） |
 
 ---
 

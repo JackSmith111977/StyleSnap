@@ -220,16 +220,11 @@ export async function saveStyleDraft(
     }
 
     // 更新风格
-    // 注意：远程数据库使用独立字段而非 design_tokens
     const { error: updateError } = await supabase.from('styles').update({
       title: basics.name,
       description: basics.description,
       category_id: basics.category,
-      color_palette: designTokens.colorPalette,
-      fonts: designTokens.fonts,
-      spacing: designTokens.spacing,
-      border_radius: designTokens.borderRadius,
-      shadows: designTokens.shadows,
+      design_tokens: designTokens,
       status: 'draft',
       updated_at: new Date().toISOString(),
     }).eq('id', styleId);
@@ -300,7 +295,6 @@ export async function createNewStyle(
     }
 
     // 创建风格
-    // 注意：远程数据库使用独立字段而非 design_tokens
     const { data, error } = await supabase
       .from('styles')
       .insert({
@@ -309,11 +303,7 @@ export async function createNewStyle(
         category_id: category.id,
         author_id: user.id,
         status: 'draft',
-        color_palette: DEFAULT_TOKENS.colorPalette,
-        fonts: DEFAULT_TOKENS.fonts,
-        spacing: DEFAULT_TOKENS.spacing,
-        border_radius: DEFAULT_TOKENS.borderRadius,
-        shadows: DEFAULT_TOKENS.shadows,
+        design_tokens: DEFAULT_TOKENS,
       })
       .select('id')
       .single();
@@ -448,23 +438,14 @@ export async function getStyleDetail(
       throw error;
     }
 
-    // 从独立字段构建 DesignTokens
-    const designTokens: DesignTokens | null = (data as any).color_palette
-      ? {
-          colorPalette: (data as any).color_palette || DEFAULT_TOKENS.colorPalette,
-          fonts: (data as any).fonts || DEFAULT_TOKENS.fonts,
-          spacing: (data as any).spacing || DEFAULT_TOKENS.spacing,
-          borderRadius: (data as any).border_radius || DEFAULT_TOKENS.borderRadius,
-          shadows: (data as any).shadows || DEFAULT_TOKENS.shadows,
-        }
-      : null;
+    // 直接使用 design_tokens 字段
+    const designTokens: DesignTokens | null = (data as any).design_tokens || null;
 
     return {
       success: true,
       data: {
         id: data.id,
-        // 远程数据库使用 'title' 而非 'name'
-        name: (data as any).title || data.title,
+        name: data.title,
         description: data.description,
         category_id: data.category_id,
         status: data.status as StyleStatus,
