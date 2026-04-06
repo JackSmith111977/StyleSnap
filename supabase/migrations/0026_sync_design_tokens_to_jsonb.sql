@@ -29,15 +29,13 @@ SELECT
   title,
   design_tokens IS NOT NULL as has_design_tokens,
   jsonb_typeof(design_tokens) as tokens_type,
-  jsonb_array_length(
-    COALESCE(
-      ARRAY(
-        SELECT * FROM jsonb_object_keys(design_tokens)
-      ),
-      ARRAY[]::text[]
-    )
-  ) as token_keys_count
+  design_tokens->'colorPalette' IS NOT NULL as has_colors,
+  design_tokens->'fonts' IS NOT NULL as has_fonts,
+  design_tokens->'spacing' IS NOT NULL as has_spacing,
+  design_tokens->'borderRadius' IS NOT NULL as has_border_radius,
+  design_tokens->'shadows' IS NOT NULL as has_shadows
 FROM styles
+ORDER BY created_at DESC
 LIMIT 10;
 
 -- ============================================================
