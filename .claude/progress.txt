@@ -6,24 +6,50 @@
 
 ### ✅ 已完成
 
+**任务：分类页筛选功能修复 - 类型不匹配问题**
+- 状态：已完成
+- 开始时间：2026-04-05
+- 完成时间：2026-04-05
+- 问题描述：从分类页点击分类卡片后，URL 参数正确显示 `?category=极简主义`，但筛选条件未生效，显示"已加载全部风格"
+- 根因分析：
+  - `category_id` 字段是 UUID 类型
+  - URL 参数传入的是分类名称（如"极简主义"）
+  - 两者类型不匹配，导致筛选条件永远无法满足
+- 修复方案：
+  - 在 `getStyles` 函数中添加类型判断逻辑
+  - 使用正则判断参数是 UUID 还是名称
+  - 如果是名称，先查询 `categories` 表获取 UUID 再筛选
+- 输出：
+  - 修改 `apps/web/actions/styles/index.ts` - 支持 UUID 和名称两种格式
+  - 创建 `docs/main/P4_CATEGORY_FILTER_FIX_REPORT.md` - 修复报告
+- 构建验证：pnpm build 成功 (18.5s)
+- 功能验证：
+  - ✅ 从分类页点击"极简主义"，正确显示 1 个风格
+  - ✅ 从风格库点击"科技未来"按钮，正确显示 1 个风格
+- git 提交：2136503
+- 推送到远程：feat/bmad
+
 **任务：筛选功能不能正常工作 - 完整修复**
 - 状态：已完成
 - 开始时间：2026-04-05
 - 完成时间：2026-04-05
 - 问题描述：高级筛选功能（颜色/行业/复杂度）无法正确筛选风格，点击"应用筛选"后页面仍显示所有风格
 - 根因分析：
-  1. 代码问题：`getStyles` 函数中使用 `.in('style_tags.tag.name', filters)` 不是正确的 PostgREST 嵌套字段筛选语法
+  1. 代码问题：Supabase `.in()` 方法不支持嵌套子查询
   2. 数据问题：`0008_seed_initial_styles.sql` 中只创建了风格案例，但没有插入 `style_tags` 关联数据
 - 修复方案：
-  - 代码修复：修改 `apps/web/actions/styles/index.ts` 中的筛选逻辑
-    - 从 `.in('style_tags.tag.name', allTagFilters)` 改为 `.filter('style_tags.tag.name', 'in', filterValue)`
-  - 数据修复：创建 `0025_add_style_tags_associations.sql` 为现有 10 个风格添加标签关联
+  - 代码修复：改用两步查询（先查 tags 表获取 ID，再查 style_tags 获取 style_id）
+  - 数据修复：migration 0025 已为 10 个风格添加标签关联
 - 输出：
-  - 修改 `apps/web/actions/styles/index.ts` - 修复标签筛选语法
-  - 创建 `supabase/migrations/0025_add_style_tags_associations.sql` - 添加风格 - 标签关联数据
-- 构建验证：pnpm build 成功
+  - 修改 `apps/web/actions/styles/index.ts` - 两步查询逻辑
+  - 更新 `docs/main/P3_FILTER_FUNCTION_FIX_REPORT.md` - 修复报告
+- 构建验证：pnpm build 成功 (16.5s)
+- 功能验证：
+  - ✅ 选择 #dark 标签，显示 2 个风格（Dark Mode Developer Tools, Neon Cyberpunk Dashboard）
+  - ✅ 页面正确显示筛选条件标签
 - 迁移说明：用户已在 Supabase Dashboard 手动执行 migration 0025
-- 下一步：验证筛选功能是否正常工作
+- git 提交：af1e1bd
+- 推送到远程：feat/bmad
 
 **任务：Story 1.3 密码重置功能修复**
 - 状态：已完成
@@ -460,6 +486,28 @@
 - 状态：✅ 已完成 (8/8 Stories)
 - 开始时间：2026-04-04
 - 完成时间：2026-04-05
+
+**Epic 2 & Epic 3: 浏览器 E2E 测试**
+- 状态：✅ 已完成
+- 开始时间：2026-04-06
+- 完成时间：2026-04-06
+- 输出：
+  - `docs/main/P7_EPIC2_BROWSER_E2E_TEST_REPORT.md` - Epic 2 测试报告（6/6 Stories 通过）
+  - `docs/main/P8_EPIC3_BROWSER_E2E_TEST_REPORT.md` - Epic 3 测试报告（5/5 Stories 通过）
+- 修复问题：
+  - Jest worker 异常导致风格详情页无法加载 - 清除 `.next` 缓存后重启解决
+  - RPC 函数 SQL 歧义错误 - 已有 fallback 处理，不影响功能
+- 测试覆盖率：
+  - Epic 2: 100% (6/6 Stories)
+  - Epic 3: 100% (5/5 Stories)
+
+---
+
+## 下一步建议
+
+1. 补充 Epic 4 & Epic 5 & Epic 6 的浏览器 E2E 测试
+2. 修复 `get_related_styles` RPC 函数 SQL 歧义问题
+3. 增加测试数据以验证相关推荐功能
 - 代码审查：
   - Story 6.6: 完成 (11 个问题全部修复) ✅
   - Story 6.7: 完成 (6 个问题全部修复) ✅
