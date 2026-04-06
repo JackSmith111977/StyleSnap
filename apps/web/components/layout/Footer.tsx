@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Github, Twitter, Heart } from 'lucide-react';
+import { Github, Twitter } from 'lucide-react';
 
 /**
  * Footer - 页脚组件
@@ -99,7 +99,7 @@ export function Footer() {
         {/* 底部信息 */}
         <div className="mt-8 pt-8 border-t border-border/40 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-sm text-muted-foreground">
-            &copy; {new Date().getFullYear()} StyleSnap. Made with <Heart className="inline h-3 w-3 text-red-500" /> by StyleSnap Team
+            &copy; {new Date().getFullYear()} StyleSnap. Made with <span className="inline-block text-red-500">♥</span> by StyleSnap Team
           </p>
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
             <Link href="/privacy" className="hover:text-foreground transition-colors">

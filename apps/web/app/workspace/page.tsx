@@ -180,15 +180,18 @@ export default function WorkspacePage() {
             />
           </div>
         ) : (
-          /* 编辑器视图 - 双栏布局（左侧 25%，右侧 75%） */
-          <div className="h-[calc(100vh-8rem)] min-h-[600px]">
-            <div className="grid grid-cols-4 gap-6 h-full">
-              {/* 左侧编辑器面板 - 25% */}
-              <div className="col-span-1 min-w-[280px]">
+          /* 编辑器视图 - 响应式双栏布局
+           * - 窄屏 (< 1024px): 垂直堆叠
+           * - 宽屏 (≥ 1024px): 左右双栏 (25% : 75%)
+           */
+          <div className="h-[calc(100vh-12rem)] min-h-[600px] overflow-hidden">
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 h-full">
+              {/* 左侧编辑器面板 - 窄屏 100%，宽屏 25% */}
+              <div className="lg:col-span-1 h-full overflow-hidden">
                 <EditorPanel />
               </div>
-              {/* 右侧预览面板 - 75% */}
-              <div className="col-span-3 min-w-[600px]">
+              {/* 右侧预览面板 - 窄屏 100%，宽屏 75% */}
+              <div className="lg:col-span-3 h-full overflow-hidden">
                 <PreviewPanel designTokens={designTokens} />
               </div>
             </div>

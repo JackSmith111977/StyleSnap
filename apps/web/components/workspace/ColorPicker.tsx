@@ -1,14 +1,8 @@
 'use client';
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Slider } from '@/components/ui/slider';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -32,7 +26,7 @@ const PRESET_COLORS = [
  * 颜色选择器组件
  * - 支持 HEX/RGB 输入
  * - 颜色选取器 + 预设色板
- * - 选择后 100ms 内更新预览
+ * - 手动控制 Popover 开关，避免嵌套问题
  */
 export function ColorPicker({
   label,
@@ -41,27 +35,26 @@ export function ColorPicker({
   description,
 }: ColorPickerProps) {
   const [inputValue, setInputValue] = useState(value);
-  const [isOpen, setIsOpen] = useState(false);
+  const [open, setOpen] = useState(false);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const popoverRef = useRef<HTMLDivElement>(null);
 
   // 同步外部值变化
   useEffect(() => {
     setInputValue(value);
   }, [value]);
 
-  // 处理颜色值变化 - 带防抖
+  // 处理颜色值变化 - 直接更新（无防抖）
   const handleColorChange = useCallback((newValue: string) => {
     setInputValue(newValue);
-    // 100ms 防抖后更新
-    const timer = setTimeout(() => {
-      onChange(newValue);
-    }, 100);
-    return () => clearTimeout(timer);
+    onChange(newValue);
   }, [onChange]);
 
   // 处理预设颜色选择
   const handlePresetSelect = useCallback((color: string) => {
     handleColorChange(color);
-    setIsOpen(false);
+    setOpen(false);
+    buttonRef.current?.focus();
   }, [handleColorChange]);
 
   // 验证颜色格式
@@ -79,6 +72,23 @@ export function ColorPicker({
   const isValid = isValidColor(inputValue);
   const errorColor = !isValid && inputValue.length > 0;
 
+  // 点击外部关闭 Popover
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (open) {
+        const target = event.target as HTMLElement;
+        if (
+          !buttonRef.current?.contains(target) &&
+          !popoverRef.current?.contains(target)
+        ) {
+          setOpen(false);
+        }
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [open]);
+
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
@@ -87,58 +97,39 @@ export function ColorPicker({
           <span className="text-xs text-muted-foreground">{description}</span>
         )}
       </div>
-      <div className="flex gap-2">
+      <div className="flex gap-2 relative z-50">
         {/* 颜色预览和选择器 */}
         <Button
+          ref={buttonRef}
           variant="outline"
           className={cn(
             "w-12 h-10 p-0 border-2",
             errorColor && "border-destructive"
           )}
           style={{ backgroundColor: inputValue }}
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={() => setOpen(!open)}
           type="button"
         >
           <span className="sr-only">选择颜色</span>
         </Button>
-        {isOpen && (
-          <PopoverContent
-            className="w-64 p-3"
-            side="bottom"
-            align="start"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="space-y-3">
-              {/* 预设色板 */}
-              <div className="grid grid-cols-6 gap-1">
-                {PRESET_COLORS.map((color) => (
-                  <button
-                    key={color}
-                    className={cn(
-                      "w-8 h-8 rounded border border-border hover:scale-110 transition-transform",
-                      value === color && "ring-2 ring-primary ring-offset-1"
-                    )}
-                    style={{ backgroundColor: color }}
-                    onClick={() => handlePresetSelect(color)}
-                    type="button"
-                  />
-                ))}
-              </div>
-              {/* 提示文字 */}
-              <p className="text-xs text-muted-foreground text-center">
-                点击选择预设颜色
-              </p>
-            </div>
-          </PopoverContent>
-        )}
 
         {/* 颜色值输入框 */}
         <Input
           value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
+          onChange={(e) => {
+            const newValue = e.target.value;
+            setInputValue(newValue);
+            // 实时验证并更新
+            if (isValidColor(newValue)) {
+              onChange(newValue);
+            }
+          }}
           onBlur={() => {
             if (isValid) {
               onChange(inputValue);
+            } else if (inputValue.length > 0) {
+              // 无效值恢复原值
+              setInputValue(value);
             }
           }}
           placeholder="#000000"
@@ -148,6 +139,41 @@ export function ColorPicker({
           )}
         />
       </div>
+
+      {/* Popover 内容 - 条件渲染 */}
+      {open && (
+        <div
+          ref={popoverRef}
+          className="fixed z-[100] w-64 bg-popover border border-border rounded-lg shadow-lg p-3"
+          style={{
+            top: buttonRef.current?.getBoundingClientRect().bottom + 4,
+            left: buttonRef.current?.getBoundingClientRect().left,
+          } as React.CSSProperties}
+        >
+          <div className="space-y-3">
+            {/* 预设色板 */}
+            <div className="grid grid-cols-6 gap-1">
+              {PRESET_COLORS.map((color) => (
+                <button
+                  key={color}
+                  className={cn(
+                    "w-8 h-8 rounded border border-border hover:scale-110 transition-transform",
+                    value === color && "ring-2 ring-primary ring-offset-1"
+                  )}
+                  style={{ backgroundColor: color }}
+                  onClick={() => handlePresetSelect(color)}
+                  type="button"
+                />
+              ))}
+            </div>
+            {/* 提示文字 */}
+            <p className="text-xs text-muted-foreground text-center">
+              点击选择预设颜色
+            </p>
+          </div>
+        </div>
+      )}
+
       {errorColor && (
         <p className="text-xs text-destructive">
           请输入有效的颜色值（HEX 或 RGB 格式）

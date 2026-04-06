@@ -52,9 +52,9 @@ export function PreviewPanel({ designTokens, className }: PreviewPanelProps) {
   } as React.CSSProperties;
 
   return (
-    <div className={cn('h-full overflow-auto bg-muted/30', className)}>
+    <div className={cn('h-full flex flex-col overflow-hidden bg-muted/30', className)}>
       {/* 预览头部 */}
-      <div className="sticky top-0 z-10 bg-background/80 backdrop-blur border-b px-4 py-3">
+      <div className="shrink-0 sticky top-0 z-10 bg-background/80 backdrop-blur border-b px-4 py-3">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-sm font-semibold">实时预览</h2>
@@ -65,8 +65,8 @@ export function PreviewPanel({ designTokens, className }: PreviewPanelProps) {
         </div>
       </div>
 
-      {/* 预览内容区 */}
-      <div className="p-6">
+      {/* 预览内容区 - 可滚动 */}
+      <div className="flex-1 overflow-auto p-6">
         <div
           className="max-w-4xl mx-auto bg-background rounded-lg shadow-lg overflow-hidden"
           style={cssVariables}
