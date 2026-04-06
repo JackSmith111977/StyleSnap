@@ -6,6 +6,25 @@
 
 ### ✅ 已完成
 
+**任务：design_tokens 迁移重构 - 代码适配 #0026**
+- 状态：已完成
+- 开始时间：2026-04-06
+- 完成时间：2026-04-06
+- 迁移背景：#0026 迁移已将独立字段数据同步到 design_tokens
+- 重构内容：
+  1. createNewStyle: 使用 design_tokens 替代 5 个独立字段
+  2. saveStyleDraft: 直接存储 designTokens 对象
+  3. getStyleDetail: 直接使用 design_tokens 字段
+- 修改文件：
+  - `apps/web/app/workspace/actions/workspace-actions.ts` - 重构 3 个函数
+  - `docs/reference/DATABASE_MIGRATION_INDEX.md` - 标记 #0026 已完成
+- 文档输出：
+  - `docs/main/P16_DESIGN_TOKENS_MIGRATION_REFACTOR.md` - 重构报告
+- 代码效果：减少 19 行代码，提升可维护性
+- 构建验证：pnpm build 成功
+- git 提交：5f8048d
+- 推送到远程：feat/bmad ✓
+
 **任务：创建 design_tokens 数据同步迁移 (#0026)**
 - 状态：已完成
 - 开始时间：2026-04-06
