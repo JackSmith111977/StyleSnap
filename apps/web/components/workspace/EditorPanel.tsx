@@ -105,7 +105,7 @@ export function EditorPanel({ className }: EditorPanelProps) {
   return (
     <Card className={cn('h-full flex flex-col overflow-hidden', className)}>
       {/* 头部 */}
-      <CardHeader className="pb-4 border-b">
+      <CardHeader className="pb-3 border-b shrink-0">
         <div className="flex items-center justify-between">
           <div>
             <CardTitle className="text-lg">设计编辑器</CardTitle>
@@ -119,16 +119,16 @@ export function EditorPanel({ className }: EditorPanelProps) {
         </div>
       </CardHeader>
 
-      {/* 内容区 */}
-      <CardContent className="flex-1 overflow-auto p-0">
+      {/* 内容区 - 使用 grid 而非 flex，避免内容溢出 */}
+      <CardContent className="flex-1 overflow-hidden p-0 flex flex-col">
         <Tabs
           value={activeTab}
           onValueChange={setActiveTab}
           className="h-full flex flex-col"
         >
-          {/* Tab 列表 */}
-          <div className="px-4 pt-4 border-b">
-            <TabsList className="w-full grid grid-cols-3 gap-1">
+          {/* Tab 列表 - 固定高度，不滚动 */}
+          <div className="px-4 py-3 border-b shrink-0 bg-card">
+            <TabsList className="w-full grid grid-cols-5 gap-1">
               <TabsTrigger value="colors" className="gap-1.5 text-xs">
                 <Palette className="w-3.5 h-3.5" />
                 <span className="hidden sm:inline">配色</span>
@@ -152,8 +152,8 @@ export function EditorPanel({ className }: EditorPanelProps) {
             </TabsList>
           </div>
 
-          {/* Tab 内容 */}
-          <div className="flex-1 overflow-auto p-4">
+          {/* Tab 内容 - 独立滚动区域，min-h-0 防止溢出 */}
+          <div className="flex-1 overflow-auto p-4 min-h-0 relative z-0">
             {/* 基本信息 Tab */}
             <TabsContent value="basics" className="space-y-4 mt-0">
               <div className="space-y-4">

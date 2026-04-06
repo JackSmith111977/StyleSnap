@@ -96,7 +96,7 @@ export function BorderRadiusControl({
   const renderPreviewBox = (radius: string, label: string) => (
     <div className="flex flex-col items-center gap-2">
       <div
-        className="w-16 h-16 bg-primary/50 border-2 border-primary transition-all duration-100"
+        className="w-16 h-16 bg-primary/50 border-2 border-primary transition-all duration-100 pointer-events-none"
         style={{ borderRadius: radius }}
       />
       <span className="text-xs text-muted-foreground">{label}</span>

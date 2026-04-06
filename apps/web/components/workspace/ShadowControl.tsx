@@ -308,7 +308,7 @@ export function ShadowControl({
             <div key={type} className="text-center">
               <div
                 className={cn(
-                  "w-full h-16 bg-background rounded transition-shadow duration-200",
+                  "w-full h-16 bg-background rounded transition-shadow duration-200 pointer-events-none",
                   activeShadow === type && "ring-2 ring-primary"
                 )}
                 style={{
