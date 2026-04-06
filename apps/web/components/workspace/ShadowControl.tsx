@@ -227,7 +227,10 @@ export function ShadowControl({
             min={-20}
             max={20}
             step={1}
-            onValueChange={([value]) => handleParamChange('x', value)}
+            onValueChange={(e) => {
+              const values = Array.isArray(e) ? e : [e];
+              handleParamChange('x', values[0]);
+            }}
           />
         </div>
 
@@ -242,7 +245,10 @@ export function ShadowControl({
             min={-20}
             max={40}
             step={1}
-            onValueChange={([value]) => handleParamChange('y', value)}
+            onValueChange={(e) => {
+              const values = Array.isArray(e) ? e : [e];
+              handleParamChange('y', values[0]);
+            }}
           />
         </div>
 
@@ -257,7 +263,10 @@ export function ShadowControl({
             min={0}
             max={50}
             step={1}
-            onValueChange={([value]) => handleParamChange('blur', value)}
+            onValueChange={(e) => {
+              const values = Array.isArray(e) ? e : [e];
+              handleParamChange('blur', values[0]);
+            }}
           />
         </div>
 
@@ -272,7 +281,10 @@ export function ShadowControl({
             min={-10}
             max={20}
             step={1}
-            onValueChange={([value]) => handleParamChange('spread', value)}
+            onValueChange={(e) => {
+              const values = Array.isArray(e) ? e : [e];
+              handleParamChange('spread', values[0]);
+            }}
           />
         </div>
 
