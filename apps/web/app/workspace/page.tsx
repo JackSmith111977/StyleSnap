@@ -18,19 +18,19 @@ import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 
 /**
- * 分类选项
+ * 分类选项（value 必须与数据库 categories.name_en 完全匹配）
  */
 const CATEGORY_OPTIONS = [
-  { value: 'minimalist', label: '极简主义' },
-  { value: 'tech', label: '科技未来' },
-  { value: 'glassmorphism', label: '玻璃拟态' },
-  { value: 'brutalist', label: '粗野主义' },
-  { value: 'corporate', label: '企业专业' },
-  { value: 'dark', label: '深色优先' },
-  { value: 'playful', label: '活泼多彩' },
-  { value: 'editorial', label: '杂志编辑' },
-  { value: 'retro', label: '复古网络' },
-  { value: 'typography', label: '排版驱动' },
+  { value: 'Minimalist', label: '极简主义' },
+  { value: 'Tech/Futuristic', label: '科技未来' },
+  { value: 'Glassmorphism', label: '玻璃拟态' },
+  { value: 'Brutalist', label: '粗野主义' },
+  { value: 'Corporate/Professional', label: '企业专业' },
+  { value: 'Dark Mode First', label: '深色优先' },
+  { value: 'Playful/Colorful', label: '活泼多彩' },
+  { value: 'Editorial', label: '杂志编辑' },
+  { value: 'Retro/Web 1.0', label: '复古网络' },
+  { value: 'Typography-Driven', label: '排版驱动' },
 ];
 
 export default function WorkspacePage() {

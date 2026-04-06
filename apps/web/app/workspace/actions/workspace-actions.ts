@@ -242,7 +242,7 @@ export async function saveStyleDraft(
 /**
  * 创建新风格
  * @param name 风格名称
- * @param category 分类
+ * @param categoryId 分类 ID（name_en 值，如 'Minimalist'）
  */
 export async function createNewStyle(
   name: string,
@@ -267,13 +267,28 @@ export async function createNewStyle(
       };
     }
 
+    // 根据 name_en 查询分类 UUID（大小写不敏感）
+    const { data: category, error: categoryError } = await supabase
+      .from('categories')
+      .select('id')
+      .ilike('name_en', categoryId)
+      .single();
+
+    if (categoryError || !category) {
+      console.error('分类不存在:', categoryId, categoryError);
+      return {
+        success: false,
+        error: `分类不存在：${categoryId}`,
+      };
+    }
+
     // 创建风格
     const { data, error } = await supabase
       .from('styles')
       .insert({
         name,
         description: '',
-        category_id: categoryId,
+        category_id: category.id,
         author_id: user.id,
         status: 'draft',
         design_tokens: null,
@@ -298,7 +313,7 @@ export async function createNewStyle(
     });
     return {
       success: false,
-      error: '创建风格失败',
+      error: `创建风格失败：${(error as Error).message}`,
     };
   }
 }
