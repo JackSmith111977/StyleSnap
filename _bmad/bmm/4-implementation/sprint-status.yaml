@@ -85,4 +85,5 @@ development_status:
   6-6-code-export-options: backlog
   6-7-preview-style-modes: backlog
   6-8-style-preview-component: done  # v1.5 StyleDetail 组件使用 designTokens 完成
+  6-9-workspace-editor: done  # ✅ 完整实现 + 测试通过 (114/114)
   epic-6-retrospective: optional
