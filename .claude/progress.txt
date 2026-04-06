@@ -6,6 +6,19 @@
 
 ### ✅ 已完成
 
+**任务：创建 design_tokens 数据同步迁移 (#0026)**
+- 状态：已完成
+- 开始时间：2026-04-06
+- 完成时间：2026-04-06
+- 迁移目的：将独立字段（color_palette, fonts 等）同步到 design_tokens JSONB 列
+- 输出文件：
+  - `supabase/migrations/0026_sync_design_tokens_to_jsonb.sql` - 迁移文件
+  - `docs/reference/MIGRATION_0026_EXECUTION_GUIDE.md` - 执行指南
+  - `docs/reference/DATABASE_MIGRATION_INDEX.md` - 迁移索引（更新）
+- git 提交：7b9bafc
+- 推送到远程：feat/bmad ✓
+- 待执行：通过 Supabase Dashboard 执行 SQL
+
 **任务：Story 6.9 代码审查关键问题修复**
 - 状态：已完成
 - 开始时间：2026-04-06
