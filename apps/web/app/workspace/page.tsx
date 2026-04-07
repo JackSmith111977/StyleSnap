@@ -3,8 +3,10 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { StyleSelector } from '@/components/workspace/StyleSelector';
 import { EditorPanel } from '@/components/workspace/EditorPanel';
-import { PreviewPanel } from '@/components/workspace/PreviewPanel';
-import { useWorkspaceStore, type WorkspaceStyle } from '@/stores/workspace-store';
+import { CanvasPreview } from '@/components/workspace/CanvasPreview';
+import { StylePreview } from '@/components/preview/style-preview';
+import { useWorkspaceStore, type DesignTokens as WorkspaceDesignTokens, type WorkspaceStyle } from '@/stores/workspace-store';
+import { type DesignTokens as PreviewDesignTokens } from '@/stores/preview-editor-store';
 import { getStyleDetail, createNewStyle, saveStyleDraft } from './actions/workspace-actions';
 import { Button } from '@/components/ui/button';
 import {
@@ -32,6 +34,20 @@ const CATEGORY_OPTIONS = [
   { value: 'Retro/Web 1.0', label: '复古网络' },
   { value: 'Typography-Driven', label: '排版驱动' },
 ];
+
+/**
+ * 将 Workspace DesignTokens 转换为 Preview DesignTokens
+ * 主要差异：colorPalette -> colors
+ */
+function convertToPreviewTokens(workspace: WorkspaceDesignTokens): PreviewDesignTokens {
+  return {
+    colors: workspace.colorPalette,
+    fonts: workspace.fonts,
+    spacing: workspace.spacing,
+    borderRadius: workspace.borderRadius,
+    shadows: workspace.shadows,
+  };
+}
 
 export default function WorkspacePage() {
   const router = useRouter();
@@ -192,7 +208,10 @@ export default function WorkspacePage() {
               </div>
               {/* 右侧预览面板 - 窄屏 100%，宽屏 75% */}
               <div className="lg:col-span-3 h-full overflow-hidden">
-                <PreviewPanel designTokens={designTokens} />
+                <CanvasPreview
+                  designTokens={designTokens}
+                  convertToPreviewTokens={convertToPreviewTokens}
+                />
               </div>
             </div>
           </div>

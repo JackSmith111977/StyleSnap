@@ -271,9 +271,13 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => {
   // 定时器引用
   let saveTimer: NodeJS.Timeout | null = null;
   let intervalTimer: NodeJS.Timeout | null = null;
+  let historyTimer: NodeJS.Timeout | null = null; // 历史防抖定时器
 
   // 保存回调（由外部设置）
   let onSaveCallback: (() => Promise<void>) | null = null;
+
+  // 待处理的历史记录
+  let pendingHistoryChange: { tokens: Partial<DesignTokens>; oldTokens: DesignTokens } | null = null;
 
   // 设置保存回调
   const setSaveCallback = (callback: () => Promise<void>) => {
@@ -348,6 +352,9 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => {
         history: [], // 加载新风格时清空历史
         historyIndex: -1,
       });
+      // 清除待处理的历史记录和定时器
+      if (historyTimer) clearTimeout(historyTimer);
+      pendingHistoryChange = null;
     },
 
     pushHistory: (changeType: HistoryChangeType, description?: string) => {
@@ -422,6 +429,8 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => {
     },
 
     clearHistory: () => {
+      if (historyTimer) clearTimeout(historyTimer);
+      pendingHistoryChange = null;
       set({
         history: [],
         historyIndex: -1,
@@ -470,9 +479,19 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => {
       lastEditedAt: new Date(),
     }));
 
-    // 自动记录历史（检测变更类型）
-    const changeType = detectChangeType(oldTokens, tokens);
-    get().pushHistory(changeType);
+    // 防抖历史记录（等待 500ms 无新操作后再记录）
+    if (historyTimer) clearTimeout(historyTimer);
+
+    // 保存待处理的变更
+    pendingHistoryChange = { tokens, oldTokens };
+
+    historyTimer = setTimeout(() => {
+      if (pendingHistoryChange) {
+        const changeType = detectChangeType(pendingHistoryChange.oldTokens, pendingHistoryChange.tokens);
+        get().pushHistory(changeType);
+        pendingHistoryChange = null;
+      }
+    }, 500); // 500ms 防抖
 
     // 编辑后 5 秒自动保存
     if (saveTimer) clearTimeout(saveTimer);
@@ -547,6 +566,8 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => {
 
   clearWorkspace: () => {
     stopAutoSave();
+    if (historyTimer) clearTimeout(historyTimer);
+    pendingHistoryChange = null;
     set({
       currentStyle: null,
       designTokens: { ...DEFAULT_TOKENS },
@@ -560,6 +581,8 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => {
       isDirty: false,
       lastSavedAt: null,
       lastEditedAt: null,
+      history: [],
+      historyIndex: -1,
     });
   },
 

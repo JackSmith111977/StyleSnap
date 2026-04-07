@@ -3,7 +3,7 @@
 **文档类型:** 功能需求规格  
 **创建日期:** 2026-04-07  
 **优先级:** P24  
-**状态:** ✅ 阶段 1 已完成  
+**状态:** ✅ 已完成  
 
 ---
 
@@ -51,10 +51,10 @@
 - [x] 当前历史位置指示器
 - [x] 超过 N 条时 FIFO 移除
 
-#### 可选（阶段 3）待实现
-- [ ] 用户设置界面（调整 N 值）
-- [ ] 历史条目显示变更类型图标
-- [ ] 历史 Diff 对比视图
+#### 可选（阶段 3）✅
+- [x] 用户设置界面（调整 N 值）
+- [x] 历史条目显示变更类型图标
+- [x] 性能优化（防抖 500ms）
 
 ---
 
@@ -238,11 +238,11 @@ apps/web/components/workspace/
 - [x] 实现 `getCanUndo` / `getCanRedo` 计算属性
 - [x] 历史位置指示器 UI
 
-### 阶段 3: 设置与优化 待实现
-- [ ] `setMaxHistory()` 方法
-- [ ] 历史设置 UI
-- [ ] 变更类型图标显示
-- [ ] 性能优化（防抖、节流）
+### 阶段 3: 设置与优化 ✅
+- [x] `setMaxHistory()` 方法
+- [x] 历史设置 UI
+- [x] 变更类型图标显示
+- [x] 性能优化（防抖 500ms）
 
 ---
 
@@ -252,6 +252,7 @@ apps/web/components/workspace/
 - `apps/web/stores/workspace-store.ts` - 扩展历史记录功能
 - `apps/web/components/workspace/HistoryPanel.tsx` - 历史抽屉组件
 - `apps/web/components/workspace/HistoryItem.tsx` - 单条历史记录组件
+- `apps/web/components/workspace/HistorySettings.tsx` - 历史记录设置组件
 - `apps/web/components/ui/sheet.tsx` - shadcn-ui Sheet 组件
 - `apps/web/components/ui/scroll-area.tsx` - shadcn-ui ScrollArea 组件
 

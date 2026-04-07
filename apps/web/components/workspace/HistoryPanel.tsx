@@ -7,6 +7,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useWorkspaceStore } from '@/stores/workspace-store';
 import { History, RotateCcw, RotateCw, Trash2, Settings2 } from 'lucide-react';
 import { HistoryItem } from './HistoryItem';
+import { HistorySettings } from './HistorySettings';
 import { cn } from '@/lib/utils';
 
 interface HistoryPanelProps {
@@ -33,6 +34,8 @@ export function HistoryPanel({ open, onOpenChange }: HistoryPanelProps) {
     getCanUndo,
     getCanRedo,
   } = useWorkspaceStore();
+
+  const [settingsOpen, setSettingsOpen] = React.useState(false);
 
   const canUndo = getCanUndo();
   const canRedo = getCanRedo();
@@ -156,13 +159,19 @@ export function HistoryPanel({ open, onOpenChange }: HistoryPanelProps) {
         <div className="mt-4 pt-4 border-t">
           <div className="flex items-center justify-between text-xs text-muted-foreground">
             <span>最多保留 {maxHistory} 条记录</span>
-            <Button variant="ghost" size="sm" className="h-6 gap-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-6 gap-1"
+              onClick={() => setSettingsOpen(true)}
+            >
               <Settings2 className="w-3 h-3" />
               设置
             </Button>
           </div>
         </div>
       </SheetContent>
+      <HistorySettings open={settingsOpen} onOpenChange={setSettingsOpen} />
     </Sheet>
   );
 }

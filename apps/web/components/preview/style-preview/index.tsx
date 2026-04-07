@@ -1,16 +1,52 @@
 'use client'
 
 import React, { useState } from 'react'
-import { type DesignTokens } from '@/stores/preview-editor-store'
+import { type DesignTokens as PreviewDesignTokens } from '@/stores/preview-editor-store'
+import { type DesignTokens as TypesDesignTokens } from '@/types/design-tokens'
 import styles from './styles.module.css'
 import { PreviewHeader } from './preview-header'
 import { PreviewSidebar } from './preview-sidebar'
 import { PreviewContent } from './preview-content'
 import { PreviewFooter } from './preview-footer'
 
+// 支持两种 DesignTokens 类型
+type StylePreviewTokens = PreviewDesignTokens | TypesDesignTokens
+
 interface StylePreviewProps {
-  tokens: DesignTokens
+  tokens?: StylePreviewTokens
+  designTokens?: StylePreviewTokens
   className?: string
+}
+
+/**
+ * 将 types/design-tokens 的 DesignTokens 转换为 preview-editor-store 格式
+ * 主要差异：colorPalette -> colors，spacing 值类型 string -> number
+ */
+function normalizeTokens(input: StylePreviewTokens | undefined): PreviewDesignTokens {
+  if (!input) {
+    throw new Error('StylePreview requires either "tokens" or "designTokens" prop')
+  }
+
+  // 检查是否是 types/design-tokens 格式（有 colorPalette）
+  if ('colorPalette' in input) {
+    const t = input as TypesDesignTokens
+    return {
+      colors: t.colorPalette,
+      fonts: t.fonts,
+      spacing: {
+        xs: Number(t.spacing.xs),
+        sm: Number(t.spacing.sm),
+        md: Number(t.spacing.md),
+        lg: Number(t.spacing.lg),
+        xl: Number(t.spacing.xl),
+      },
+      borderRadius: t.borderRadius,
+      shadows: t.shadows,
+    }
+  }
+
+  // 已经是 preview-editor-store 格式
+  return input as PreviewDesignTokens
 }
 
 /**
@@ -22,41 +58,44 @@ type PreviewSection = 'all' | 'typography' | 'colors' | 'spacing' | 'borderRadiu
  * 风格预览组件主组件
  * 固定尺寸、响应式布局，展示风格应用效果
  */
-export function StylePreview({ tokens, className }: StylePreviewProps) {
+export function StylePreview({ tokens, designTokens, className }: StylePreviewProps) {
   const [activeSection, setActiveSection] = useState<PreviewSection>('all')
+
+  // 统一处理两种 tokens 格式
+  const normalizedTokens = normalizeTokens(tokens || designTokens)
 
   // 生成内联样式
   const previewStyles: React.CSSProperties = {
     // 颜色变量（8 色）
-    '--preview-primary': tokens.colors.primary,
-    '--preview-secondary': tokens.colors.secondary,
-    '--preview-background': tokens.colors.background,
-    '--preview-surface': tokens.colors.surface,
-    '--preview-text': tokens.colors.text,
-    '--preview-text-muted': tokens.colors.textMuted,
-    '--preview-border': tokens.colors.border,
-    '--preview-accent': tokens.colors.accent,
+    '--preview-primary': normalizedTokens.colors.primary,
+    '--preview-secondary': normalizedTokens.colors.secondary,
+    '--preview-background': normalizedTokens.colors.background,
+    '--preview-surface': normalizedTokens.colors.surface,
+    '--preview-text': normalizedTokens.colors.text,
+    '--preview-text-muted': normalizedTokens.colors.textMuted,
+    '--preview-border': normalizedTokens.colors.border,
+    '--preview-accent': normalizedTokens.colors.accent,
     // 字体变量
-    '--preview-font-heading': tokens.fonts.heading,
-    '--preview-font-body': tokens.fonts.body,
-    '--preview-font-weight-heading': tokens.fonts.headingWeight.toString(),
-    '--preview-font-weight-body': tokens.fonts.bodyWeight.toString(),
-    '--preview-font-line-height-heading': tokens.fonts.headingLineHeight.toString(),
-    '--preview-font-line-height-body': tokens.fonts.bodyLineHeight.toString(),
+    '--preview-font-heading': normalizedTokens.fonts.heading,
+    '--preview-font-body': normalizedTokens.fonts.body,
+    '--preview-font-weight-heading': normalizedTokens.fonts.headingWeight.toString(),
+    '--preview-font-weight-body': normalizedTokens.fonts.bodyWeight.toString(),
+    '--preview-font-line-height-heading': normalizedTokens.fonts.headingLineHeight.toString(),
+    '--preview-font-line-height-body': normalizedTokens.fonts.bodyLineHeight.toString(),
     // 间距变量
-    '--preview-spacing-xs': `${tokens.spacing.xs}px`,
-    '--preview-spacing-sm': `${tokens.spacing.sm}px`,
-    '--preview-spacing-md': `${tokens.spacing.md}px`,
-    '--preview-spacing-lg': `${tokens.spacing.lg}px`,
-    '--preview-spacing-xl': `${tokens.spacing.xl}px`,
+    '--preview-spacing-xs': `${normalizedTokens.spacing.xs}px`,
+    '--preview-spacing-sm': `${normalizedTokens.spacing.sm}px`,
+    '--preview-spacing-md': `${normalizedTokens.spacing.md}px`,
+    '--preview-spacing-lg': `${normalizedTokens.spacing.lg}px`,
+    '--preview-spacing-xl': `${normalizedTokens.spacing.xl}px`,
     // 圆角变量
-    '--preview-border-radius-small': tokens.borderRadius.small,
-    '--preview-border-radius-medium': tokens.borderRadius.medium,
-    '--preview-border-radius-large': tokens.borderRadius.large,
+    '--preview-border-radius-small': normalizedTokens.borderRadius.small,
+    '--preview-border-radius-medium': normalizedTokens.borderRadius.medium,
+    '--preview-border-radius-large': normalizedTokens.borderRadius.large,
     // 阴影变量
-    '--preview-shadow-light': tokens.shadows.light,
-    '--preview-shadow-medium': tokens.shadows.medium,
-    '--preview-shadow-heavy': tokens.shadows.heavy,
+    '--preview-shadow-light': normalizedTokens.shadows.light,
+    '--preview-shadow-medium': normalizedTokens.shadows.medium,
+    '--preview-shadow-heavy': normalizedTokens.shadows.heavy,
   } as React.CSSProperties
 
   return (

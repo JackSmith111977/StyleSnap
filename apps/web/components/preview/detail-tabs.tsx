@@ -2,6 +2,7 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import type { DesignTokens } from '@/types/design-tokens'
+import { StylePreview } from '@/components/preview/style-preview'
 
 interface DetailTabsProps {
   styleId: string
