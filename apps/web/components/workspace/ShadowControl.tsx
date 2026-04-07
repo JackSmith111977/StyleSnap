@@ -13,6 +13,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
+import { ColorPicker } from './ColorPicker';
 
 interface ShadowControlProps {
   light: string;
@@ -305,16 +306,12 @@ export function ShadowControl({
         {/* 阴影颜色 */}
         <div className="space-y-2">
           <Label className="text-sm">阴影颜色</Label>
-          <Input
-            type="text"
+          <ColorPicker
+            label=""
             value={current.color}
-            onChange={(e) => handleParamChange('color', e.target.value)}
-            placeholder="rgba(0,0,0,0.1)"
-            className="text-sm font-mono"
+            onChange={(color) => handleParamChange('color', color)}
+            description="支持 HEX、RGB、RGBA 格式"
           />
-          <p className="text-xs text-muted-foreground">
-            支持 HEX、RGB、RGBA 格式
-          </p>
         </div>
 
         {/* 当前阴影值预览 */}

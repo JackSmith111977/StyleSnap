@@ -250,6 +250,42 @@ export function ColorPicker({ label, value, onChange, description }: ColorPicker
   // 计算色相滑块中的光标位置
   const hueX = hsl.h / 360;
 
+  // Popover 位置状态
+  const [popoverPosition, setPopoverPosition] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
+
+  // 更新 Popover 位置
+  const updatePopoverPosition = useCallback(() => {
+    if (open && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setPopoverPosition({
+        top: rect.bottom + window.scrollY + 4,
+        left: rect.left + window.scrollX,
+      });
+    }
+  }, [open]);
+
+  // 监听滚动和窗口大小变化
+  useEffect(() => {
+    if (open) {
+      updatePopoverPosition();
+      const handleScroll = () => updatePopoverPosition();
+      const handleResize = () => updatePopoverPosition();
+      window.addEventListener('scroll', handleScroll, true);
+      window.addEventListener('resize', handleResize);
+      return () => {
+        window.removeEventListener('scroll', handleScroll, true);
+        window.removeEventListener('resize', handleResize);
+      };
+    }
+  }, [open, updatePopoverPosition]);
+
+  // 初始打开时设置位置
+  useEffect(() => {
+    if (open) {
+      updatePopoverPosition();
+    }
+  }, [open, updatePopoverPosition]);
+
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
@@ -258,7 +294,7 @@ export function ColorPicker({ label, value, onChange, description }: ColorPicker
           <span className="text-xs text-muted-foreground">{description}</span>
         )}
       </div>
-      <div className="flex gap-2 relative z-50">
+      <div className="flex gap-2 relative">
         {/* 颜色预览和选择器 */}
         <Button
           ref={buttonRef}
@@ -294,14 +330,14 @@ export function ColorPicker({ label, value, onChange, description }: ColorPicker
         />
       </div>
 
-      {/* Popover 内容 */}
+      {/* Popover 内容 - 使用固定定位并跟随滚动 */}
       {open && (
         <div
           ref={popoverRef}
           className="fixed z-[100] w-72 bg-popover border border-border rounded-lg shadow-lg p-4"
           style={{
-            top: buttonRef.current?.getBoundingClientRect().bottom + 4,
-            left: buttonRef.current?.getBoundingClientRect().left,
+            top: popoverPosition.top,
+            left: popoverPosition.left,
           } as React.CSSProperties}
         >
           <Tabs value={mode} onValueChange={(v) => setMode(v as 'saturation' | 'hue')}>
