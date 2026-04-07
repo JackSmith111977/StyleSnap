@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -260,17 +261,28 @@ export function ColorPicker({ label, value, onChange, description }: ColorPicker
   const calculatePopoverPosition = useCallback((buttonRect: DOMRect) => {
     const popoverHeight = 350; // 估算 Popover 高度
     const viewportHeight = window.innerHeight;
+    const viewportWidth = window.innerWidth;
     const spaceBelow = viewportHeight - buttonRect.bottom;
     const spaceAbove = buttonRect.top;
+    const popoverWidth = 288; // w-72 = 288px
 
     // 优先向下展开，空间不足则向上
     const top = spaceBelow >= popoverHeight
-      ? buttonRect.bottom + window.scrollY + 4
-      : buttonRect.top + window.scrollY - popoverHeight - 4;
+      ? buttonRect.bottom + 4
+      : buttonRect.top - popoverHeight - 4;
+
+    // 确保不超出视口左右边界
+    let left = buttonRect.left;
+    if (left + popoverWidth > viewportWidth) {
+      left = viewportWidth - popoverWidth - 8;
+    }
+    if (left < 8) {
+      left = 8;
+    }
 
     return {
       top,
-      left: buttonRect.left + window.scrollX,
+      left,
     };
   }, []);
 
@@ -391,8 +403,8 @@ export function ColorPicker({ label, value, onChange, description }: ColorPicker
         />
       </div>
 
-      {/* Popover 内容 - 使用固定定位并跟随滚动 */}
-      {open && (
+      {/* Popover 内容 - 使用 Portal 渲染到 body，避免父容器层叠上下文限制 */}
+      {open && typeof document !== 'undefined' && createPortal(
         <div
           ref={popoverRef}
           className="fixed z-[var(--z-popover)] w-72 bg-popover border border-border rounded-lg shadow-lg p-4"
@@ -596,7 +608,8 @@ export function ColorPicker({ label, value, onChange, description }: ColorPicker
               ))}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
