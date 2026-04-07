@@ -70,6 +70,11 @@
     - **禁止**：不要在 Client Component 中依赖 `getUser()` 获取初始状态
     - **参考文档**：`docs/main/P1_AUTH_SYNC_ANALYSIS.md`
 
+17. **Z-Index 使用规范** - 禁止使用魔法数字：
+    - **禁止**：`z-[9999]`、`z-[100]` 等硬编码值
+    - **必须使用**：`z-[var(--z-base)]`、`z-[var(--z-sticky)]`、`z-[var(--z-dropdown)]`、`z-[var(--z-popover)]`、`z-[var(--z-modal-overlay)]`、`z-[var(--z-modal)]`、`z-[var(--z-toast)]`
+    - **参考文档**：`docs/reference/z-index-tokens.md`
+
 ---
 
 ## 约束条件

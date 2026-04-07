@@ -37,9 +37,9 @@ export function FullscreenPreview({
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-background overflow-auto">
+    <div className="fixed inset-0 z-[var(--z-modal)] bg-background overflow-auto">
       {/* 顶部操作栏 */}
-      <div className="sticky top-0 z-10 flex items-center justify-between border-b bg-background/80 backdrop-blur-sm p-4">
+      <div className="sticky top-0 z-[var(--z-sticky)] flex items-center justify-between border-b bg-background/80 backdrop-blur-sm p-4">
         <div>
           <h1 className="text-xl font-bold">{styleName}</h1>
           {styleDescription && (

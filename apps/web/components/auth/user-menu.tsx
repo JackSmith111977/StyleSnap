@@ -37,10 +37,10 @@ export function UserMenu() {
       {open && (
         <>
           <div
-            className="fixed inset-0 z-10"
+            className="fixed inset-0 z-[var(--z-dropdown)]"
             onClick={() => setOpen(false)}
           />
-          <div className="absolute right-0 mt-2 w-48 bg-popover rounded-md shadow-lg z-20 border">
+          <div className="absolute right-0 mt-2 w-48 bg-popover rounded-md shadow-lg z-[var(--z-dropdown)] border">
             <div className="p-2 border-b">
               <p className="text-sm font-medium truncate">{user.email}</p>
             </div>

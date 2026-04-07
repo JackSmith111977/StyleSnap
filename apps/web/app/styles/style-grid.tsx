@@ -204,7 +204,7 @@ export function StyleGrid({ initialStyles, totalPages, categories, initialFilter
   return (
     <div className="min-h-screen">
       {/* 工具栏：分类筛选、视图切换、排序、搜索 */}
-      <div className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="sticky top-0 z-[var(--z-sticky)] border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto px-4 py-4">
           <div className="flex flex-col gap-4">
             {/* 第一行：搜索框 */}

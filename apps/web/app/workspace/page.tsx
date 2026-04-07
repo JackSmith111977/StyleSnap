@@ -201,7 +201,7 @@ export default function WorkspacePage() {
 
       {/* 创建新风格模态框 */}
       {showCreateModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 z-[var(--z-modal-overlay)] bg-black/50 flex items-center justify-center p-4">
           <div className="bg-card rounded-lg shadow-lg max-w-md w-full p-6 space-y-4">
             <div>
               <h3 className="text-lg font-semibold">创建新风格</h3>

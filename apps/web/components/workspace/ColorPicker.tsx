@@ -132,8 +132,6 @@ export function ColorPicker({ label, value, onChange, description }: ColorPicker
   const [inputValue, setInputValue] = useState(value);
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState<'saturation' | 'hue'>('saturation');
-  const buttonRef = useRef<HTMLButtonElement>(null);
-  const popoverRef = useRef<HTMLDivElement>(null);
   const saturationRef = useRef<HTMLDivElement>(null);
   const hueSliderRef = useRef<HTMLDivElement>(null);
   const [isDraggingSaturation, setIsDraggingSaturation] = useState(false);
@@ -252,17 +250,37 @@ export function ColorPicker({ label, value, onChange, description }: ColorPicker
 
   // Popover 位置状态
   const [popoverPosition, setPopoverPosition] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
+  const [isDraggingPopover, setIsDraggingPopover] = useState(false);
+  const [userHasDragged, setUserHasDragged] = useState(false); // 用户是否拖动过 Popover
+  const dragOffset = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+  const popoverRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
-  // 更新 Popover 位置
+  // 计算 Popover 位置（考虑视口边界）
+  const calculatePopoverPosition = useCallback((buttonRect: DOMRect) => {
+    const popoverHeight = 350; // 估算 Popover 高度
+    const viewportHeight = window.innerHeight;
+    const spaceBelow = viewportHeight - buttonRect.bottom;
+    const spaceAbove = buttonRect.top;
+
+    // 优先向下展开，空间不足则向上
+    const top = spaceBelow >= popoverHeight
+      ? buttonRect.bottom + window.scrollY + 4
+      : buttonRect.top + window.scrollY - popoverHeight - 4;
+
+    return {
+      top,
+      left: buttonRect.left + window.scrollX,
+    };
+  }, []);
+
+  // 更新 Popover 位置（初始打开时或滚动时）
   const updatePopoverPosition = useCallback(() => {
-    if (open && buttonRef.current) {
+    if (open && buttonRef.current && !isDraggingPopover && !userHasDragged) {
       const rect = buttonRef.current.getBoundingClientRect();
-      setPopoverPosition({
-        top: rect.bottom + window.scrollY + 4,
-        left: rect.left + window.scrollX,
-      });
+      setPopoverPosition(calculatePopoverPosition(rect));
     }
-  }, [open]);
+  }, [open, isDraggingPopover, userHasDragged, calculatePopoverPosition]);
 
   // 监听滚动和窗口大小变化
   useEffect(() => {
@@ -285,6 +303,49 @@ export function ColorPicker({ label, value, onChange, description }: ColorPicker
       updatePopoverPosition();
     }
   }, [open, updatePopoverPosition]);
+
+  // Popover 拖动控制
+  const handlePopoverDragStart = useCallback((e: React.MouseEvent) => {
+    if (!popoverRef.current) return;
+    const rect = popoverRef.current.getBoundingClientRect();
+    dragOffset.current = {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    };
+    setIsDraggingPopover(true);
+  }, []);
+
+  // 鼠标拖动事件 - Popover
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (isDraggingPopover) {
+        e.preventDefault();
+        setPopoverPosition({
+          top: e.clientY - dragOffset.current.y,
+          left: e.clientX - dragOffset.current.x,
+        });
+      }
+    };
+    const handleMouseUp = () => {
+      setIsDraggingPopover(false);
+      setUserHasDragged(true); // 标记用户已拖动，禁用自动定位
+    };
+    if (isDraggingPopover) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      return () => {
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+      };
+    }
+  }, [isDraggingPopover]);
+
+  // 关闭 Popover 时重置拖动标志
+  useEffect(() => {
+    if (!open) {
+      setUserHasDragged(false);
+    }
+  }, [open]);
 
   return (
     <div className="space-y-2">
@@ -334,12 +395,20 @@ export function ColorPicker({ label, value, onChange, description }: ColorPicker
       {open && (
         <div
           ref={popoverRef}
-          className="fixed z-[100] w-72 bg-popover border border-border rounded-lg shadow-lg p-4"
+          className="fixed z-[var(--z-popover)] w-72 bg-popover border border-border rounded-lg shadow-lg p-4"
           style={{
             top: popoverPosition.top,
             left: popoverPosition.left,
           } as React.CSSProperties}
         >
+          {/* 拖动把手 */}
+          <div
+            className="h-4 cursor-grab active:cursor-grabbing mb-2 flex items-center justify-center"
+            onMouseDown={handlePopoverDragStart}
+          >
+            <div className="w-8 h-1 bg-muted-foreground/30 rounded-full" />
+          </div>
+
           <Tabs value={mode} onValueChange={(v) => setMode(v as 'saturation' | 'hue')}>
             <TabsList className="grid w-full grid-cols-2 mb-3">
               <TabsTrigger value="saturation">饱和度</TabsTrigger>
