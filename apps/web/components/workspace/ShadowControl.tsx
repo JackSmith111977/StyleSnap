@@ -115,10 +115,21 @@ export function ShadowControl({
   });
 
   useEffect(() => {
-    setLocalValues({
-      light: parseShadow(light),
-      medium: parseShadow(medium),
-      heavy: parseShadow(heavy),
+    const newLight = parseShadow(light);
+    const newMedium = parseShadow(medium);
+    const newHeavy = parseShadow(heavy);
+
+    // 只在值真正变化时才同步，避免 Slider 回弹
+    setLocalValues((prev) => {
+      if (prev.light.x === newLight.x && prev.light.y === newLight.y &&
+          prev.light.blur === newLight.blur && prev.light.spread === newLight.spread &&
+          prev.medium.x === newMedium.x && prev.medium.y === newMedium.y &&
+          prev.medium.blur === newMedium.blur && prev.medium.spread === newMedium.spread &&
+          prev.heavy.x === newHeavy.x && prev.heavy.y === newHeavy.y &&
+          prev.heavy.blur === newHeavy.blur && prev.heavy.spread === newHeavy.spread) {
+        return prev;
+      }
+      return { light: newLight, medium: newMedium, heavy: newHeavy };
     });
   }, [light, medium, heavy]);
 

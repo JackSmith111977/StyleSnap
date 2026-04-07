@@ -49,10 +49,16 @@ export function BorderRadiusControl({
   });
 
   useEffect(() => {
-    setLocalValues({
-      small: parsePxValue(small),
-      medium: parsePxValue(medium),
-      large: parsePxValue(large),
+    const newSmall = parsePxValue(small);
+    const newMedium = parsePxValue(medium);
+    const newLarge = parsePxValue(large);
+
+    // 只在值真正变化时才同步，避免 Slider 回弹
+    setLocalValues((prev) => {
+      if (prev.small === newSmall && prev.medium === newMedium && prev.large === newLarge) {
+        return prev;
+      }
+      return { small: newSmall, medium: newMedium, large: newLarge };
     });
   }, [small, medium, large]);
 

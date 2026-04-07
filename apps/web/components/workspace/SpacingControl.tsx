@@ -57,7 +57,13 @@ export function SpacingControl({
   const [localValues, setLocalValues] = useState<{ xs: number; sm: number; md: number; lg: number; xl: number }>({ xs, sm, md, lg, xl });
 
   useEffect(() => {
-    setLocalValues({ xs, sm, md, lg, xl });
+    // 只在值真正变化时才同步，避免 Slider 回弹
+    setLocalValues((prev) => {
+      if (prev.xs === xs && prev.sm === sm && prev.md === md && prev.lg === lg && prev.xl === xl) {
+        return prev;
+      }
+      return { xs, sm, md, lg, xl };
+    });
   }, [xs, sm, md, lg, xl]);
 
   // 处理单个间距变化

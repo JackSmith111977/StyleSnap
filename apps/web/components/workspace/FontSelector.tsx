@@ -90,7 +90,16 @@ export function FontSelector({
   });
 
   useEffect(() => {
-    setLocalValues({ headingWeight, bodyWeight, headingLineHeight, bodyLineHeight });
+    // 只在值真正变化时才同步，避免 Slider 回弹
+    setLocalValues((prev) => {
+      if (prev.headingWeight === headingWeight &&
+          prev.bodyWeight === bodyWeight &&
+          prev.headingLineHeight === headingLineHeight &&
+          prev.bodyLineHeight === bodyLineHeight) {
+        return prev;
+      }
+      return { headingWeight, bodyWeight, headingLineHeight, bodyLineHeight };
+    });
   }, [headingWeight, bodyWeight, headingLineHeight, bodyLineHeight]);
 
   // 处理滑块变化（带防抖）
