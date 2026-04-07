@@ -26,8 +26,9 @@ import { SpacingControl } from './SpacingControl';
 import { BorderRadiusControl } from './BorderRadiusControl';
 import { ShadowControl } from './ShadowControl';
 import { AutoSaveIndicator } from './AutoSaveIndicator';
+import { HistoryPanel } from './HistoryPanel';
 import { cn } from '@/lib/utils';
-import { Palette, Type, Ruler, Square, Layers, RotateCcw } from 'lucide-react';
+import { Palette, Type, Ruler, Square, Layers, RotateCcw, History } from 'lucide-react';
 
 interface EditorPanelProps {
   className?: string;
@@ -63,9 +64,46 @@ export function EditorPanel({ className }: EditorPanelProps) {
     updateDesignTokens,
     updateBasics,
     resetToOriginal,
+    undo,
+    redo,
+    getCanUndo,
+    getCanRedo,
   } = useWorkspaceStore();
 
   const [activeTab, setActiveTab] = useState('colors');
+  const [historyOpen, setHistoryOpen] = useState(false);
+
+  const canUndo = getCanUndo();
+  const canRedo = getCanRedo();
+
+  // 键盘快捷键（撤销/重做）
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // 忽略输入框中的按键
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+        return;
+      }
+
+      // Ctrl+Z 撤销
+      if (e.ctrlKey && e.key === 'z' && !e.shiftKey) {
+        e.preventDefault();
+        if (canUndo) undo();
+      }
+      // Ctrl+Shift+Z 重做
+      if (e.ctrlKey && e.shiftKey && e.key === 'Z') {
+        e.preventDefault();
+        if (canRedo) redo();
+      }
+      // Ctrl+Y 重做（备用快捷键）
+      if (e.ctrlKey && e.key === 'y') {
+        e.preventDefault();
+        if (canRedo) redo();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [canUndo, canRedo, undo, redo]);
 
   // 处理基本信息变化
   const handleBasicsChange = (field: keyof StyleBasics, value: string | string[]) => {
@@ -103,6 +141,7 @@ export function EditorPanel({ className }: EditorPanelProps) {
     : 'saved';
 
   return (
+    <>
     <Card className={cn('h-full flex flex-col overflow-hidden', className)}>
       {/* 头部 */}
       <CardHeader className="pb-3 border-b shrink-0">
@@ -111,11 +150,23 @@ export function EditorPanel({ className }: EditorPanelProps) {
             <CardTitle className="text-lg">设计编辑器</CardTitle>
             <CardDescription>配置您的设计变量</CardDescription>
           </div>
-          <AutoSaveIndicator
-            status={saveStatus}
-            lastSavedAt={lastSavedAt}
-            className="shrink-0"
-          />
+          <div className="flex items-center gap-1">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setHistoryOpen(true)}
+              className="gap-1.5"
+              title="历史记录 (Ctrl+Z/Ctrl+Shift+Z)"
+            >
+              <History className="w-4 h-4" />
+              <span className="hidden sm:inline">历史</span>
+            </Button>
+            <AutoSaveIndicator
+              status={saveStatus}
+              lastSavedAt={lastSavedAt}
+              className="shrink-0"
+            />
+          </div>
         </div>
       </CardHeader>
 
@@ -303,5 +354,7 @@ export function EditorPanel({ className }: EditorPanelProps) {
         </div>
       </div>
     </Card>
+    <HistoryPanel open={historyOpen} onOpenChange={setHistoryOpen} />
+    </>
   );
 }

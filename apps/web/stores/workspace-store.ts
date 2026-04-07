@@ -149,6 +149,68 @@ export const DEFAULT_TOKENS: DesignTokens = {
 };
 
 /**
+ * 生成历史记录描述
+ */
+function generateHistoryDescription(
+  changeType: HistoryChangeType,
+  tokens: DesignTokens
+): string {
+  switch (changeType) {
+    case 'color':
+      return `修改颜色 - 主色 ${tokens.colorPalette.primary}`;
+    case 'font':
+      return `修改字体 - 标题 ${tokens.fonts.heading}`;
+    case 'spacing':
+      return `修改间距 - md ${tokens.spacing.md}px`;
+    case 'radius':
+      return `修改圆角 - 中 ${tokens.borderRadius.medium}`;
+    case 'shadow':
+      return `修改阴影 - 中等 ${tokens.shadows.medium}`;
+    case 'auto-save':
+      return '自动保存';
+    default:
+      return '设计变量变更';
+  }
+}
+
+/**
+ * 检测设计变量变更类型
+ */
+function detectChangeType(
+  oldTokens: DesignTokens,
+  newTokens: Partial<DesignTokens>
+): HistoryChangeType {
+  if (newTokens.colorPalette) return 'color';
+  if (newTokens.fonts) return 'font';
+  if (newTokens.spacing) return 'spacing';
+  if (newTokens.borderRadius) return 'radius';
+  if (newTokens.shadows) return 'shadow';
+  return 'auto-save';
+}
+
+/**
+ * 历史记录变更类型
+ */
+export type HistoryChangeType =
+  | 'color'
+  | 'font'
+  | 'spacing'
+  | 'radius'
+  | 'shadow'
+  | 'auto-save';
+
+/**
+ * 历史记录条目
+ */
+export interface HistoryEntry {
+  id: string; // 时间戳生成，用于 key
+  timestamp: number; // Date.now()
+  changeType: HistoryChangeType;
+  description: string; // 如 "修改主色 #3B82F6 → #FF6B6B"
+  designTokens: DesignTokens; // 完整设计变量快照
+}
+
+/**
  * 工作台状态接口
  */
 interface WorkspaceState {
@@ -167,6 +229,11 @@ interface WorkspaceState {
   lastSavedAt: Date | null;
   lastEditedAt: Date | null; // 最后编辑时间（用于自动保存）
 
+  // 历史记录（阶段 1）
+  history: HistoryEntry[];
+  historyIndex: number;
+  maxHistory: number;
+
   // Actions
   setCurrentStyle: (style: WorkspaceStyle) => void;
   updateDesignTokens: (tokens: Partial<DesignTokens>) => void;
@@ -176,6 +243,16 @@ interface WorkspaceState {
   setIsDirty: (dirty: boolean) => void;
   setLastEditedAt: (date: Date) => void;
   clearWorkspace: () => void;
+
+  // 历史记录相关
+  pushHistory: (changeType: HistoryChangeType, description?: string) => void;
+  restoreTo: (index: number) => void;
+  undo: () => void;
+  redo: () => void;
+  clearHistory: () => void;
+  setMaxHistory: (max: number) => void;
+  getCanUndo: () => boolean;
+  getCanRedo: () => boolean;
 
   // 自动保存相关
   startAutoSave: () => void;
@@ -249,26 +326,121 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => {
     isDirty: false,
     lastSavedAt: null,
     lastEditedAt: null,
+    history: [],
+    historyIndex: -1,
+    maxHistory: 10,
 
-  setCurrentStyle: (style: WorkspaceStyle) => {
-    const tokens = style.design_tokens || { ...DEFAULT_TOKENS };
-    set({
-      currentStyle: style,
-      designTokens: { ...tokens },
-      basics: {
-        name: style.name,
-        description: style.description || '',
-        category: style.category_id,
-        tags: [],
-      },
-      status: style.status,
-      isDirty: false,
-      lastSavedAt: style.updated_at ? new Date(style.updated_at) : null,
-      lastEditedAt: null,
-    });
-  },
+    setCurrentStyle: (style: WorkspaceStyle) => {
+      const tokens = style.design_tokens || { ...DEFAULT_TOKENS };
+      set({
+        currentStyle: style,
+        designTokens: { ...tokens },
+        basics: {
+          name: style.name,
+          description: style.description || '',
+          category: style.category_id,
+          tags: [],
+        },
+        status: style.status,
+        isDirty: false,
+        lastSavedAt: style.updated_at ? new Date(style.updated_at) : null,
+        lastEditedAt: null,
+        history: [], // 加载新风格时清空历史
+        historyIndex: -1,
+      });
+    },
+
+    pushHistory: (changeType: HistoryChangeType, description?: string) => {
+      const { designTokens, history, historyIndex, maxHistory } = get();
+
+      // 生成描述
+      const defaultDescription = generateHistoryDescription(changeType, designTokens);
+
+      const newEntry: HistoryEntry = {
+        id: `h-${Date.now()}`,
+        timestamp: Date.now(),
+        changeType,
+        description: description || defaultDescription,
+        designTokens: { ...designTokens },
+      };
+
+      // 截断当前索引之后的历史（如果当前不在历史末尾）
+      const newHistory = history.slice(0, historyIndex + 1);
+      newHistory.push(newEntry);
+
+      // 超过最大限制时，移除最旧的记录
+      if (newHistory.length > maxHistory) {
+        newHistory.shift();
+      }
+
+      set({
+        history: newHistory,
+        historyIndex: newHistory.length - 1,
+      });
+    },
+
+    restoreTo: (index: number) => {
+      const { history } = get();
+      if (index >= 0 && index < history.length) {
+        const entry = history[index];
+        if (entry) {
+          set({
+            designTokens: { ...entry.designTokens },
+            historyIndex: index,
+            isDirty: true,
+          });
+        }
+      }
+    },
+
+    undo: () => {
+      const { history, historyIndex } = get();
+      if (historyIndex > 0) {
+        const prevEntry = history[historyIndex - 1];
+        if (prevEntry) {
+          set({
+            designTokens: { ...prevEntry.designTokens },
+            historyIndex: historyIndex - 1,
+            isDirty: true,
+          });
+        }
+      }
+    },
+
+    redo: () => {
+      const { history, historyIndex } = get();
+      if (historyIndex < history.length - 1) {
+        const nextEntry = history[historyIndex + 1];
+        if (nextEntry) {
+          set({
+            designTokens: { ...nextEntry.designTokens },
+            historyIndex: historyIndex + 1,
+            isDirty: true,
+          });
+        }
+      }
+    },
+
+    clearHistory: () => {
+      set({
+        history: [],
+        historyIndex: -1,
+      });
+    },
+
+    setMaxHistory: (max: number) => {
+      const state = get();
+      const newHistory = max > 0 ? state.history.slice(-max) : state.history;
+      set({
+        maxHistory: max,
+        history: newHistory,
+        historyIndex: Math.min(state.historyIndex, newHistory.length - 1),
+      });
+    },
 
   updateDesignTokens: (tokens: Partial<DesignTokens>) => {
+    const oldTokens = get().designTokens;
+
     set((state) => ({
       designTokens: {
         ...state.designTokens,
@@ -297,6 +469,10 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => {
       isDirty: true,
       lastEditedAt: new Date(),
     }));
+
+    // 自动记录历史（检测变更类型）
+    const changeType = detectChangeType(oldTokens, tokens);
+    get().pushHistory(changeType);
 
     // 编辑后 5 秒自动保存
     if (saveTimer) clearTimeout(saveTimer);
@@ -392,5 +568,12 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => {
   stopAutoSave,
   triggerSave,
   setSaveCallback,
+
+  // 计算属性（getter 函数）
+  getCanUndo: () => get().historyIndex > 0,
+  getCanRedo: () => {
+    const { history, historyIndex } = get();
+    return historyIndex < history.length - 1;
+  },
   };
 });
