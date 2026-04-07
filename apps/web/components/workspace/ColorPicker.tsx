@@ -367,12 +367,12 @@ export function ColorPicker({ label, value, onChange, description }: ColorPicker
           <span className="text-xs text-muted-foreground">{description}</span>
         )}
       </div>
-      <div className="flex gap-2 min-w-0">
+      <div className="flex flex-col gap-2">
         {/* 颜色预览和选择器 */}
         <Button
           ref={buttonRef}
           variant="outline"
-          className="w-10 h-10 p-0 border-2 flex-shrink-0"
+          className="w-12 h-12 p-0 border-2"
           style={{ backgroundColor: inputValue }}
           onClick={() => setOpen(!open)}
           type="button"
@@ -399,7 +399,7 @@ export function ColorPicker({ label, value, onChange, description }: ColorPicker
             }
           }}
           placeholder="#000000"
-          className="flex-1 min-w-[100px] font-mono text-sm"
+          className="w-full font-mono text-sm text-center tracking-wide py-1.5"
         />
       </div>
 
