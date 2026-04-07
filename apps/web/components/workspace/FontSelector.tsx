@@ -1,8 +1,7 @@
 'use client';
 
 import React, { useState, useCallback, useEffect } from 'react';
-import { Label } from '@/components/ui/label';
-import { Slider } from '@/components/ui/slider';
+import { SliderWithPreview } from '@/components/ui/slider-with-preview';
 import {
   Select,
   SelectContent,
@@ -10,8 +9,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
-import { cn } from '@/lib/utils';
 
 interface FontSelectorProps {
   heading: string;
@@ -210,50 +207,30 @@ export function FontSelector({
 
         <div className="space-y-4">
           {/* 标题字重 */}
-          <div className="space-y-2">
-            <div className="flex justify-between">
-              <Label className="text-sm">标题字重</Label>
-              <span className="text-xs text-muted-foreground">{localValues.headingWeight}</span>
-            </div>
-            <Slider
-              value={[localValues.headingWeight]}
-              min={300}
-              max={800}
-              step={100}
-              onValueChange={(e) => {
-                const values = Array.isArray(e) ? e : [e];
-                handleSliderChange('headingWeight', values[0]);
-              }}
-              className="w-full"
-            />
-            <div className="flex justify-between text-xs text-muted-foreground">
-              <span>Light</span>
-              <span>Bold</span>
-            </div>
-          </div>
+          <SliderWithPreview
+            value={localValues.headingWeight}
+            min={300}
+            max={800}
+            step={100}
+            onValueChange={(newValue) => handleSliderChange('headingWeight', newValue)}
+            label="标题字重"
+            showPreview={true}
+            minLabel="Light"
+            maxLabel="Bold"
+          />
 
           {/* 正文字重 */}
-          <div className="space-y-2">
-            <div className="flex justify-between">
-              <Label className="text-sm">正文字重</Label>
-              <span className="text-xs text-muted-foreground">{localValues.bodyWeight}</span>
-            </div>
-            <Slider
-              value={[localValues.bodyWeight]}
-              min={300}
-              max={700}
-              step={100}
-              onValueChange={(e) => {
-                const values = Array.isArray(e) ? e : [e];
-                handleSliderChange('bodyWeight', values[0]);
-              }}
-              className="w-full"
-            />
-            <div className="flex justify-between text-xs text-muted-foreground">
-              <span>Light</span>
-              <span>Bold</span>
-            </div>
-          </div>
+          <SliderWithPreview
+            value={localValues.bodyWeight}
+            min={300}
+            max={700}
+            step={100}
+            onValueChange={(newValue) => handleSliderChange('bodyWeight', newValue)}
+            label="正文字重"
+            showPreview={true}
+            minLabel="Light"
+            maxLabel="Bold"
+          />
         </div>
       </div>
 
@@ -268,16 +245,13 @@ export function FontSelector({
               <Label className="text-sm">标题行高</Label>
               <span className="text-xs text-muted-foreground">{localValues.headingLineHeight}</span>
             </div>
-            <Slider
-              value={[localValues.headingLineHeight]}
+            <SliderWithPreview
+              value={localValues.headingLineHeight}
               min={1}
               max={2}
               step={0.1}
-              onValueChange={(e) => {
-                const values = Array.isArray(e) ? e : [e];
-                handleSliderChange('headingLineHeight', values[0]);
-              }}
-              className="w-full"
+              onValueChange={(newValue) => handleSliderChange('headingLineHeight', newValue)}
+              showPreview={false}
             />
             <Select
               value={String(localValues.headingLineHeight)}
@@ -302,16 +276,13 @@ export function FontSelector({
               <Label className="text-sm">正文行高</Label>
               <span className="text-xs text-muted-foreground">{localValues.bodyLineHeight}</span>
             </div>
-            <Slider
-              value={[localValues.bodyLineHeight]}
+            <SliderWithPreview
+              value={localValues.bodyLineHeight}
               min={1}
               max={2}
               step={0.1}
-              onValueChange={(e) => {
-                const values = Array.isArray(e) ? e : [e];
-                handleSliderChange('bodyLineHeight', values[0]);
-              }}
-              className="w-full"
+              onValueChange={(newValue) => handleSliderChange('bodyLineHeight', newValue)}
+              showPreview={false}
             />
             <Select
               value={String(localValues.bodyLineHeight)}

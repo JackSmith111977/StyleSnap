@@ -1,18 +1,8 @@
 'use client';
 
 import React, { useState, useCallback, useEffect } from 'react';
-import { Label } from '@/components/ui/label';
-import { Slider } from '@/components/ui/slider';
-import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { SliderWithPreview } from '@/components/ui/slider-with-preview';
 
 interface SpacingControlProps {
   xs: number;
@@ -128,50 +118,19 @@ export function SpacingControl({
       {/* 间距滑块组 */}
       <div className="space-y-4">
         {(Object.keys(SPACING_LABELS) as Array<'xs' | 'sm' | 'md' | 'lg' | 'xl'>).map((key) => (
-          <div key={key} className="space-y-2">
-            <div className="flex items-center justify-between">
-              <div>
-                <Label className="text-sm font-medium">{SPACING_LABELS[key].label}</Label>
-                <p className="text-xs text-muted-foreground">
-                  {SPACING_LABELS[key].usage}
-                </p>
-              </div>
-              <div className="flex items-center gap-2">
-                <Input
-                  type="number"
-                  value={localValues[key]}
-                  onChange={(e) =>
-                    handleSpacingChange(key, parseInt(e.target.value) || 0)
-                  }
-                  className={cn(
-                    "w-16 h-8 text-right text-sm",
-                    localValues[key] !== { xs, sm, md, lg, xl }[key] && "border-primary"
-                  )}
-                  min={0}
-                  max={100}
-                />
-                <span className="text-xs text-muted-foreground w-8">px</span>
-              </div>
-            </div>
-            <Slider
-              value={[localValues[key]]}
-              min={0}
-              max={64}
-              step={2}
-              onValueChange={(e) => {
-                const values = Array.isArray(e) ? e : [e];
-                handleSpacingChange(key, values[0]);
-              }}
-              className="w-full"
-            />
-            {/* 间距预览条 */}
-            <div className="relative h-4 bg-muted rounded overflow-hidden">
-              <div
-                className="absolute left-0 top-0 h-full bg-primary/50 transition-all duration-100"
-                style={{ width: `${Math.min(localValues[key] * 2, 100)}%` }}
-              />
-            </div>
-          </div>
+          <SliderWithPreview
+            key={key}
+            value={localValues[key]}
+            min={0}
+            max={64}
+            step={2}
+            onValueChange={(newValue) => handleSpacingChange(key, newValue)}
+            label={SPACING_LABELS[key].label}
+            labelSuffix="px"
+            description={SPACING_LABELS[key].usage}
+            showPreview={true}
+            previewColor="bg-primary/50"
+          />
         ))}
       </div>
 

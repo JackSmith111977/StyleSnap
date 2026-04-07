@@ -1,11 +1,8 @@
 'use client';
 
 import React, { useState, useCallback, useEffect } from 'react';
-import { Label } from '@/components/ui/label';
-import { Slider } from '@/components/ui/slider';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { SliderWithPreview } from '@/components/ui/slider-with-preview';
 
 interface BorderRadiusControlProps {
   small: string;
@@ -139,104 +136,41 @@ export function BorderRadiusControl({
 
       {/* 圆角滑块组 */}
       <div className="space-y-4">
-        {/* Small */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <Label className="text-sm font-medium">
-              小圆角 (按钮、标签)
-            </Label>
-            <div className="flex items-center gap-2">
-              <Input
-                type="number"
-                value={localValues.small}
-                onChange={(e) =>
-                  handleRadiusChange('small', parseInt(e.target.value) || 0)
-                }
-                className="w-16 h-8 text-right text-sm"
-                min={0}
-                max={64}
-              />
-              <span className="text-xs text-muted-foreground w-8">px</span>
-            </div>
-          </div>
-          <Slider
-            value={[localValues.small]}
-            min={0}
-            max={32}
-            step={1}
-            onValueChange={(e) => {
-              const values = Array.isArray(e) ? e : [e];
-              handleRadiusChange('small', values[0]);
-            }}
-            className="w-full"
-          />
-        </div>
+        <SliderWithPreview
+          value={localValues.small}
+          min={0}
+          max={32}
+          step={1}
+          onValueChange={(newValue) => handleRadiusChange('small', newValue)}
+          label="小圆角"
+          labelSuffix="px"
+          description="按钮、标签"
+          showPreview={true}
+        />
 
-        {/* Medium */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <Label className="text-sm font-medium">
-              中圆角 (卡片、输入框)
-            </Label>
-            <div className="flex items-center gap-2">
-              <Input
-                type="number"
-                value={localValues.medium}
-                onChange={(e) =>
-                  handleRadiusChange('medium', parseInt(e.target.value) || 0)
-                }
-                className="w-16 h-8 text-right text-sm"
-                min={0}
-                max={64}
-              />
-              <span className="text-xs text-muted-foreground w-8">px</span>
-            </div>
-          </div>
-          <Slider
-            value={[localValues.medium]}
-            min={0}
-            max={48}
-            step={2}
-            onValueChange={(e) => {
-              const values = Array.isArray(e) ? e : [e];
-              handleRadiusChange('medium', values[0]);
-            }}
-            className="w-full"
-          />
-        </div>
+        <SliderWithPreview
+          value={localValues.medium}
+          min={0}
+          max={48}
+          step={2}
+          onValueChange={(newValue) => handleRadiusChange('medium', newValue)}
+          label="中圆角"
+          labelSuffix="px"
+          description="卡片、输入框"
+          showPreview={true}
+        />
 
-        {/* Large */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <Label className="text-sm font-medium">
-              大圆角 (大容器、头像)
-            </Label>
-            <div className="flex items-center gap-2">
-              <Input
-                type="number"
-                value={localValues.large}
-                onChange={(e) =>
-                  handleRadiusChange('large', parseInt(e.target.value) || 0)
-                }
-                className="w-16 h-8 text-right text-sm"
-                min={0}
-                max={64}
-              />
-              <span className="text-xs text-muted-foreground w-8">px</span>
-            </div>
-          </div>
-          <Slider
-            value={[localValues.large]}
-            min={0}
-            max={64}
-            step={4}
-            onValueChange={(e) => {
-              const values = Array.isArray(e) ? e : [e];
-              handleRadiusChange('large', values[0]);
-            }}
-            className="w-full"
-          />
-        </div>
+        <SliderWithPreview
+          value={localValues.large}
+          min={0}
+          max={64}
+          step={4}
+          onValueChange={(newValue) => handleRadiusChange('large', newValue)}
+          label="大圆角"
+          labelSuffix="px"
+          description="大容器、头像"
+          showPreview={true}
+        />
       </div>
 
       {/* 圆角效果预览 */}
