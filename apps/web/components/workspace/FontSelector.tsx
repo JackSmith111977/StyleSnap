@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useCallback, useEffect } from 'react';
+import { Label } from '@/components/ui/label';
 import { SliderWithPreview } from '@/components/ui/slider-with-preview';
 import {
   Select,
