@@ -5,21 +5,12 @@ import { StyleSelector } from '@/components/workspace/StyleSelector';
 import { EditorPanel } from '@/components/workspace/EditorPanel';
 import { CanvasPreview } from '@/components/workspace/CanvasPreview';
 import { CodeExportDialog } from '@/components/workspace/CodeExportDialog';
+import { Button } from '@/components/ui/button';
 import { Code2 } from 'lucide-react';
-import { StylePreview } from '@/components/preview/style-preview';
 import { useWorkspaceStore, type DesignTokens as WorkspaceDesignTokens, type WorkspaceStyle } from '@/stores/workspace-store';
 import { type DesignTokens as PreviewDesignTokens } from '@/stores/preview-editor-store';
 import { getStyleDetail, createNewStyle, saveStyleDraft } from './actions/workspace-actions';
-import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from '@/components/ui/card';
 import { toast } from 'sonner';
-import { useRouter } from 'next/navigation';
 
 /**
  * 分类选项（value 必须与数据库 categories.name_en 完全匹配）
@@ -52,13 +43,11 @@ function convertToPreviewTokens(workspace: WorkspaceDesignTokens): PreviewDesign
 }
 
 export default function WorkspacePage() {
-  const router = useRouter();
   const { currentStyle, setCurrentStyle, clearWorkspace, designTokens, startAutoSave, stopAutoSave, setSaveCallback } = useWorkspaceStore();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newStyleName, setNewStyleName] = useState('');
   const [newStyleCategory, setNewStyleCategory] = useState<string>(CATEGORY_OPTIONS[0]?.value || 'minimalist');
   const [isCreating, setIsCreating] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
 
   // 设置保存回调 - 使用 useRef 确保始终使用最新的 currentStyle
@@ -99,7 +88,7 @@ export default function WorkspacePage() {
     return () => {
       stopAutoSave();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [setSaveCallback, startAutoSave, stopAutoSave]);
 
   /**
@@ -146,7 +135,7 @@ export default function WorkspacePage() {
         setShowCreateModal(false);
         setNewStyleName('');
         // 跳转到新风格的编辑页面
-        handleStyleSelect(response.styleId);
+        void handleStyleSelect(response.styleId);
       } else {
         toast.error(response.error || '创建失败');
       }
