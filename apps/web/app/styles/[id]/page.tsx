@@ -12,7 +12,6 @@ import { FavoriteButton } from '@/components/favorite-button'
 import { CommentList } from '@/components/comment-list'
 import { CommentForm } from '@/components/comment-form'
 import { RelatedStyles } from '@/components/related-styles'
-import { LivePreviewEditor } from '@/components/preview'
 import { StylePreview } from '@/components/preview/style-preview'
 import { ShareButton } from '@/components/share'
 import { AuthorCard } from '@/components/follow'
@@ -183,12 +182,6 @@ export default async function StyleDetailPage({ params }: StyleDetailPageProps) 
               { language: 'html', title: 'Tailwind', code: style.code_tailwind },
             ]}
           />
-        </div>
-
-        {/* 实时预览编辑器 */}
-        <div className="mt-12">
-          <h2 className="text-2xl font-bold mb-6">实时预览编辑器</h2>
-          <LivePreviewEditor styleName={style.title} />
         </div>
 
         {/* 作者信息卡片 */}
