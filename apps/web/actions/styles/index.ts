@@ -18,6 +18,9 @@ export interface Style {
   code_css: string | null
   code_react: string | null
   code_tailwind: string | null
+  code_css_modules: string | null    // 迁移 0028 新增：CSS Modules 组件样式
+  code_readme: string | null         // 迁移 0028 新增：README.md 文档
+  design_tokens: Record<string, unknown> | null  // 设计变量 JSONB
   preview_light: string | null
   preview_dark: string | null
   preview_images: Record<string, string> | null

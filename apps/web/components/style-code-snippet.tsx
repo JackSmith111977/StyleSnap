@@ -5,7 +5,8 @@ import { CodeBlock } from '@/components/code-block'
 import { Code } from 'lucide-react'
 
 interface CodeSnippet {
-  language: 'html' | 'css' | 'tsx' | 'typescript'
+  id?: string  // 唯一标识符，用于区分相同语言的多个片段
+  language: 'html' | 'css' | 'tsx' | 'typescript' | 'markdown'
   title: string
   code: string | null
 }
@@ -28,27 +29,22 @@ export function CodeSnippetDisplay({ snippets }: CodeSnippetDisplayProps) {
     )
   }
 
-  // 默认选择第一个片段
-  const defaultValue = validSnippets[0]?.language ?? 'html'
+  // 使用 id 或 language 作为 defaultValue（优先使用 id）
+  const defaultValue = validSnippets[0]?.id ?? validSnippets[0]?.language ?? 'html'
 
   return (
-    <div className="space-y-6">
-      <h2 className="flex items-center gap-2 text-2xl font-bold">
-        <Code className="h-6 w-6" />
-        代码示例
-      </h2>
-
+    <div className="space-y-4">
       <Tabs defaultValue={defaultValue} className="w-full">
         <TabsList className="w-full justify-start overflow-x-auto">
           {validSnippets.map((snippet) => (
-            <TabsTrigger key={snippet.language} value={snippet.language}>
+            <TabsTrigger key={snippet.id ?? snippet.language} value={snippet.id ?? snippet.language}>
               {snippet.title}
             </TabsTrigger>
           ))}
         </TabsList>
 
         {validSnippets.map((snippet) => (
-          <TabsContent key={snippet.language} value={snippet.language} className="mt-4">
+          <TabsContent key={snippet.id ?? snippet.language} value={snippet.id ?? snippet.language} className="mt-4">
             <CodeBlock
               code={snippet.code!}
               language={snippet.language}

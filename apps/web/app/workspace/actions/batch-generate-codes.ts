@@ -1,6 +1,9 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
+import { env } from '@/env';
 import { generateCSS, generateHTML, generateREADME } from '@/lib/code-generators';
 import { type DesignTokens, type ColorTokens, type FontTokens, type SpacingTokens, type BorderRadiusTokens, type ShadowTokens } from '@/stores/workspace-store';
 
@@ -13,6 +16,7 @@ export interface BatchCodeGenerationResult {
   failedCount?: number;
   errors?: Array<{ styleId: string; styleName: string; error: string }>;
   message?: string;
+  error?: string;  // 用于单条错误消息
 }
 
 /**
@@ -94,7 +98,34 @@ function parseSpacingValue(value: any): number | null {
 }
 
 /**
- * 为单个风格生成代码并保存
+ * 创建 Service Role 客户端（绕过 RLS，仅用于管理员操作）
+ */
+async function createServiceRoleClient() {
+  const cookieStore = await cookies();
+  return createServerClient(
+    env.NEXT_PUBLIC_SUPABASE_URL,
+    env.SUPABASE_SERVICE_ROLE_KEY,
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll();
+        },
+        setAll(cookiesToSet) {
+          try {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            );
+          } catch {
+            // Called from Server Component, ignore
+          }
+        },
+      },
+    }
+  );
+}
+
+/**
+ * 为单个风格生成代码并保存（使用 RPC 函数绕过 RLS）
  */
 async function generateStyleCode(
   supabase: any,
@@ -127,20 +158,22 @@ async function generateStyleCode(
     const html = generateHTML(tokens, styleName);
     const readme = generateREADME({ styleName, tokens });
 
-    // 更新数据库 - 存储完整的设计系统代码包
-    const { error: updateError } = await supabase
-      .from('styles')
-      .update({
-        code_css: css.variables,           // CSS Variables (:root {...})
-        code_css_modules: css.modules,     // CSS Modules 组件样式
-        code_html: html.index,             // 完整 HTML 页面
-        code_readme: readme,               // README.md 文档
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', styleId);
+    // 使用 RPC 函数更新数据库（绕过 RLS）
+    const { data: updateResult, error: updateError } = await supabase
+      .rpc('update_style_codes', {
+        p_style_id: styleId,
+        p_code_css: css.variables,
+        p_code_css_modules: css.modules,
+        p_code_html: html.index,
+        p_code_readme: readme,
+      });
 
     if (updateError) {
       return { success: false, error: `更新数据库失败：${updateError.message}` };
+    }
+
+    if (!updateResult) {
+      return { success: false, error: `风格 ${styleId} 不存在，未更新` };
     }
 
     return { success: true };
@@ -157,7 +190,8 @@ async function generateStyleCode(
  */
 export async function batchGeneratePresetStyleCodes(): Promise<BatchCodeGenerationResult> {
   try {
-    const supabase = await createClient();
+    // 使用 Service Role 客户端绕过 RLS 限制（管理员操作）
+    const supabase = await createServiceRoleClient();
 
     // 获取所有预设风格（10 个分类各一个）
     const { data: styles, error: fetchError } = await supabase
@@ -217,7 +251,8 @@ export async function batchGeneratePresetStyleCodes(): Promise<BatchCodeGenerati
  */
 export async function generateCodeForStyle(styleId: string): Promise<BatchCodeGenerationResult> {
   try {
-    const supabase = await createClient();
+    // 使用 Service Role 客户端绕过 RLS 限制（管理员操作）
+    const supabase = await createServiceRoleClient();
 
     // 获取风格信息
     const { data: style, error: fetchError } = await supabase

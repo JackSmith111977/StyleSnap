@@ -20,6 +20,22 @@ import Link from 'next/link'
 import { Eye, Heart, MessageCircle, FileCode } from 'lucide-react'
 import { type Metadata } from 'next'
 import { getCurrentUser } from '@/lib/auth'
+import { type DesignTokens as PreviewDesignTokens } from '@/stores/preview-editor-store'
+import { type DesignTokens as WorkspaceDesignTokens } from '@/stores/workspace-store'
+
+/**
+ * 将 Preview DesignTokens 转换为 Workspace DesignTokens
+ * 主要差异：colors -> colorPalette
+ */
+function convertToWorkspaceTokens(preview: PreviewDesignTokens): WorkspaceDesignTokens {
+  return {
+    colorPalette: preview.colors,
+    fonts: preview.fonts,
+    spacing: preview.spacing,
+    borderRadius: preview.borderRadius,
+    shadows: preview.shadows,
+  };
+}
 
 interface StyleDetailPageProps {
   params: Promise<{
@@ -85,7 +101,9 @@ export default async function StyleDetailPage({ params }: StyleDetailPageProps) 
 
   // 获取设计变量（用于风格预览组件）
   const designTokensResult = await getStyleDesignTokens(id)
-  const designTokens = designTokensResult.success ? designTokensResult.data : undefined
+  const previewDesignTokens = designTokensResult.success ? designTokensResult.data : null
+  // 转换为 Workspace DesignTokens 格式（用于 CodeViewer ZIP 导出）
+  const workspaceDesignTokens = previewDesignTokens ? convertToWorkspaceTokens(previewDesignTokens) : null
 
   // 获取作者信息（包含关注状态）
   const authorInfoResult = style.author_id ? await getAuthorInfo(style.author_id) : null
@@ -163,13 +181,13 @@ export default async function StyleDetailPage({ params }: StyleDetailPageProps) 
         </div>
 
         {/* 设计变量展示 */}
-        {designTokens && <StyleDetail designTokens={designTokens} />}
+        {previewDesignTokens && <StyleDetail designTokens={previewDesignTokens} />}
 
         {/* 风格预览组件 */}
-        {designTokens && (
+        {previewDesignTokens && (
           <div className="mt-8">
             <h2 className="text-2xl font-bold mb-6">风格预览</h2>
-            <StylePreview tokens={designTokens} />
+            <StylePreview tokens={previewDesignTokens} />
           </div>
         )}
 
@@ -187,15 +205,15 @@ export default async function StyleDetailPage({ params }: StyleDetailPageProps) 
               codeCssModules={style.code_css_modules}
               codeHtml={style.code_html}
               codeReadme={style.code_readme}
-              designTokens={designTokens || undefined}
+              designTokens={workspaceDesignTokens}
             />
           </div>
           <CodeSnippetDisplay
             snippets={[
-              { language: 'html', title: 'HTML', code: style.code_html },
-              { language: 'css', title: 'CSS', code: style.code_css },
-              { language: 'css', title: 'CSS Modules', code: style.code_css_modules },
-              { language: 'markdown', title: 'README', code: style.code_readme },
+              { id: 'html', language: 'html', title: 'HTML', code: style.code_html },
+              { id: 'css-vars', language: 'css', title: 'CSS Variables', code: style.code_css },
+              { id: 'css-modules', language: 'css', title: 'CSS Modules', code: style.code_css_modules },
+              { id: 'readme', language: 'markdown', title: 'README', code: style.code_readme },
             ]}
           />
         </div>

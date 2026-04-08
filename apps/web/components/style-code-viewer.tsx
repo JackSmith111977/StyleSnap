@@ -8,7 +8,7 @@ import { CodeBlock } from '@/components/code-block';
 import { Copy, Download, FileCode, ChevronRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { generateZipBlob } from '@/lib/code-generators/zip-export';
-import { type DesignTokens } from '@/stores/workspace-store';
+import { type DesignTokens as WorkspaceDesignTokens } from '@/stores/workspace-store';
 
 interface StyleCodeViewerProps {
   styleId: string;
@@ -19,7 +19,7 @@ interface StyleCodeViewerProps {
   codeHtml?: string | null;        // 完整 HTML 页面
   codeReadme?: string | null;      // README.md 文档
   // 设计变量（用于 ZIP 生成）
-  designTokens?: DesignTokens | null;
+  designTokens?: WorkspaceDesignTokens | null;
 }
 
 /**

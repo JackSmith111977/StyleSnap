@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import Prism from 'prismjs'
 import 'prismjs/components/prism-markup'
+import 'prismjs/components/prism-markdown'
 import 'prismjs/components/prism-css'
 import 'prismjs/components/prism-jsx'
 import 'prismjs/components/prism-tsx'
@@ -16,7 +17,7 @@ import { toast } from 'sonner'
 
 interface CodeBlockProps {
   code: string
-  language: 'html' | 'css' | 'jsx' | 'tsx' | 'typescript' | 'javascript' | 'bash' | 'json'
+  language: 'html' | 'css' | 'jsx' | 'tsx' | 'typescript' | 'javascript' | 'bash' | 'json' | 'markdown'
   title?: string
   showLineNumbers?: boolean
   maxHeight?: number  // 代码区域最大高度（px），默认 400
