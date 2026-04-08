@@ -92,7 +92,7 @@ describe('SpacingControl', () => {
     vi.useFakeTimers();
     render(<SpacingControl {...defaultProps} onChange={onChange} />);
     const inputs = screen.getAllByTestId('spacing-input');
-    fireEvent.change(inputs[0], { target: { value: '10' } });
+    fireEvent.change(inputs[0]!, { target: { value: '10' } });
     vi.advanceTimersByTime(100);
     expect(onChange).toHaveBeenCalledWith({ xs: 10 });
     vi.useRealTimers();
@@ -103,7 +103,7 @@ describe('SpacingControl', () => {
     vi.useFakeTimers();
     render(<SpacingControl {...defaultProps} onChange={onChange} />);
     const inputs = screen.getAllByTestId('spacing-input');
-    fireEvent.change(inputs[0], { target: { value: '150' } });
+    fireEvent.change(inputs[0]!, { target: { value: '150' } });
     vi.advanceTimersByTime(100);
     expect(onChange).toHaveBeenCalledWith({ xs: 100 });
     vi.useRealTimers();
@@ -112,8 +112,8 @@ describe('SpacingControl', () => {
   it('滑块应该显示当前值', () => {
     render(<SpacingControl {...defaultProps} />);
     const sliders = screen.getAllByTestId('spacing-slider');
-    expect(sliders[0]).toHaveAttribute('data-value', '4');
-    expect(sliders[4]).toHaveAttribute('data-value', '32');
+    expect(sliders[0]!).toHaveAttribute('data-value', '4');
+    expect(sliders[4]!).toHaveAttribute('data-value', '32');
   });
 
   it('点击滑块应该调用 onChange', async () => {

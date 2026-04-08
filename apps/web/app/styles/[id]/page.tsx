@@ -184,17 +184,18 @@ export default async function StyleDetailPage({ params }: StyleDetailPageProps) 
               styleId={style.id}
               styleName={style.title}
               codeCss={style.code_css}
+              codeCssModules={style.code_css_modules}
               codeHtml={style.code_html}
-              codeReact={style.code_react}
-              codeTailwind={style.code_tailwind}
+              codeReadme={style.code_readme}
+              designTokens={designTokens || undefined}
             />
           </div>
           <CodeSnippetDisplay
             snippets={[
               { language: 'html', title: 'HTML', code: style.code_html },
               { language: 'css', title: 'CSS', code: style.code_css },
-              { language: 'tsx', title: 'React', code: style.code_react },
-              { language: 'html', title: 'Tailwind', code: style.code_tailwind },
+              { language: 'css', title: 'CSS Modules', code: style.code_css_modules },
+              { language: 'markdown', title: 'README', code: style.code_readme },
             ]}
           />
         </div>

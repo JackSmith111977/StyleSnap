@@ -1,0 +1,161 @@
+import { describe, it, expect } from 'vitest';
+import { generateREADME } from '@/lib/code-generators/readme-generator';
+import type { DesignTokens } from '@/stores/workspace-store';
+
+const mockTokens: DesignTokens = {
+  colorPalette: {
+    primary: '#3b82f6',
+    secondary: '#8b5cf6',
+    background: '#ffffff',
+    surface: '#f8fafc',
+    text: '#1e293b',
+    textMuted: '#64748b',
+    border: '#e2e8f0',
+    accent: '#f59e0b',
+  },
+  fonts: {
+    heading: 'Inter',
+    body: 'Roboto',
+    mono: 'Fira Code',
+    headingWeight: 700,
+    bodyWeight: 400,
+    headingLineHeight: 1.2,
+    bodyLineHeight: 1.5,
+  },
+  spacing: {
+    xs: 4,
+    sm: 8,
+    md: 16,
+    lg: 24,
+    xl: 32,
+  },
+  borderRadius: {
+    small: 4,
+    medium: 8,
+    large: 16,
+  },
+  shadows: {
+    light: '0 1px 2px rgba(0,0,0,0.05)',
+    medium: '0 4px 6px rgba(0,0,0,0.1)',
+    heavy: '0 10px 15px rgba(0,0,0,0.1)',
+  },
+};
+
+describe('generateREADME', () => {
+  it('should generate README content', () => {
+    const result = generateREADME({ styleName: 'Test Style', tokens: mockTokens });
+
+    expect(result).toContain('# Test Style Design System');
+    expect(result).toContain('> 由 StyleSnap 生成');
+  });
+
+  it('should include file description table', () => {
+    const result = generateREADME({ styleName: 'Test Style', tokens: mockTokens });
+
+    expect(result).toContain('| 文件 | 说明 |');
+    expect(result).toContain('`styles.css`');
+    expect(result).toContain('`styles.module.css`');
+    expect(result).toContain('`index.html`');
+    expect(result).toContain('`README.md`');
+  });
+
+  it('should include quick start guide', () => {
+    const result = generateREADME({ styleName: 'Test Style', tokens: mockTokens });
+
+    expect(result).toContain('## 🚀 快速开始');
+    expect(result).toContain('### 方式一：直接使用（推荐）');
+    expect(result).toContain('### 方式二：CSS Modules（React/Vue）');
+    expect(result).toContain('### 方式三：Tailwind CSS 集成');
+  });
+
+  it('should include design variables table', () => {
+    const result = generateREADME({ styleName: 'Test Style', tokens: mockTokens });
+
+    expect(result).toContain('## 🎨 设计变量');
+    expect(result).toContain('### 配色方案');
+    expect(result).toContain('### 排版系统');
+    expect(result).toContain('### 间距系统');
+    expect(result).toContain('### 圆角配置');
+    expect(result).toContain('### 阴影配置');
+  });
+
+  it('should include correct color values', () => {
+    const result = generateREADME({ styleName: 'Test Style', tokens: mockTokens });
+
+    expect(result).toContain('| `--color-primary` | #3b82f6 |');
+    expect(result).toContain('| `--color-secondary` | #8b5cf6 |');
+    expect(result).toContain('| `--color-background` | #ffffff |');
+  });
+
+  it('should include correct font values', () => {
+    const result = generateREADME({ styleName: 'Test Style', tokens: mockTokens });
+
+    expect(result).toContain('| `--font-heading` | Inter |');
+    expect(result).toContain('| `--font-body` | Roboto |');
+    expect(result).toContain('| `--font-heading-weight` | 700 |');
+  });
+
+  it('should include correct spacing values', () => {
+    const result = generateREADME({ styleName: 'Test Style', tokens: mockTokens });
+
+    expect(result).toContain('| `--spacing-xs` | 4px |');
+    expect(result).toContain('| `--spacing-sm` | 8px |');
+    expect(result).toContain('| `--spacing-md` | 16px |');
+  });
+
+  it('should include correct border radius values', () => {
+    const result = generateREADME({ styleName: 'Test Style', tokens: mockTokens });
+
+    expect(result).toContain('| `--radius-small` | 4 |');
+    expect(result).toContain('| `--radius-medium` | 8 |');
+    expect(result).toContain('| `--radius-large` | 16 |');
+  });
+
+  it('should include correct shadow values', () => {
+    const result = generateREADME({ styleName: 'Test Style', tokens: mockTokens });
+
+    expect(result).toContain('| `--shadow-light` | 0 1px 2px rgba(0,0,0,0.05) |');
+    expect(result).toContain('| `--shadow-medium` | 0 4px 6px rgba(0,0,0,0.1) |');
+  });
+
+  it('should include responsive design note', () => {
+    const result = generateREADME({ styleName: 'Test Style', tokens: mockTokens });
+
+    expect(result).toContain('## 📱 响应式支持');
+    expect(result).toContain('所有组件样式均为响应式设计');
+  });
+
+  it('should include customization guide', () => {
+    const result = generateREADME({ styleName: 'Test Style', tokens: mockTokens });
+
+    expect(result).toContain('## 🔧 定制建议');
+    expect(result).toContain('编辑 `styles.css` 中的 `root {...}` 块');
+  });
+
+  it('should include license section', () => {
+    const result = generateREADME({ styleName: 'Test Style', tokens: mockTokens });
+
+    expect(result).toContain('## 📄 License');
+    expect(result).toContain('本设计系统由 StyleSnap 生成，可自由用于商业和个人项目。');
+  });
+
+  it('should include StyleSnap footer', () => {
+    const result = generateREADME({ styleName: 'Test Style', tokens: mockTokens });
+
+    expect(result).toContain('**Generated by [StyleSnap](https://stylesnap.dev)**');
+  });
+});
+
+describe('generateREADME - Different Style Names', () => {
+  it('should use provided style name', () => {
+    const result = generateREADME({ styleName: 'Minimalist Pro', tokens: mockTokens });
+
+    expect(result).toContain('# Minimalist Pro Design System');
+  });
+
+  it('should handle special characters in style name', () => {
+    const result = generateREADME({ styleName: 'My-Design_System.v2', tokens: mockTokens });
+
+    expect(result).toContain('# My-Design_System.v2 Design System');
+  });
+});

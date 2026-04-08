@@ -143,28 +143,44 @@ export function EditorPanel({ className }: EditorPanelProps) {
   return (
     <>
     <Card className={cn('h-full flex flex-col overflow-hidden', className)}>
-      {/* 头部 */}
-      <CardHeader className="pb-3 border-b shrink-0">
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle className="text-lg">设计编辑器</CardTitle>
-            <CardDescription>配置您的设计变量</CardDescription>
+      {/* 头部 - 集成所有功能和状态 */}
+      <CardHeader className="pb-2 border-b shrink-0">
+        <div className="flex flex-col gap-2">
+          {/* 第一行：标题和操作按钮 */}
+          <div className="flex items-center justify-between gap-2">
+            <CardTitle className="text-lg shrink-0">设计编辑器</CardTitle>
+            <div className="flex items-center gap-1 shrink-0">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={resetToOriginal}
+                className="gap-1.5 h-8"
+                title="重置为原始状态"
+              >
+                <RotateCcw className="w-4 h-4" />
+                <span className="hidden sm:inline">重置</span>
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setHistoryOpen(true)}
+                className="gap-1.5 h-8"
+                title="历史记录 (Ctrl+Z/Ctrl+Shift+Z)"
+              >
+                <History className="w-4 h-4" />
+                <span className="hidden sm:inline">历史</span>
+              </Button>
+            </div>
           </div>
-          <div className="flex items-center gap-1">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setHistoryOpen(true)}
-              className="gap-1.5"
-              title="历史记录 (Ctrl+Z/Ctrl+Shift+Z)"
-            >
-              <History className="w-4 h-4" />
-              <span className="hidden sm:inline">历史</span>
-            </Button>
+          {/* 第二行：状态和保存指示器 */}
+          <div className="flex items-center justify-between gap-2 text-xs">
+            <div className="text-muted-foreground capitalize">
+              状态：<span className={status === 'draft' ? 'text-amber-600' : 'text-green-600'}>{status}</span>
+            </div>
             <AutoSaveIndicator
               status={saveStatus}
               lastSavedAt={lastSavedAt}
-              className="shrink-0"
+              variant="compact"
             />
           </div>
         </div>
@@ -336,23 +352,6 @@ export function EditorPanel({ className }: EditorPanelProps) {
         </Tabs>
       </CardContent>
 
-      {/* 底部操作栏 */}
-      <div className="p-4 border-t bg-muted/30">
-        <div className="flex items-center justify-between">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={resetToOriginal}
-            className="gap-1.5"
-          >
-            <RotateCcw className="w-3.5 h-3.5" />
-            重置
-          </Button>
-          <div className="text-xs text-muted-foreground">
-            状态：<span className="font-medium capitalize">{status}</span>
-          </div>
-        </div>
-      </div>
     </Card>
     <HistoryPanel open={historyOpen} onOpenChange={setHistoryOpen} />
     </>

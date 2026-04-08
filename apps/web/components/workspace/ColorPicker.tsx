@@ -28,7 +28,8 @@ const PRESET_COLORS = [
 /**
  * HEX 转 RGB
  */
-function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
+function hexToRgb(hex: string | undefined): { r: number; g: number; b: number } | null {
+  if (!hex) return null;
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   return result
     ? {
@@ -548,8 +549,8 @@ export function ColorPicker({ label, value, onChange, description }: ColorPicker
                     min={0}
                     max={255}
                     step={1}
-                    onValueChange={([v]) => {
-                      const newHex = rgbToHex(v, rgb.g, rgb.b);
+                    onValueChange={(v: number[]) => {
+                      const newHex = rgbToHex(v[0], rgb.g, rgb.b);
                       handleColorChange(newHex);
                     }}
                   />
@@ -564,8 +565,8 @@ export function ColorPicker({ label, value, onChange, description }: ColorPicker
                     min={0}
                     max={255}
                     step={1}
-                    onValueChange={([v]) => {
-                      const newHex = rgbToHex(rgb.r, v, rgb.b);
+                    onValueChange={(v: number[]) => {
+                      const newHex = rgbToHex(rgb.r, v[0], rgb.b);
                       handleColorChange(newHex);
                     }}
                   />
@@ -580,8 +581,8 @@ export function ColorPicker({ label, value, onChange, description }: ColorPicker
                     min={0}
                     max={255}
                     step={1}
-                    onValueChange={([v]) => {
-                      const newHex = rgbToHex(rgb.r, rgb.g, v);
+                    onValueChange={(v: number[]) => {
+                      const newHex = rgbToHex(rgb.r, rgb.g, v[0]);
                       handleColorChange(newHex);
                     }}
                   />

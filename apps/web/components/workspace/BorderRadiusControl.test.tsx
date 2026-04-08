@@ -59,8 +59,8 @@ describe('BorderRadiusControl', () => {
   it('应该显示当前圆角值', () => {
     render(<BorderRadiusControl {...defaultProps} />);
     const inputs = screen.getAllByTestId('radius-input');
-    expect(inputs[0]).toHaveValue(4);
-    expect(inputs[2]).toHaveValue(16);
+    expect(inputs[0]!).toHaveValue(4);
+    expect(inputs[2]!).toHaveValue(16);
   });
 
   it('应该显示预设按钮', () => {
@@ -96,7 +96,7 @@ describe('BorderRadiusControl', () => {
     vi.useFakeTimers();
     render(<BorderRadiusControl {...defaultProps} onChange={onChange} />);
     const inputs = screen.getAllByTestId('radius-input');
-    fireEvent.change(inputs[0], { target: { value: '12' } });
+    fireEvent.change(inputs[0]!, { target: { value: '12' } });
     vi.advanceTimersByTime(100);
     expect(onChange).toHaveBeenCalledWith({ small: '12px' });
     vi.useRealTimers();
@@ -107,7 +107,7 @@ describe('BorderRadiusControl', () => {
     vi.useFakeTimers();
     render(<BorderRadiusControl {...defaultProps} onChange={onChange} />);
     const inputs = screen.getAllByTestId('radius-input');
-    fireEvent.change(inputs[0], { target: { value: '100' } });
+    fireEvent.change(inputs[0]!, { target: { value: '100' } });
     vi.advanceTimersByTime(100);
     expect(onChange).toHaveBeenCalledWith({ small: '64px' });
     vi.useRealTimers();

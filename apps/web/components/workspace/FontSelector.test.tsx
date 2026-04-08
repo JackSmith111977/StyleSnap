@@ -79,7 +79,7 @@ describe('FontSelector', () => {
     render(<FontSelector {...defaultProps} onChange={onChange} />);
     const selects = screen.getAllByTestId('font-select');
     // 触发 onChange
-    fireEvent.change(selects[0], { target: { value: 'Arial, sans-serif' } });
+    fireEvent.change(selects[0]!, { target: { value: 'Arial, sans-serif' } });
     // 等待一下确保调用
     expect(onChange).toHaveBeenCalled();
   });
@@ -88,7 +88,7 @@ describe('FontSelector', () => {
     const onChange = vi.fn();
     render(<FontSelector {...defaultProps} onChange={onChange} />);
     const selects = screen.getAllByTestId('font-select');
-    fireEvent.change(selects[1], { target: { value: 'Georgia, serif' } });
+    fireEvent.change(selects[1]!, { target: { value: 'Georgia, serif' } });
     expect(onChange).toHaveBeenCalled();
   });
 

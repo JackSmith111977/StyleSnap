@@ -282,18 +282,23 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => {
   // 设置保存回调
   const setSaveCallback = (callback: () => Promise<void>) => {
     onSaveCallback = callback;
+    console.log('[WorkspaceStore] 保存回调已设置', !!callback);
   };
 
   // 触发保存
   const triggerSave = async () => {
-    const { isDirty } = get();
-    if (isDirty && onSaveCallback) {
+    const state = get();
+    if (state.isDirty && onSaveCallback) {
       try {
+        console.log('[WorkspaceStore] 开始自动保存...');
         await onSaveCallback();
         set({ isDirty: false, lastSavedAt: new Date() });
+        console.log('[WorkspaceStore] 保存成功');
       } catch (error) {
-        console.error('自动保存失败:', error);
+        console.error('[WorkspaceStore] 自动保存失败:', error);
       }
+    } else {
+      console.log('[WorkspaceStore] 无需保存（isDirty:', state.isDirty, ', hasCallback:', !!onSaveCallback, ')');
     }
   };
 

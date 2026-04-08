@@ -33,8 +33,8 @@ vi.mock('@/components/ui/label', () => ({
 }));
 
 vi.mock('@/components/ui/button', () => ({
-  Button: ({ className, children, onClick, type, 'data-slot': dataSlot }: React.ComponentProps<'button'>) => (
-    <button className={className} onClick={onClick} type={type} data-slot={dataSlot} data-testid="color-button">
+  Button: ({ className, children, onClick, type, ...props }: React.ComponentProps<'button'>) => (
+    <button className={className} onClick={onClick} type={type} {...props} data-testid="color-button">
       {children}
     </button>
   ),
@@ -145,7 +145,7 @@ describe('ColorPalette', () => {
   it('应该显示正确的颜色值', () => {
     render(<ColorPalette values={defaultValues} onChange={vi.fn()} />);
     const inputs = screen.getAllByTestId('color-input');
-    expect(inputs[0]).toHaveValue('#3B82F6');
+    expect(inputs[0]!).toHaveValue('#3B82F6');
   });
 
   it('修改颜色应该调用 onChange 并传递正确的键', async () => {
@@ -153,8 +153,8 @@ describe('ColorPalette', () => {
     render(<ColorPalette values={defaultValues} onChange={onChange} />);
     const inputs = screen.getAllByTestId('color-input');
 
-    fireEvent.change(inputs[0], { target: { value: '#FF0000' } });
-    fireEvent.blur(inputs[0]);
+    fireEvent.change(inputs[0]!, { target: { value: '#FF0000' } });
+    fireEvent.blur(inputs[0]!);
 
     await waitFor(() => {
       expect(onChange).toHaveBeenCalledWith({ primary: '#FF0000' });

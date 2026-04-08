@@ -4,6 +4,8 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { StyleSelector } from '@/components/workspace/StyleSelector';
 import { EditorPanel } from '@/components/workspace/EditorPanel';
 import { CanvasPreview } from '@/components/workspace/CanvasPreview';
+import { CodeExportDialog } from '@/components/workspace/CodeExportDialog';
+import { Code2 } from 'lucide-react';
 import { StylePreview } from '@/components/preview/style-preview';
 import { useWorkspaceStore, type DesignTokens as WorkspaceDesignTokens, type WorkspaceStyle } from '@/stores/workspace-store';
 import { type DesignTokens as PreviewDesignTokens } from '@/stores/preview-editor-store';
@@ -57,17 +59,24 @@ export default function WorkspacePage() {
   const [newStyleCategory, setNewStyleCategory] = useState<string>(CATEGORY_OPTIONS[0]?.value || 'minimalist');
   const [isCreating, setIsCreating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [exportDialogOpen, setExportDialogOpen] = useState(false);
 
-  // 设置保存回调
+  // 设置保存回调 - 使用 useRef 确保始终使用最新的 currentStyle
+  const currentStyleRef = React.useRef<WorkspaceStyle | null>(currentStyle);
+  useEffect(() => {
+    currentStyleRef.current = currentStyle;
+  }, [currentStyle]);
+
   useEffect(() => {
     const handleSave = async () => {
-      if (!currentStyle) return;
+      const style = currentStyleRef.current;
+      if (!style) return;
 
       setIsSaving(true);
       try {
         const state = useWorkspaceStore.getState();
         const response = await saveStyleDraft(
-          currentStyle.id,
+          style.id,
           state.designTokens,
           state.basics
         );
@@ -90,7 +99,8 @@ export default function WorkspacePage() {
     return () => {
       stopAutoSave();
     };
-  }, [currentStyle, setSaveCallback, startAutoSave, stopAutoSave]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [setSaveCallback, startAutoSave, stopAutoSave]);
 
   /**
    * 处理风格选择
@@ -166,21 +176,39 @@ export default function WorkspacePage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* 页面头部 */}
+      {/* 页面头部 - 始终显示 */}
       <header className="border-b bg-card">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold">工作台</h1>
               <p className="text-sm text-muted-foreground mt-1">
-                创建和编辑您的设计风格
+                {currentStyle ? (
+                  <span>编辑中：<span className="font-medium text-foreground">{currentStyle.name}</span></span>
+                ) : (
+                  '创建和编辑您的设计风格'
+                )}
               </p>
             </div>
-            {currentStyle && (
-              <Button variant="outline" size="sm" onClick={clearWorkspace}>
-                返回选择
-              </Button>
-            )}
+            <div className="flex items-center gap-2">
+              {currentStyle && (
+                <>
+                  <Button
+                    variant="default"
+                    size="sm"
+                    onClick={() => setExportDialogOpen(true)}
+                    className="gap-1.5"
+                    title="导出代码"
+                  >
+                    <Code2 className="w-4 h-4" />
+                    <span className="hidden sm:inline">导出</span>
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={clearWorkspace}>
+                    返回选择
+                  </Button>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </header>
@@ -282,6 +310,7 @@ export default function WorkspacePage() {
           </div>
         </div>
       )}
+      <CodeExportDialog open={exportDialogOpen} onOpenChange={setExportDialogOpen} />
     </div>
   );
 }

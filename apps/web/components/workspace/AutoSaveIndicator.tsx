@@ -8,6 +8,7 @@ interface AutoSaveIndicatorProps {
   status: 'saved' | 'saving' | 'unsaved' | 'error';
   lastSavedAt: Date | null;
   className?: string;
+  variant?: 'default' | 'compact';
 }
 
 /**
@@ -19,6 +20,7 @@ export function AutoSaveIndicator({
   status,
   lastSavedAt,
   className,
+  variant = 'default',
 }: AutoSaveIndicatorProps) {
   // 格式化相对时间
   const formatRelativeTime = (date: Date | null): string => {
@@ -82,6 +84,25 @@ export function AutoSaveIndicator({
   const config = statusConfig[status];
   const Icon = config.icon;
 
+  // 紧凑模式：只显示图标和简短状态
+  if (variant === 'compact') {
+    return (
+      <div
+        className={cn(
+          'flex items-center gap-1.5 px-2 py-1 rounded-md border text-xs transition-all duration-300',
+          config.bgColor,
+          config.borderColor,
+          className
+        )}
+        title={config.text + (config.subtext ? ` - ${config.subtext}` : '')}
+      >
+        <Icon className={cn('w-3.5 h-3.5', config.color, status === 'saving' && 'animate-pulse')} />
+        <span className={cn('font-medium', config.color)}>{config.text}</span>
+      </div>
+    );
+  }
+
+  // 默认模式：完整显示
   return (
     <div
       className={cn(
