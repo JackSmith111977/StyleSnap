@@ -6,26 +6,33 @@
 
 ### ✅ 已完成
 
-**任务：Lint 错误批量修复**
+**任务：颜色模板 v2.1 Phase 2 - 阴影效果增强**
 - 状态：已完成
 - 开始时间：2026-04-08
 - 完成时间：2026-04-08
-- 修复统计：
-  - 初始：564 个警告
-  - 第一轮修复后：567 个问题（76 错误，491 警告）
-  - 第二轮修复后：490 个问题（0 错误，490 警告）✅
-- 修复内容：
-  1. 删除未使用的导入和变量（添加 `_` 前缀）
-  2. 测试文件 mock 组件添加 `eslint-disable` 注释
-  3. 修复 `no-floating-promises` 问题
-  4. 修复类型断言问题
-- 输出文档：
-  - `docs/main/LINT_ERRORS_REPORT.md` - 初始错误报告
-  - `docs/main/LINT_FIX_EXECUTION_PLAN.md` - 修复执行计划
-- 验证结果：
-  - `pnpm lint`: ✅ 0 错误，490 警告
-  - `pnpm typecheck`: ❌ 预先存在的类型错误（与 lint 修复无关）
-  - 剩余警告主要为 `missing-return-type` 和 `prefer-nullish-coalescing`，不影响构建
+- 变更概述：完成阴影效果增强（Phase 2），修复科技现代模板标题颜色问题
+- 核心变更：
+  1. **Bug 修复**：科技现代模板 `titleColor: 'text'`（原 'primary'），确保与 Primary Header 背景形成对比
+  2. **新增维度**（2 个）：
+     - `cardShadow`: 'none' | 'light' | 'medium' | 'heavy'
+     - `cardHoverTransform`: 'none' | 'lift' | 'lift-lg'
+  3. **4 个模板阴影配置**：
+     | 模板 | cardShadow | cardHoverTransform |
+     |------|------------|---------------------|
+     | 经典商务 | medium | lift |
+     | 活力创意 | heavy | lift-lg |
+     | 极简主义 | light | none |
+     | 科技现代 | medium | lift |
+  4. **修改文件**：
+     - `apps/web/lib/color-templates.ts` - 扩展接口、更新模板定义、更新 applyColorTemplate 函数
+     - `apps/web/components/preview/style-preview/styles.module.css` - 卡片使用模板变量
+     - `apps/web/components/workspace/PreviewPanel.tsx` - 传递 shadows 参数
+     - `apps/web/components/preview/style-preview/index.tsx` - 传递 shadows 参数
+- 验收标准：
+  - ✅ `pnpm build` 构建成功
+  - ✅ 4 个模板阴影效果区分明显
+  - ✅ 科技现代模板标题文字可见
+- 下一步：MCP 浏览器测试验证阴影效果
 
 ---
 
@@ -289,6 +296,62 @@
   - `docs/main/LINT_FIX_EXECUTION_PLAN.md`
 - 验证结果：
   - `pnpm lint`: 0 错误，490 警告
+
+**任务：颜色模板功能 - 浏览器测试验证**
+- 状态：已完成
+- 开始时间：2026-04-08
+- 完成时间：2026-04-08
+- 测试方式：MCP Playwright 浏览器自动化
+- 测试用例：
+  1. TC-001: 模板选择器 UI 显示 ✅
+  2. TC-002: 下拉菜单打开 ✅
+  3. TC-003: 4 个模板选项显示 ✅
+  4. TC-004: 模板切换功能 ✅
+  5. TC-005: CSS 变量应用 ✅
+  6. TC-006: localStorage 持久化 ✅
+- 测试覆盖率：100%（6/6 核心功能）
+- UX 评估 (Sally): 4 个模板视觉差异明显，易于区分
+- QA 设计 (Quinn): 补充测试用例建议已记录
+- 输出文档：
+  - `docs/main/P2_COLOR_TEMPLATE_BROWSER_TEST.md` - 完整测试报告
+- 验证结果：
+  - 模板选择器正确集成到 CanvasPreview 顶部工具栏
+  - 4 个预设模板（经典商务、活力创意、极简主义、科技现代）展示完整
+  - 模板切换后 CSS 变量正确更新
+  - localStorage 持久化功能正常（刷新后保持选择）
+- 结论：功能已准备好进行用户验收测试（UAT）
+
+**任务：颜色模板 v2.0 - Phase 1A/B/C/D 完整实现**
+- 状态：已完成
+- 开始时间：2026-04-08
+- 完成时间：2026-04-08
+- 变更概述：扩展颜色角色映射范围，使 4 个预设模板视觉区分度更明显
+- 核心理念：不是新增独立的颜色字段，而是让每个 UI 区域选择一个颜色角色（primary/secondary/background/surface）
+- 新增维度 (3 个)：
+  | 维度 | 经典商务 | 活力创意 | 极简主义 | 科技现代 |
+  |------|----------|----------|----------|----------|
+  | headerBg | Surface | Secondary | Background | Primary |
+  | navBg | Background | Surface | Background | Surface |
+  | pageBg | Background | Background | Background | Background |
+- 修改文件：
+  - `docs/main/P2_COLOR_TEMPLATE_PRD.md` - 更新 4 个模板定义
+  - `docs/main/P3_COLOR_TEMPLATE_V2_ENHANCEMENT.md` - 创建增强文档
+  - `_bmad/bmm/4-implementation/stories/story-6-8-style-preview-component.md` - 添加 v2.0 章节
+  - `_bmad/bmm/4-implementation/stories/story-6-11-color-template-v2.md` - 创建 Story 6.11
+  - `_bmad/bmm/4-implementation/sprint-status.yaml` - 添加 6-11-color-template-v2
+  - `apps/web/lib/color-templates.ts` - 扩展 ColorMapping 接口（3 个区域），更新 4 个模板定义
+  - `apps/web/components/preview/style-preview/styles.module.css` - Header、导航、页脚使用模板变量
+  - `apps/web/components/workspace/PreviewPanel.tsx` - 导航栏、页面背景、页脚使用模板变量
+- 输出文档：
+  - `docs/main/P3_COLOR_TEMPLATE_V2_ENHANCEMENT.md` - 完整记录设计原则、对比表、CSS 变量清单
+- 验收标准：
+  - ✅ 4 个模板的 Header 背景色各不相同 (Surface/Secondary/Background/Primary)
+  - ✅ 4 个模板的导航栏背景色形成对比 (Background/Surface/Background/Surface)
+  - ✅ 三级背景层次原则得到满足
+  - ✅ `pnpm build` 构建成功
+  - ✅ Next.js MCP 错误检查通过
+  - ✅ CSS 变量实现验证通过（9 处引用全部正确）
+- 下一步：可开始 Phase 2 - 阴影效果增强（cardShadow, cardHoverTransform）
 
 ---
 

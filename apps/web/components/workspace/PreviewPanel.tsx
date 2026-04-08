@@ -2,10 +2,11 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { useWorkspaceStore, type DesignTokens } from '@/stores/workspace-store';
+import { useColorTemplateStore } from '@/stores/color-template-store';
+import { applyColorTemplate } from '@/lib/color-templates';
 import { cn } from '@/lib/utils';
-import { Check, X } from 'lucide-react';
+import { Check } from 'lucide-react';
 
 interface PreviewPanelProps {
   designTokens: DesignTokens;
@@ -19,8 +20,10 @@ interface PreviewPanelProps {
  */
 export function PreviewPanel({ designTokens, className }: PreviewPanelProps) {
   const { currentStyle } = useWorkspaceStore();
+  const { getCurrentMapping } = useColorTemplateStore();
+  const mapping = getCurrentMapping();
 
-  // 生成 CSS 变量
+  // 生成基础 CSS 变量
   const cssVariables: React.CSSProperties = {
     // 颜色
     '--primary': designTokens.colorPalette.primary,
@@ -51,6 +54,12 @@ export function PreviewPanel({ designTokens, className }: PreviewPanelProps) {
     '--shadow-heavy': designTokens.shadows.heavy,
   } as React.CSSProperties;
 
+  // 生成模板 CSS 变量
+  const templateVariables = applyColorTemplate(mapping, designTokens.colorPalette, designTokens.shadows);
+
+  // 合并所有 CSS 变量
+  const allVariables = { ...cssVariables, ...templateVariables };
+
   return (
     <div className={cn('h-full flex flex-col overflow-hidden bg-muted/30', className)}>
       {/* 预览头部 */}
@@ -67,12 +76,25 @@ export function PreviewPanel({ designTokens, className }: PreviewPanelProps) {
 
       {/* 预览内容区 - 可滚动 */}
       <div className="flex-1 overflow-auto p-6">
+        {/* 内联样式：输入框焦点环使用模板变量 */}
+        <style jsx global>{`
+          .preview-panel-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px var(--template-input-focus, var(--primary));
+          }
+        `}</style>
         <div
           className="max-w-4xl mx-auto bg-background rounded-lg shadow-lg overflow-hidden"
-          style={cssVariables}
+          style={allVariables}
         >
           {/* 模拟导航栏 */}
-          <nav className="border-b px-6 py-4" style={{ backgroundColor: 'var(--surface)' }}>
+          <nav
+            className="border-b px-6 py-4"
+            style={{
+              backgroundColor: 'var(--template-header-bg, var(--surface))',
+              borderColor: 'var(--border)',
+            }}
+          >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <div
@@ -83,7 +105,7 @@ export function PreviewPanel({ designTokens, className }: PreviewPanelProps) {
                   className="font-semibold"
                   style={{
                     fontFamily: 'var(--font-heading)',
-                    color: 'var(--text)',
+                    color: 'var(--template-title-color, var(--text))',
                   }}
                 >
                   StyleSnap
@@ -94,7 +116,7 @@ export function PreviewPanel({ designTokens, className }: PreviewPanelProps) {
                   className="px-3 py-1.5 text-sm rounded hover:opacity-80 transition-opacity"
                   style={{
                     fontFamily: 'var(--font-body)',
-                    color: 'var(--text)',
+                    color: 'var(--template-link-color, var(--text))',
                     backgroundColor: 'transparent',
                   }}
                 >
@@ -104,7 +126,7 @@ export function PreviewPanel({ designTokens, className }: PreviewPanelProps) {
                   className="px-4 py-1.5 text-sm rounded text-white"
                   style={{
                     fontFamily: 'var(--font-body)',
-                    backgroundColor: 'var(--primary)',
+                    backgroundColor: 'var(--template-button-bg, var(--primary))',
                     borderRadius: 'var(--radius-small)',
                   }}
                 >
@@ -115,7 +137,10 @@ export function PreviewPanel({ designTokens, className }: PreviewPanelProps) {
           </nav>
 
           {/* 模拟内容区 */}
-          <main className="p-6" style={{ backgroundColor: 'var(--background)' }}>
+          <main
+            className="p-6"
+            style={{ backgroundColor: 'var(--template-page-bg, var(--background))' }}
+          >
             {/* 标题区 */}
             <div className="mb-8">
               <h1
@@ -124,7 +149,7 @@ export function PreviewPanel({ designTokens, className }: PreviewPanelProps) {
                   fontFamily: 'var(--font-heading)',
                   fontWeight: designTokens.fonts.headingWeight,
                   lineHeight: designTokens.fonts.headingLineHeight,
-                  color: 'var(--text)',
+                  color: 'var(--template-title-color, var(--text))',
                 }}
               >
                 欢迎来到 StyleSnap
@@ -190,7 +215,7 @@ export function PreviewPanel({ designTokens, className }: PreviewPanelProps) {
                 className="text-xl font-semibold mb-4"
                 style={{
                   fontFamily: 'var(--font-heading)',
-                  color: 'var(--text)',
+                  color: 'var(--template-title-color, var(--text))',
                 }}
               >
                 按钮样式
@@ -200,7 +225,7 @@ export function PreviewPanel({ designTokens, className }: PreviewPanelProps) {
                   className="px-4 py-2 text-white transition-opacity hover:opacity-90"
                   style={{
                     fontFamily: 'var(--font-body)',
-                    backgroundColor: 'var(--primary)',
+                    backgroundColor: 'var(--template-button-bg, var(--primary))',
                     borderRadius: 'var(--radius-small)',
                   }}
                 >
@@ -221,7 +246,7 @@ export function PreviewPanel({ designTokens, className }: PreviewPanelProps) {
                   className="px-4 py-2 text-white transition-opacity hover:opacity-90"
                   style={{
                     fontFamily: 'var(--font-body)',
-                    backgroundColor: 'var(--accent)',
+                    backgroundColor: 'var(--template-secondary-button-bg, var(--accent))',
                     borderRadius: 'var(--radius-small)',
                   }}
                 >
@@ -236,7 +261,7 @@ export function PreviewPanel({ designTokens, className }: PreviewPanelProps) {
                 className="text-xl font-semibold mb-4"
                 style={{
                   fontFamily: 'var(--font-heading)',
-                  color: 'var(--text)',
+                  color: 'var(--template-title-color, var(--text))',
                 }}
               >
                 输入框样式
@@ -245,7 +270,7 @@ export function PreviewPanel({ designTokens, className }: PreviewPanelProps) {
                 <input
                   type="text"
                   placeholder="请输入..."
-                  className="w-full px-3 py-2 border bg-background transition-colors focus:outline-none focus:ring-2"
+                  className="preview-panel-input w-full px-3 py-2 border bg-background transition-colors focus:outline-none"
                   style={{
                     fontFamily: 'var(--font-body)',
                     borderRadius: 'var(--radius-small)',
@@ -262,7 +287,7 @@ export function PreviewPanel({ designTokens, className }: PreviewPanelProps) {
                 className="text-xl font-semibold mb-4"
                 style={{
                   fontFamily: 'var(--font-heading)',
-                  color: 'var(--text)',
+                  color: 'var(--template-title-color, var(--text))',
                 }}
               >
                 列表样式
@@ -285,7 +310,7 @@ export function PreviewPanel({ designTokens, className }: PreviewPanelProps) {
                   >
                     <Check
                       className="w-4 h-4"
-                      style={{ color: 'var(--primary)' }}
+                      style={{ color: 'var(--template-list-marker, var(--primary))' }}
                     />
                     <span style={{ color: 'var(--text)' }}>{item}</span>
                   </li>
@@ -298,7 +323,7 @@ export function PreviewPanel({ designTokens, className }: PreviewPanelProps) {
           <footer
             className="border-t px-6 py-4"
             style={{
-              backgroundColor: 'var(--surface)',
+              backgroundColor: 'var(--template-nav-bg, var(--surface))',
               borderColor: 'var(--border)',
             }}
           >
@@ -317,7 +342,7 @@ export function PreviewPanel({ designTokens, className }: PreviewPanelProps) {
                   className="hover:underline"
                   style={{
                     fontFamily: 'var(--font-body)',
-                    color: 'var(--text-muted)',
+                    color: 'var(--template-link-color, var(--text-muted))',
                   }}
                 >
                   隐私政策
@@ -327,7 +352,7 @@ export function PreviewPanel({ designTokens, className }: PreviewPanelProps) {
                   className="hover:underline"
                   style={{
                     fontFamily: 'var(--font-body)',
-                    color: 'var(--text-muted)',
+                    color: 'var(--template-link-color, var(--text-muted))',
                   }}
                 >
                   使用条款

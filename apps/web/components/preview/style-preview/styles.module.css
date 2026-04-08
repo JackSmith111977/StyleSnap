@@ -66,7 +66,7 @@
    导航栏样式
    ==================== */
 .previewHeader {
-  background-color: var(--preview-surface);
+  background-color: var(--template-header-bg, var(--preview-surface));
   border-bottom: 1px solid var(--preview-border);
   padding: var(--preview-spacing-sm) var(--preview-spacing-md);
 }
@@ -82,7 +82,7 @@
   font-family: var(--preview-font-heading);
   font-size: calc(var(--preview-spacing-xl) * 1.25);
   font-weight: var(--preview-font-weight-heading);
-  color: var(--preview-primary);
+  color: var(--template-title-color, var(--preview-primary));
 }
 
 .nav {
@@ -91,7 +91,7 @@
 }
 
 .navLink {
-  color: var(--preview-text);
+  color: var(--template-link-color, var(--preview-primary));
   text-decoration: none;
   font-size: calc(var(--preview-spacing-md) * 0.875);
   font-weight: var(--preview-font-weight-body);
@@ -99,7 +99,7 @@
 }
 
 .navLink:hover {
-  color: var(--preview-accent);
+  color: var(--template-link-color, var(--preview-accent));
 }
 
 /* ====================
@@ -107,7 +107,7 @@
    ==================== */
 .previewSidebar {
   width: 200px;
-  background-color: var(--preview-surface);
+  background-color: var(--template-nav-bg, var(--preview-surface));
   border-right: 1px solid var(--preview-border);
   padding: var(--preview-spacing-md);
   flex-shrink: 0;
@@ -122,7 +122,7 @@
   font-family: var(--preview-font-heading);
   font-size: calc(var(--preview-spacing-md) * 0.875);
   font-weight: var(--preview-font-weight-heading);
-  color: var(--preview-text);
+  color: var(--template-title-color, var(--preview-text));
   margin-bottom: var(--preview-spacing-sm);
 }
 
@@ -167,11 +167,11 @@
 .tag {
   display: inline-block;
   padding: var(--preview-spacing-xs) var(--preview-spacing-sm);
-  background-color: var(--preview-background);
+  background-color: var(--template-badge-bg, var(--preview-background));
   color: var(--preview-text-muted);
   font-size: calc(var(--preview-spacing-sm) * 0.75);
   border-radius: var(--preview-border-radius-small);
-  border: 1px solid var(--preview-border);
+  border: 1px solid var(--template-border-accent, var(--preview-border));
 }
 
 /* ====================
@@ -182,6 +182,13 @@
   padding: var(--preview-spacing-lg);
   overflow-y: auto; /* 内容区可滚动 */
   height: 100%; /* 占满父容器高度 */
+}
+
+/* 标题样式 - 使用模板变量 */
+.heading1,
+.heading2,
+.heading3 {
+  color: var(--template-title-color, var(--preview-text));
 }
 
 .contentSection {
@@ -233,27 +240,30 @@
 }
 
 .card {
-  background-color: var(--preview-background);
+  background-color: var(--template-card-bg, var(--preview-background));
   border: 1px solid var(--preview-border);
   border-radius: var(--preview-border-radius-medium);
   overflow: hidden;
-  transition: box-shadow 0.2s ease;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  box-shadow: var(--template-card-shadow, var(--preview-shadow-medium));
 }
 
 .card:hover {
-  box-shadow: var(--preview-shadow-medium);
+  box-shadow: var(--template-card-shadow, var(--preview-shadow-heavy));
+  transform: var(--template-card-hover-transform, none);
 }
 
 .cardHeader {
   padding: var(--preview-spacing-md);
   border-bottom: 1px solid var(--preview-border);
+  background-color: var(--template-card-header-bg, var(--preview-background));
 }
 
 .cardTitle {
   font-family: var(--preview-font-heading);
   font-size: calc(var(--preview-spacing-md));
   font-weight: var(--preview-font-weight-heading);
-  color: var(--preview-text);
+  color: var(--template-title-color, var(--preview-text));
   margin: 0;
 }
 
@@ -276,7 +286,7 @@
 .cardButton {
   width: 100%;
   padding: var(--preview-spacing-sm) var(--preview-spacing-md);
-  background-color: var(--preview-primary);
+  background-color: var(--template-button-bg, var(--preview-primary));
   color: white;
   border: none;
   border-radius: var(--preview-border-radius-small);
@@ -310,7 +320,7 @@
 
 .listItem::before {
   content: '•';
-  color: var(--preview-accent);
+  color: var(--template-list-marker, var(--preview-primary));
   font-weight: bold;
   display: inline-block;
   width: 1em;
@@ -321,7 +331,7 @@
    页脚样式
    ==================== */
 .previewFooter {
-  background-color: var(--preview-surface);
+  background-color: var(--template-nav-bg, var(--preview-surface));
   border-top: 1px solid var(--preview-border);
   padding: var(--preview-spacing-sm) var(--preview-spacing-md);
 }
@@ -345,14 +355,14 @@
 }
 
 .footerLink {
-  color: var(--preview-text-muted);
+  color: var(--template-link-color, var(--preview-text-muted));
   text-decoration: none;
   font-size: 12px;
   transition: color 0.2s ease;
 }
 
 .footerLink:hover {
-  color: var(--preview-primary);
+  color: var(--template-link-color, var(--preview-primary));
 }
 
 /* ====================
@@ -664,11 +674,11 @@
   color: var(--preview-text);
 }
 
-/* 辅色按钮 */
+/* 辅色按钮 - 使用模板变量 */
 .cardButtonSecondary {
   width: 100%;
   padding: var(--preview-spacing-sm) var(--preview-spacing-md);
-  background-color: var(--preview-secondary);
+  background-color: var(--template-secondary-button-bg, var(--preview-secondary));
   color: white;
   border: none;
   border-radius: var(--preview-border-radius-small);

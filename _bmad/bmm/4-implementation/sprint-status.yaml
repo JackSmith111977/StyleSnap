@@ -84,7 +84,8 @@ development_status:
   6-5-user-collections: done
   6-6-code-export-options: backlog
   6-7-preview-style-modes: backlog
-  6-8-style-preview-component: done  # v1.5 StyleDetail 组件使用 designTokens 完成
+  6-8-style-preview-component: done  # v1.5 StyleDetail 组件使用 designTokens 完成 | v2.0 颜色模板增强
   6-9-workspace-editor: done  # ✅ 代码审查完成，TypeScript 错误已修复
   6-10-submission-review: ready-for-dev  # ✅ Story spec 创建完成
+  6-11-color-template-v2: done  # ✅ 颜色模板 v2.0 + v2.1 Phase 2 完成 - Phase 1A/B/C/D + Phase 2 全部通过，构建验证成功，科技现代模板 Bug 已修复
   epic-6-retrospective: optional

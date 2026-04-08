@@ -3,6 +3,8 @@
 import React, { useState } from 'react'
 import { type DesignTokens as PreviewDesignTokens } from '@/stores/preview-editor-store'
 import { type DesignTokens as TypesDesignTokens } from '@/types/design-tokens'
+import { useColorTemplateStore } from '@/stores/color-template-store'
+import { applyColorTemplate } from '@/lib/color-templates'
 import styles from './styles.module.css'
 import { PreviewHeader } from './preview-header'
 import { PreviewSidebar } from './preview-sidebar'
@@ -60,6 +62,8 @@ type PreviewSection = 'all' | 'typography' | 'colors' | 'spacing' | 'borderRadiu
  */
 export function StylePreview({ tokens, designTokens, className }: StylePreviewProps) {
   const [activeSection, setActiveSection] = useState<PreviewSection>('all')
+  const { getCurrentMapping } = useColorTemplateStore()
+  const mapping = getCurrentMapping()
 
   // 统一处理两种 tokens 格式
   const normalizedTokens = normalizeTokens(tokens || designTokens)
@@ -98,10 +102,13 @@ export function StylePreview({ tokens, designTokens, className }: StylePreviewPr
     '--preview-shadow-heavy': normalizedTokens.shadows.heavy,
   } as React.CSSProperties
 
+  // 生成模板 CSS 变量
+  const templateVariables = applyColorTemplate(mapping, normalizedTokens.colors, normalizedTokens.shadows)
+
   return (
     <div
       className={`${styles.previewContainer} ${className || ''}`}
-      style={previewStyles}
+      style={{ ...previewStyles, ...templateVariables }}
       data-preview-container
     >
       {/* 导航栏 */}
