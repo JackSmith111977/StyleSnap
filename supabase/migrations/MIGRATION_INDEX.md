@@ -22,6 +22,7 @@
 | 0025 | `0025_add_style_tags_associations.sql` | 风格标签关联 | ✅ 已迁移 | - | 标签系统 |
 | 0026 | `0026_sync_design_tokens_to_jsonb.sql` | 设计变量同步到 JSONB | ✅ 已迁移 | - | 设计变量 |
 | 0027 | `0027_generate_preset_style_codes.sql` | 预设风格代码生成（设计变量转换函数） | ✅ 已迁移 | 2026-04-08 | 代码生成 |
+| 0028 | `0028_add_code_readme_and_modules.sql` | 添加 code_readme 和 code_css_modules 字段 | ✅ 已迁移 | 2026-04-08 | 代码存储 |
 
 ## 待执行迁移
 
@@ -64,3 +65,9 @@
 - 创建 5 个转换函数：`convert_color_palette`, `convert_fonts`, `convert_spacing`, `convert_border_radius`, `convert_shadows`
 - 更新 `styles` 表的设计变量字段为新格式
 - 为后续代码生成 Server Action 提供数据基础
+
+### 0028 - 添加代码存储字段
+- 添加 `code_css_modules` 字段（存储 CSS Modules 组件样式）
+- 添加 `code_readme` 字段（存储 README.md 文档）
+- 为 code_readme 添加 Gin 全文搜索索引
+- 使数据库能够存储与工作台导出格式一致的完整代码包
