@@ -7,6 +7,7 @@ import { getStyleDesignTokens } from '@/actions/styles/get-design-tokens'
 import { getAuthorInfo } from '@/actions/follow/get-author-info'
 import { StyleDetail } from '@/components/style-detail'
 import { CodeSnippetDisplay } from '@/components/style-code-snippet'
+import { StyleCodeViewer } from '@/components/style-code-viewer'
 import { LikeButton } from '@/components/like-button'
 import { FavoriteButton } from '@/components/favorite-button'
 import { CommentList } from '@/components/comment-list'
@@ -16,7 +17,7 @@ import { StylePreview } from '@/components/preview/style-preview'
 import { ShareButton } from '@/components/share'
 import { AuthorCard } from '@/components/follow'
 import Link from 'next/link'
-import { Eye, Heart, MessageCircle } from 'lucide-react'
+import { Eye, Heart, MessageCircle, FileCode } from 'lucide-react'
 import { type Metadata } from 'next'
 import { getCurrentUser } from '@/lib/auth'
 
@@ -174,6 +175,20 @@ export default async function StyleDetailPage({ params }: StyleDetailPageProps) 
 
         {/* 代码示例 - Tabs 切换 */}
         <div className="mt-8">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="flex items-center gap-2 text-2xl font-bold">
+              <FileCode className="h-6 w-6" />
+              代码示例
+            </h2>
+            <StyleCodeViewer
+              styleId={style.id}
+              styleName={style.title}
+              codeCss={style.code_css}
+              codeHtml={style.code_html}
+              codeReact={style.code_react}
+              codeTailwind={style.code_tailwind}
+            />
+          </div>
           <CodeSnippetDisplay
             snippets={[
               { language: 'html', title: 'HTML', code: style.code_html },
