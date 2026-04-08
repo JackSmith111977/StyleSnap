@@ -18,23 +18,14 @@
 | 0001 | `0001_initial_schema.sql` | 初始数据库 Schema（表、索引、触发器、RLS） | ✅ 已迁移 | - | 基础架构 |
 | 0008 | `0008_seed_initial_styles.sql` | 初始风格案例数据（10 个预设风格） | ✅ 已迁移 | - | 种子数据 |
 | 0023 | `0023_add_collections.sql` | 合集功能（collection_styles 表） | ✅ 已迁移 | - | 收藏管理 |
-| 0024 | `0024_generate_preset_style_codes.sql` | 预设风格代码生成（设计变量转换函数） | ⏳ 待迁移 | - | 代码生成 |
+| 0024 | `0024_unified_favorites.sql` | 统一收藏管理 | ✅ 已迁移 | - | 收藏系统 |
+| 0025 | `0025_add_style_tags_associations.sql` | 风格标签关联 | ✅ 已迁移 | - | 标签系统 |
+| 0026 | `0026_sync_design_tokens_to_jsonb.sql` | 设计变量同步到 JSONB | ✅ 已迁移 | - | 设计变量 |
+| 0027 | `0027_generate_preset_style_codes.sql` | 预设风格代码生成（设计变量转换函数） | ✅ 已迁移 | 2026-04-08 | 代码生成 |
 
 ## 待执行迁移
 
-### 0024 - 预设风格代码生成
-
-**文件**: `supabase/migrations/0024_generate_preset_style_codes.sql`
-
-**描述**: 为 10 个预设风格生成完整的代码（CSS Variables, CSS Modules, HTML, React, Tailwind）
-
-**执行内容**:
-- 创建 5 个转换函数：`convert_color_palette`, `convert_fonts`, `convert_spacing`, `convert_border_radius`, `convert_shadows`
-- 更新 `styles` 表的设计变量字段为新格式
-
-**执行后操作**:
-1. 调用 Server Action `batchGeneratePresetStyleCodes()` 生成代码
-2. 验证 `styles.code_css`, `code_html`, `code_react`, `code_tailwind` 字段已填充
+无待执行迁移。
 
 ---
 
@@ -56,3 +47,20 @@
 - 新增 `collections` 表
 - 新增 `collection_styles` 关联表
 - 支持用户创建和管理风格合集
+
+### 0024 - 统一收藏管理
+- 重构收藏系统
+- 支持合集管理
+
+### 0025 - 风格标签关联
+- 添加风格与标签的关联表
+- 支持多标签筛选
+
+### 0026 - 设计变量同步到 JSONB
+- 将设计变量同步到 JSONB 字段
+- 支持更灵活的数据结构
+
+### 0027 - 预设风格代码生成
+- 创建 5 个转换函数：`convert_color_palette`, `convert_fonts`, `convert_spacing`, `convert_border_radius`, `convert_shadows`
+- 更新 `styles` 表的设计变量字段为新格式
+- 为后续代码生成 Server Action 提供数据基础
