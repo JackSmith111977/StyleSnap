@@ -210,27 +210,39 @@ const Button = ({ children }) => (
         <section className={styles.contentSection} data-section="components">
           <h3 className={styles.heading3}>卡片组件</h3>
           <div className={styles.cardGrid}>
-            <div className={styles.card}>
+            <div className={`${styles.card} ${styles.cardShadowLight}`}>
               <div className={styles.cardHeader}>
-                <h4 className={styles.cardTitle}>卡片标题 1</h4>
+                <h4 className={styles.cardTitle}>Light 阴影</h4>
               </div>
               <div className={styles.cardBody}>
-                <p>这是卡片内容，展示风格的卡片设计效果，包括圆角和阴影。</p>
+                <p>轻微阴影效果，悬浮时显示。适合简洁、扁平化的设计风格。</p>
               </div>
               <div className={styles.cardFooter}>
                 <button className={styles.cardButton}>主色按钮</button>
               </div>
             </div>
 
-            <div className={styles.card}>
+            <div className={`${styles.card} ${styles.cardShadowMedium}`}>
               <div className={styles.cardHeader}>
-                <h4 className={styles.cardTitle}>卡片标题 2</h4>
+                <h4 className={styles.cardTitle}>Medium 阴影</h4>
               </div>
               <div className={styles.cardBody}>
-                <p>这是另一张卡片内容，展示重复组件的一致性。</p>
+                <p>中等阴影效果，悬浮时显示。适合大多数现代网页设计风格。</p>
               </div>
               <div className={styles.cardFooter}>
                 <button className={styles.cardButtonSecondary}>辅色按钮</button>
+              </div>
+            </div>
+
+            <div className={`${styles.card} ${styles.cardShadowHeavy}`}>
+              <div className={styles.cardHeader}>
+                <h4 className={styles.cardTitle}>Heavy 阴影</h4>
+              </div>
+              <div className={styles.cardBody}>
+                <p>重度阴影效果，悬浮时显示。适合立体感强、视觉冲击力强的设计风格。</p>
+              </div>
+              <div className={styles.cardFooter}>
+                <button className={styles.cardButton}>强调色按钮</button>
               </div>
             </div>
           </div>
