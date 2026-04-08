@@ -14,6 +14,7 @@ import { CommentList } from '@/components/comment-list'
 import { CommentForm } from '@/components/comment-form'
 import { RelatedStyles } from '@/components/related-styles'
 import { StylePreview } from '@/components/preview/style-preview'
+import { ColorTemplateSelector } from '@/components/workspace/ColorTemplateSelector'
 import { ShareButton } from '@/components/share'
 import { AuthorCard } from '@/components/follow'
 import Link from 'next/link'
@@ -186,7 +187,10 @@ export default async function StyleDetailPage({ params }: StyleDetailPageProps) 
         {/* 风格预览组件 */}
         {previewDesignTokens && (
           <div className="mt-8">
-            <h2 className="text-2xl font-bold mb-6">风格预览</h2>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold">风格预览</h2>
+              <ColorTemplateSelector />
+            </div>
             <StylePreview tokens={previewDesignTokens} />
           </div>
         )}
