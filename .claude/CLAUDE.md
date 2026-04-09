@@ -75,6 +75,14 @@
     - **必须使用**：`z-[var(--z-base)]`、`z-[var(--z-sticky)]`、`z-[var(--z-dropdown)]`、`z-[var(--z-popover)]`、`z-[var(--z-modal-overlay)]`、`z-[var(--z-modal)]`、`z-[var(--z-toast)]`
     - **参考文档**：`docs/reference/z-index-tokens.md`
 
+18. **MCP 截图管理规范** - 浏览器调试截图统一存储位置：
+    - **统一路径**：`apps/web/tests/results/mcp-screenshots/`
+    - **子目录**：`bug-reports/`（Bug 调试）、`ux-reviews/`（UX 审核）、`misc/`（其他）
+    - **命名格式**：`{场景}-{描述}.png`（如 `bug-nav-hovering.png`、`ux-workspace-desktop.png`）
+    - **E2E 截图**：Playwright 自动管理，保存在 `apps/web/tests/results/test-results/`
+    - **禁止**：不要使用 `.playwright-mcp/` 或根目录存放调试截图
+    - **参考文档**：`.claude/skills/playwright-mcp-flow/SKILL.md`
+
 ---
 
 ## 约束条件

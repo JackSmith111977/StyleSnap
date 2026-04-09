@@ -45,6 +45,19 @@ test-results/
 playwright/.cache/
 .playwright-mcp/
 
+# Test results - ignore runtime outputs, keep structure
+apps/web/tests/results/test-results/
+apps/web/tests/results/playwright-report/
+apps/web/tests/results/playwright/
+
+# Screenshots (MCP debug & review)
+**/mcp-screenshots/*.png
+**/mcp-screenshots/*.jpg
+**/mcp-screenshots/*.jpeg
+**/mcp-screenshots/*.webp
+**/mcp-screenshots/*.gif
+.temp-screenshots/
+
 # Supabase local development
 .supabase/
 

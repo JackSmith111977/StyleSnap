@@ -110,7 +110,7 @@ await page.click('#submit') // 元素可能还未准备好
 
 3. **截图定位问题**
    ```
-   browser_take_screenshot filename="debug-state.png"
+   browser_take_screenshot filename="apps/web/tests/results/mcp-screenshots/misc/debug-state.png"
    ```
 
 4. **单步执行**

@@ -104,7 +104,7 @@ browser_console_messages level="debug" all=true
 ### 截图
 
 ```
-browser_take_screenshot type="png" filename="debug-screenshot.png"
+browser_take_screenshot filename="apps/web/tests/results/mcp-screenshots/bug-reports/debug-issue.png"
 ```
 
 ### 执行 JS

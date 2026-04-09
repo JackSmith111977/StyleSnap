@@ -111,7 +111,7 @@ browser_close
 | 点击 | `browser_click` | ref (元素引用) |
 | 输入 | `browser_type` | ref, text |
 | 表单填写 | `browser_fill_form` | fields array |
-| 截图 | `browser_take_screenshot` | filename, type |
+| 截图 | `browser_take_screenshot` | filename, type | 保存到 `apps/web/tests/results/mcp-screenshots/` |
 | 获取快照 | `browser_snapshot` | depth |
 | 执行脚本 | `browser_evaluate` | script |
 
@@ -194,6 +194,33 @@ flowchart TD
 ### 最佳实践指南
 
 详见 `references/best-practices.md`
+
+---
+
+## 截图管理
+
+### 统一存储位置
+
+所有 MCP 浏览器调试截图统一存放在：
+
+```
+apps/web/tests/results/mcp-screenshots/
+├── bug-reports/    # Bug 调试截图
+├── ux-reviews/     # UX 审核截图
+└── misc/           # 其他临时截图
+```
+
+### 截图命名规范
+
+| 场景 | 命名格式 | 示例 |
+|------|---------|------|
+| Bug 调试 | `bug-{issue-id}-{page}-{state}.png` | `bug-nav-hovering.png` |
+| UX 审核 | `ux-{feature}-{view}.png` | `ux-workspace-desktop.png` |
+| 通用 | `{purpose}-{timestamp}.png` | `debug-before-fix-20260409.png` |
+
+### E2E 测试截图
+
+E2E 测试失败截图由 Playwright 自动管理，保存在 `apps/web/tests/results/test-results/`，无需手动处理。
 
 ---
 
