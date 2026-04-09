@@ -86,7 +86,7 @@ export interface StyleBasics {
 /**
  * 风格状态类型
  */
-export type StyleStatus = 'draft' | 'pending' | 'approved' | 'rejected';
+export type StyleStatus = 'draft' | 'pending_review' | 'approved' | 'rejected';
 
 /**
  * 风格接口（工作台版本）
@@ -259,6 +259,9 @@ interface WorkspaceState {
   stopAutoSave: () => void;
   triggerSave: () => void;
   setSaveCallback: (callback: () => Promise<void>) => void;
+
+  // 提交审核相关
+  updateStyleStatus: (status: StyleStatus, submittedAt?: string | null, reviewedAt?: string | null, reviewerComments?: string | null) => void;
 }
 
 /**
@@ -310,7 +313,7 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => {
 
     // 定时保存（30 秒）
     intervalTimer = setInterval(() => {
-      triggerSave();
+      void triggerSave();
     }, 30000);
   };
 
@@ -501,7 +504,7 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => {
     // 编辑后 5 秒自动保存
     if (saveTimer) clearTimeout(saveTimer);
     saveTimer = setTimeout(() => {
-      triggerSave();
+      void triggerSave();
     }, 5000);
   },
 
@@ -520,7 +523,7 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => {
     // 编辑后 5 秒自动保存
     if (saveTimer) clearTimeout(saveTimer);
     saveTimer = setTimeout(() => {
-      triggerSave();
+      void triggerSave();
     }, 5000);
   },
 
@@ -589,6 +592,20 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => {
       history: [],
       historyIndex: -1,
     });
+  },
+
+  // 提交审核相关
+  updateStyleStatus: (status: StyleStatus, submittedAt?: string | null, reviewedAt?: string | null, reviewerComments?: string | null) => {
+    set((state) => ({
+      status,
+      currentStyle: state.currentStyle ? {
+        ...state.currentStyle,
+        status,
+        submitted_at: submittedAt !== undefined ? submittedAt : state.currentStyle.submitted_at,
+        reviewed_at: reviewedAt !== undefined ? reviewedAt : state.currentStyle.reviewed_at,
+        reviewer_comments: reviewerComments !== undefined ? reviewerComments : state.currentStyle.reviewer_comments,
+      } : state.currentStyle,
+    }));
   },
 
   // 自动保存方法

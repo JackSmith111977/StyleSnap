@@ -6,11 +6,30 @@
 
 ### ✅ 已完成
 
+**任务：风格详细页添加颜色模板切换功能**
+- 状态：已完成
+- 开始时间：2026-04-08
+- 完成时间：2026-04-08
+- 变更概述：为风格详细页的预览组件添加颜色模板下拉切换功能
+- 核心变更：
+  1. **导入 ColorTemplateSelector 组件**
+  2. **在 StylePreview 上方添加选择器** - 标题右侧显示模板下拉菜单
+  3. **复用已有功能** - StylePreview 组件已集成颜色模板，自动响应 store 变化
+- 修改文件：
+  - `apps/web/app/styles/[id]/page.tsx` - 添加 ColorTemplateSelector 组件
+- 验收标准：
+  - ✅ `pnpm build` 构建成功 (15.344s)
+  - ✅ 模板选择器显示在预览区域顶部
+  - ✅ 4 个预设模板可选（经典商务/活力创意/极简主义/科技现代）
+  - ✅ 切换模板后预览效果实时更新
+- git 提交：`3316f04`
+- 推送状态：feat/bmad ✓
+
 **任务：颜色模板 v2.1 Phase 2 - 阴影效果增强**
 - 状态：已完成
 - 开始时间：2026-04-08
 - 完成时间：2026-04-08
-- 变更概述：完成阴影效果增强（Phase 2），修复科技现代模板标题颜色问题
+- 变更概述：完成阴影效果增强（Phase 2），修复科技现代模板标题颜色问题，优化为悬浮显示阴影
 - 核心变更：
   1. **Bug 修复**：科技现代模板 `titleColor: 'text'`（原 'primary'），确保与 Primary Header 背景形成对比
   2. **新增维度**（2 个）：
@@ -23,16 +42,26 @@
      | 活力创意 | heavy | lift-lg |
      | 极简主义 | light | none |
      | 科技现代 | medium | lift |
-  4. **修改文件**：
+  4. **阴影效果优化**：
+     - 常态卡片无阴影（扁平化）
+     - 悬浮时显示阴影效果（根据模板配置）
+     - 三张卡片展示 Light/Medium/Heavy 三种强度
+  5. **布局优化**：
+     - 卡片网格改为三栏布局（grid-template-columns: repeat(3, 1fr)）
+  6. **修改文件**：
      - `apps/web/lib/color-templates.ts` - 扩展接口、更新模板定义、更新 applyColorTemplate 函数
-     - `apps/web/components/preview/style-preview/styles.module.css` - 卡片使用模板变量
+     - `apps/web/components/preview/style-preview/styles.module.css` - 卡片阴影悬浮效果 + 三栏布局
+     - `apps/web/components/preview/style-preview/preview-content.tsx` - 三张卡片展示三种阴影
      - `apps/web/components/workspace/PreviewPanel.tsx` - 传递 shadows 参数
      - `apps/web/components/preview/style-preview/index.tsx` - 传递 shadows 参数
 - 验收标准：
-  - ✅ `pnpm build` 构建成功
+  - ✅ `pnpm build` 构建成功 (16.483s)
   - ✅ 4 个模板阴影效果区分明显
   - ✅ 科技现代模板标题文字可见
-- 下一步：MCP 浏览器测试验证阴影效果
+  - ✅ 常态卡片无阴影，悬浮时显示阴影
+  - ✅ 三栏布局展示三种阴影强度
+- git 提交：`6a2beec`
+- 推送状态：feat/bmad ✓
 
 ---
 
@@ -352,6 +381,66 @@
   - ✅ Next.js MCP 错误检查通过
   - ✅ CSS 变量实现验证通过（9 处引用全部正确）
 - 下一步：可开始 Phase 2 - 阴影效果增强（cardShadow, cardHoverTransform）
+
+---
+
+## 2026-04-09
+
+### ✅ 已完成
+
+**任务：Story 6.10 投稿审核功能实现 + 代码审查修复**
+- 状态：已完成
+- 开始时间：2026-04-09
+- 完成时间：2026-04-09
+- 变更概述：实现投稿审核功能（提交/撤回/状态显示）+ 修复 adversarial code review 发现的 17 个问题
+- 核心变更：
+  1. **新建 Server Actions**：
+     - `apps/web/actions/workspace/submit-for-review.ts` - 提交审核（带输入验证、TOCTOU 防护）
+     - `apps/web/actions/workspace/withdraw-submission.ts` - 撤回提交（带输入验证、TOCTOU 防护）
+  2. **新建工具函数**：
+     - `apps/web/utils/completeness-check.ts` - 完整性检查（名称、描述、分类、8 色、字体、间距）
+  3. **新建对话框组件**：
+     - `apps/web/components/workspace/SubmissionDialog.tsx` - 提交确认对话框（带 isSubmitting 状态）
+     - `apps/web/components/workspace/WithdrawDialog.tsx` - 撤回确认对话框（带 isSubmitting 状态）
+  4. **新建状态组件**：
+     - `apps/web/components/workspace/SubmissionStatusBadge.tsx` - 审核状态标识（4 状态：草稿/审核中/已发布/已拒绝）
+  5. **新建 UI 组件**：
+     - `apps/web/components/ui/alert-dialog.tsx` - Radix UI AlertDialog 封装
+  6. **状态管理扩展**：
+     - `apps/web/stores/workspace-store.ts` - 新增 updateStyleStatus action，修复 StyleStatus 类型（pending → pending_review）
+  7. **页面集成**：
+     - `apps/web/app/workspace/page.tsx` - 头部按钮集成（提交/撤回按钮与导出按钮并列），支持 rejected 状态重新提交
+- 代码审查修复（17 个问题）：
+  | 严重性 | 数量 | 修复内容 |
+  |--------|------|----------|
+  | Critical | 3 | 竞态条件（TOCTOU）、授权绕过、输入验证缺失 |
+  | High | 5 | 空值安全、条件更新防 TOCTOU、加载状态、导入错误处理 |
+  | Medium | 4 | 日期验证、rejected 状态支持、z-index 规范 |
+  | Low | 5 | 类型一致性、可访问性、结构化日志、魔法值 |
+  - 关键修复：
+    1. 使用 `.eq('status', 'draft')` 条件更新防止 TOCTOU
+    2. 添加 Zod schema 验证 styleId 格式
+    3. 修复 `basics.description.length` 空值安全问题
+    4. 添加 isSubmitting 状态到对话框组件
+    5. 统一使用 `pending_review`（不是 `pending`）
+    6. 添加日期格式验证 `isNaN(date.getTime())`
+    7. 结构化日志输出 `{ styleId, userId, error }`
+- 修改文件：
+  - 新建 7 个文件，修改 3 个文件
+- 文档更新：
+  - `_bmad/bmm/4-implementation/sprint-status.yaml` - 6-10-submission-review: done
+  - `.claude/progress.txt` - 记录完成内容
+- 验收标准：
+  - ✅ pnpm build 构建成功 (15.225s)
+  - ✅ pnpm typecheck: workspace 相关文件无错误
+  - ✅ 提交审核流程完整（草稿 → 审核中）
+  - ✅ 撤回提交流程完整（审核中 → 草稿）
+  - ✅ 4 状态标识显示正确
+  - ✅ rejected 状态支持重新提交
+  - ✅ 完整性检查覆盖 6 项必填内容
+  - ✅ TOCTOU 竞态条件防护
+  - ✅ 输入验证使用 Zod schema
+- 下一步：提交 git 并推送到远程仓库
 
 ---
 

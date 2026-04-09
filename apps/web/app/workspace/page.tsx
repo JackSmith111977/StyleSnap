@@ -5,8 +5,10 @@ import { StyleSelector } from '@/components/workspace/StyleSelector';
 import { EditorPanel } from '@/components/workspace/EditorPanel';
 import { CanvasPreview } from '@/components/workspace/CanvasPreview';
 import { CodeExportDialog } from '@/components/workspace/CodeExportDialog';
+import { SubmissionDialog } from '@/components/workspace/SubmissionDialog';
+import { WithdrawDialog } from '@/components/workspace/WithdrawDialog';
 import { Button } from '@/components/ui/button';
-import { Code2 } from 'lucide-react';
+import { Code2, Send, Undo2 } from 'lucide-react';
 import { useWorkspaceStore, type DesignTokens as WorkspaceDesignTokens, type WorkspaceStyle } from '@/stores/workspace-store';
 import { type DesignTokens as PreviewDesignTokens } from '@/stores/preview-editor-store';
 import { getStyleDetail, createNewStyle, saveStyleDraft } from './actions/workspace-actions';
@@ -48,7 +50,11 @@ export default function WorkspacePage() {
   const [newStyleName, setNewStyleName] = useState('');
   const [newStyleCategory, setNewStyleCategory] = useState<string>(CATEGORY_OPTIONS[0]?.value || 'minimalist');
   const [isCreating, setIsCreating] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
+  const [submitDialogOpen, setSubmitDialogOpen] = useState(false);
+  const [withdrawDialogOpen, setWithdrawDialogOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // 设置保存回调 - 使用 useRef 确保始终使用最新的 currentStyle
   const currentStyleRef = React.useRef<WorkspaceStyle | null>(currentStyle);
@@ -163,6 +169,63 @@ export default function WorkspacePage() {
     setNewStyleCategory(CATEGORY_OPTIONS[0]?.value || 'minimalist');
   };
 
+  // 处理提交审核
+  const handleSubmitForReview = async () => {
+    if (!currentStyle) return;
+
+    setIsSubmitting(true);
+    try {
+      const state = useWorkspaceStore.getState();
+      const { submitStyleForReview } = await import('@/actions/workspace/submit-for-review');
+      const result = await submitStyleForReview(currentStyle.id, state.designTokens, state.basics);
+
+      if (result.success) {
+        toast.success(result.message);
+        state.updateStyleStatus('pending_review', new Date().toISOString());
+        setCurrentStyle({
+          ...currentStyle,
+          status: 'pending_review',
+          submitted_at: new Date().toISOString(),
+        });
+        setSubmitDialogOpen(false);
+      } else {
+        toast.error(result.error || '提交失败');
+      }
+    } catch (error) {
+      console.error('提交审核失败:', error);
+      toast.error('提交失败，请稍后重试');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // 处理撤回提交
+  const handleWithdraw = async () => {
+    if (!currentStyle) return;
+
+    try {
+      const { withdrawSubmission } = await import('@/actions/workspace/withdraw-submission');
+      const result = await withdrawSubmission(currentStyle.id);
+
+      if (result.success) {
+        toast.success(result.message);
+        const state = useWorkspaceStore.getState();
+        state.updateStyleStatus('draft', null);
+        setCurrentStyle({
+          ...currentStyle,
+          status: 'draft',
+          submitted_at: null,
+        });
+        setWithdrawDialogOpen(false);
+      } else {
+        toast.error(result.error || '撤回失败');
+      }
+    } catch (error) {
+      console.error('撤回提交失败:', error);
+      toast.error('撤回失败，请稍后重试');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* 页面头部 - 始终显示 */}
@@ -182,6 +245,32 @@ export default function WorkspacePage() {
             <div className="flex items-center gap-2">
               {currentStyle && (
                 <>
+                  {/* 提交审核按钮 - 草稿/已拒绝状态显示 */}
+                  {(currentStyle.status === 'draft' || currentStyle.status === 'rejected') && (
+                    <Button
+                      variant="default"
+                      size="sm"
+                      onClick={() => setSubmitDialogOpen(true)}
+                      className="gap-1.5 bg-green-600 hover:bg-green-700"
+                      title="提交审核"
+                    >
+                      <Send className="w-4 h-4" />
+                      <span className="hidden sm:inline">提交审核</span>
+                    </Button>
+                  )}
+                  {/* 撤回提交按钮 - 审核中状态显示 */}
+                  {currentStyle.status === 'pending_review' && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setWithdrawDialogOpen(true)}
+                      className="gap-1.5"
+                      title="撤回提交"
+                    >
+                      <Undo2 className="w-4 h-4" />
+                      <span className="hidden sm:inline">撤回提交</span>
+                    </Button>
+                  )}
                   <Button
                     variant="default"
                     size="sm"
@@ -300,6 +389,18 @@ export default function WorkspacePage() {
         </div>
       )}
       <CodeExportDialog open={exportDialogOpen} onOpenChange={setExportDialogOpen} />
+      <SubmissionDialog
+        open={submitDialogOpen}
+        onOpenChange={setSubmitDialogOpen}
+        onConfirm={handleSubmitForReview}
+        isSubmitting={isSubmitting}
+      />
+      <WithdrawDialog
+        open={withdrawDialogOpen}
+        onOpenChange={setWithdrawDialogOpen}
+        onConfirm={handleWithdraw}
+        isSubmitting={isSubmitting}
+      />
     </div>
   );
 }
