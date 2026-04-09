@@ -467,3 +467,110 @@ apps/web/app/styles/[id]/page.tsx  # 添加 StylePreview 组件集成
 
 **数据初始化:**
 - [ ] 在 Supabase 云端执行迁移脚本 `0022_init_style_design_tokens.sql`
+
+---
+
+## 14. v2.0 增强：颜色模板系统
+
+### 14.1 增强背景
+
+**问题**: 4 个预设颜色模板的视觉区分度不够明显，用户难以直观感受不同模板的差异。
+
+**根因**: 
+1. Header 栏、侧栏、主体背景色在多个模板中使用相同颜色角色
+2. 容器背景与容器内容背景没有形成对比
+3. 缺乏视觉锚点，各模板特色不明显
+
+### 14.2 v2.0 变更范围
+
+**新增 6 个颜色映射维度**:
+
+| 维度 | 说明 | 验收标准 |
+|------|------|----------|
+| headerBg | Header 栏背景色 | 4 个模板各不相同 |
+| navBg | 导航栏背景色 | 形成层次区分 |
+| sidebarBg | 侧栏背景色 | 与 Header 形成呼应或对比 |
+| pageBg | 页面主背景色 | 保持统一或形成对比 |
+| cardBg | 卡片背景色 | 与内容区形成对比 |
+| cardContentBg | 卡片内容背景色 | 内凹或外凸效果 |
+
+### 14.3 4 个模板的颜色分配
+
+| 维度 | 经典商务 | 活力创意 | 极简主义 | 科技现代 |
+|------|----------|----------|----------|----------|
+| headerBg | Surface | **Secondary** | Background | **Primary** |
+| navBg | Background | Surface | Background | Surface |
+| sidebarBg | Surface | Background | Surface | Background |
+| pageBg | Background | Background | Background | Background |
+| cardBg | Surface | **Secondary** | Background | **Primary** |
+| cardContentBg | Background | Surface | Surface | Surface |
+
+### 14.4 设计原则
+
+**原则 1: 三级背景层次**
+- Header 栏、侧栏、主体背景不能同时一致
+- 必须建立视觉层次
+
+**原则 2: 容器 - 内容对比**
+- 容器背景 ≠ 容器内容背景
+- 形成内凹或外凸效果
+
+**原则 3: 60-30-10 配色法则**
+- 60% 背景色 (主背景)
+- 30% 表面色 (卡片、侧栏)
+- 10% 强调色 (按钮、装饰)
+
+**原则 4: 视觉锚点**
+- 每个模板需要一个显著的色彩区域
+- 活力创意：Secondary 色的 Header 和卡片
+- 科技现代：Primary 色的 Header 和卡片
+
+### 14.5 技术实现
+
+**CSS 变量新增 (6 个)**:
+```css
+--template-header-bg
+--template-nav-bg
+--template-sidebar-bg
+--template-page-bg
+--template-card-bg
+--template-card-content-bg
+```
+
+**文件修改清单**:
+| 文件 | 变更内容 |
+|------|----------|
+| `apps/web/lib/color-templates.ts` | 新增 6 个维度到 ColorMapping 接口和 4 个模板定义 |
+| `apps/web/components/preview/style-preview/styles.module.css` | Header、侧栏、导航、卡片背景使用模板变量 |
+| `apps/web/components/workspace/PreviewPanel.tsx` | 工作台预览同步更新 |
+
+### 14.6 验收标准
+
+**视觉差异验证**:
+- [ ] 4 个模板的 Header 背景色可明显区分
+- [ ] 4 个模板的卡片背景色可明显区分
+- [ ] 4 个模板的侧栏与主体关系清晰
+- [ ] 容器与内容区形成对比
+
+**功能验证**:
+- [ ] 模板切换后预览效果实时更新
+- [ ] localStorage 持久化正常
+- [ ] StylePreview 和 PreviewPanel 效果一致
+
+### 14.7 相关文档
+
+- `docs/main/P2_COLOR_TEMPLATE_PRD.md` - 产品需求文档
+- `docs/main/P3_COLOR_TEMPLATE_V2_ENHANCEMENT.md` - 增强文档
+- `docs/main/P2_COLOR_TEMPLATE_BROWSER_TEST.md` - 浏览器测试报告
+
+---
+
+## 15. 修订历史
+
+| 版本 | 日期 | 变更内容 |
+|------|------|----------|
+| 1.0 | 2026-04-04 | 初始版本 - Story Spec 创建 |
+| 1.1 | 2026-04-04 | 实施完成 - 创建所有组件并集成到风格详情页，构建验证通过 |
+| 1.2 | 2026-04-04 | 需求增强 - 完整设计变量系统（8 色配色、完整字体参数、圆角、阴影、间距） |
+| 1.3 | 2026-04-04 | 预览场景增强 - 配色/字体/间距/圆角/阴影展示 |
+| 2.0 | 2026-04-08 | 颜色模板 v2.0 - 新增 6 个区域背景色维度，增强 4 个模板视觉区分度 |

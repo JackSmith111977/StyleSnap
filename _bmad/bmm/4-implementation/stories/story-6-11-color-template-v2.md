@@ -176,6 +176,8 @@ type BackgroundRole = 'background' | 'surface';
 - [x] 修复科技现代模板标题颜色问题（titleColor: 'text'）
 - [x] 更新组件样式应用阴影变量
 - [x] 构建验证：`pnpm build` 成功
+- [x] 阴影效果优化：常态无阴影，悬浮时显示阴影
+- [x] 卡片展示改为三栏布局，分别展示 Light/Medium/Heavy 三种阴影强度
 
 ---
 
