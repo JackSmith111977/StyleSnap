@@ -184,7 +184,7 @@ export async function register(
     // ============================================
     // 步骤 4: 检查 profile 是否已创建
     // ============================================
-    const { data: profileData } = await supabase
+    const { data: profileData, error: profileError } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', data.user.id)

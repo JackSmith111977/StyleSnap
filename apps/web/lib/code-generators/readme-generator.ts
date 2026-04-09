@@ -3,7 +3,7 @@
  * 为导出的设计系统生成使用说明
  */
 
-import { DesignTokens } from '@/stores/workspace-store';
+import { type DesignTokens } from '@/stores/workspace-store';
 
 /**
  * README 生成选项

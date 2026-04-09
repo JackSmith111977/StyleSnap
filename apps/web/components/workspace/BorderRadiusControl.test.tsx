@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { BorderRadiusControl } from './BorderRadiusControl';
 
 /**
@@ -7,23 +7,27 @@ import { BorderRadiusControl } from './BorderRadiusControl';
  */
 
 vi.mock('@/components/ui/input', () => ({
-  Input: ({ value, onChange, type, min, max, ...props }: any) => (
-    <input value={value} onChange={onChange} type={type} min={min} max={max} data-testid="radius-input" {...props} />
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  Input: ({ value, onChange, type, min, max, ..._props }: any) => (
+    <input value={value} onChange={onChange} type={type} min={min} max={max} data-testid="radius-input" {..._props} />
   ),
 }));
 
 vi.mock('@/components/ui/label', () => ({
-  Label: ({ children, ...props }: any) => <label data-testid="radius-label" {...props}>{children}</label>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  Label: ({ children, ..._props }: any) => <label data-testid="radius-label" {..._props}>{children}</label>,
 }));
 
 vi.mock('@/components/ui/button', () => ({
-  Button: ({ children, onClick, ...props }: any) => (
-    <button onClick={onClick} data-testid="radius-button" {...props}>{children}</button>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  Button: ({ children, onClick, ..._props }: any) => (
+    <button onClick={onClick} data-testid="radius-button" {..._props}>{children}</button>
   ),
 }));
 
 vi.mock('@/components/ui/slider', () => ({
-  Slider: ({ value, onValueChange, ...props }: any) => (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  Slider: ({ value, onValueChange, ..._props }: any) => (
     <div
       data-testid="radius-slider"
       data-value={value[0]}
@@ -35,6 +39,7 @@ vi.mock('@/components/ui/slider', () => ({
 }));
 
 vi.mock('@/lib/utils', () => ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   cn: (...classes: any[]) => classes.filter(Boolean).join(' '),
 }));
 

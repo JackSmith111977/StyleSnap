@@ -1,6 +1,5 @@
 'use server';
 
-import { createClient } from '@/lib/supabase/server';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { env } from '@/env';
@@ -23,11 +22,11 @@ export interface BatchCodeGenerationResult {
  * 将数据库中的设计变量格式转换为 DesignTokens 格式
  */
 function convertDBTokensToDesignTokens(
-  colorPalette: any,
-  fonts: any,
-  spacing: any,
-  borderRadius: any,
-  shadows: any
+  colorPalette: Record<string, unknown> | null,
+  fonts: Record<string, unknown> | null,
+  spacing: Record<string, unknown> | null,
+  borderRadius: Record<string, unknown> | null,
+  shadows: Record<string, unknown> | null
 ): DesignTokens {
   // 解析颜色（8 色完整色板）
   const colors: ColorTokens = {
@@ -87,7 +86,7 @@ function convertDBTokensToDesignTokens(
 /**
  * 解析间距值（支持 "8px" -> 8 或直接数字）
  */
-function parseSpacingValue(value: any): number | null {
+function parseSpacingValue(value: unknown): number | null {
   if (value === null || value === undefined) return null;
   if (typeof value === 'number') return value;
   if (typeof value === 'string') {
@@ -128,7 +127,7 @@ async function createServiceRoleClient() {
  * 为单个风格生成代码并保存（使用 RPC 函数绕过 RLS）
  */
 async function generateStyleCode(
-  supabase: any,
+  supabase: unknown,
   styleId: string,
   styleName: string
 ): Promise<{ success: boolean; error?: string }> {

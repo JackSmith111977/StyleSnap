@@ -27,7 +27,7 @@ interface StyleCodeViewerProps {
  * 与工作台 CodeExportDialog 格式完全一致
  */
 export function StyleCodeViewer({
-  styleId,
+  _styleId,
   styleName,
   codeCss,
   codeCssModules,
@@ -79,7 +79,7 @@ export function StyleCodeViewer({
     try {
       await navigator.clipboard.writeText(code);
       toast.success('代码已复制到剪贴板');
-    } catch (error) {
+    } catch (_error) {
       toast.error('复制失败');
     }
   };

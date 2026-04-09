@@ -59,7 +59,7 @@ export async function createCollection(
 
     return {
       success: true,
-      data: { id: collection.id },
+      data: { id: (collection as { id: string }).id },
     }
   } catch (error) {
     await captureActionError(error, {
@@ -187,7 +187,7 @@ export async function getCollectionDetail(
       throw error
     }
 
-    const collection = data?.[0] as {
+    const collection = (data?.[0] as unknown) as {
       id: string
       user_id: string
       name: string
@@ -256,7 +256,7 @@ export async function getUserCollections(
     const offset = (page - 1) * limit
 
     // 使用 RPC 函数获取合集列表
-    const { data, error } = await supabase.rpc('get_user_collections', {
+    const { data: rawData, error } = await supabase.rpc('get_user_collections', {
       p_user_id: validatedData,
       p_viewer_id: user?.id ?? null,
       p_limit: limit,
@@ -267,7 +267,7 @@ export async function getUserCollections(
       throw error
     }
 
-    const collections: Collection[] = ((data as unknown[]) ?? []).map((item: unknown) => {
+    const collections: Collection[] = ((rawData as unknown[]) ?? []).map((item: unknown) => {
       const typedItem = item as Record<string, unknown>
       return {
         id: typedItem.id as string,

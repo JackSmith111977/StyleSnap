@@ -56,9 +56,6 @@ test.describe('工作台自动保存功能', () => {
       // 找到编辑区域并进行修改
       const primaryColorInput = page.locator('input[placeholder="#000000"]').first();
       if (await primaryColorInput.isVisible()) {
-        // 记录当前时间
-        const beforeEdit = Date.now();
-
         // 修改颜色
         await primaryColorInput.fill('#FF0000');
         await page.waitForTimeout(500);
@@ -106,10 +103,9 @@ test.describe('工作台自动保存功能', () => {
         await page.waitForTimeout(5000);
 
         // 记录保存状态
-        let saveCount = 0;
         const savedStatus = page.getByText(/已保存/i);
         if (await savedStatus.isVisible()) {
-          saveCount++;
+          // 保存计数（用于观察）
         }
 
         // 继续等待 30 秒观察定时保存
@@ -215,7 +211,7 @@ test.describe('工作台自动保存功能', () => {
         const toast = page.locator('[data-sonner-toast], .toast');
         if (await toast.isVisible()) {
           const toastText = await toast.textContent();
-          expect(toastText && toastText.includes('保存')).toBeTruthy();
+          expect(toastText?.includes('保存')).toBeTruthy();
         }
       }
     }

@@ -75,8 +75,8 @@ export async function toggleFavorite(
     }
 
     const result = {
-      is_favorite: rpcResult.is_favorite as boolean,
-      count: Number(rpcResult.count) as number,
+      is_favorite: (rpcResult as { is_favorite: boolean }).is_favorite,
+      count: Number((rpcResult as { count: unknown }).count),
     }
     console.log('[toggleFavorite] 解析后的结果:', result)
 
@@ -574,7 +574,7 @@ export async function getUserCollectionsSimple(): Promise<{
       throw error
     }
 
-    const collections = (data || []).map(c => ({
+    const collections = (data ?? []).map((c: { id: string; name: string; style_count: unknown }) => ({
       id: c.id,
       name: c.name,
       style_count: Array.isArray(c.style_count) ? (c.style_count[0] as { count?: number })?.count ?? 0 : 0,

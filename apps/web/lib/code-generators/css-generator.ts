@@ -3,7 +3,7 @@
  * 将 DesignTokens 转换为可用的 CSS 代码
  */
 
-import { DesignTokens } from '@/stores/workspace-store';
+import { type DesignTokens } from '@/stores/workspace-store';
 
 /**
  * 生成的 CSS 结果
@@ -79,7 +79,7 @@ function generateCSSVariables(tokens: DesignTokens): string {
 /**
  * 生成 CSS Modules
  */
-function generateCSSModules(tokens: DesignTokens): string {
+function generateCSSModules(_tokens: DesignTokens): string {
   return `/* ========================================
  * StyleSnap CSS Modules
  * ======================================== */

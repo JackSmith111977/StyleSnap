@@ -264,7 +264,7 @@ export function ColorPicker({ label, value, onChange, description }: ColorPicker
     const viewportHeight = window.innerHeight;
     const viewportWidth = window.innerWidth;
     const spaceBelow = viewportHeight - buttonRect.bottom;
-    const spaceAbove = buttonRect.top;
+    const _spaceAbove = buttonRect.top;
     const popoverWidth = 288; // w-72 = 288px
 
     // 优先向下展开，空间不足则向上

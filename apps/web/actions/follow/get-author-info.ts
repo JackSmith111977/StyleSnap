@@ -73,18 +73,29 @@ export async function getAuthorInfo(
       isFollowing = !!followData
     }
 
+    // 类型断言：确保 profile 字段类型安全
+    const typedProfile = profile as {
+      user_id: string
+      display_name: string | null
+      avatar_url: string | null
+      bio: string | null
+      follower_count: number | null
+      following_count: number | null
+      created_at: string
+    }
+
     return {
       success: true,
       data: {
-        user_id: profile.user_id,
-        display_name: profile.display_name,
-        avatar_url: profile.avatar_url,
-        bio: profile.bio,
+        user_id: typedProfile.user_id,
+        display_name: typedProfile.display_name,
+        avatar_url: typedProfile.avatar_url,
+        bio: typedProfile.bio,
         style_count: count ?? 0,
-        follower_count: profile.follower_count ?? 0,
-        following_count: profile.following_count ?? 0,
+        follower_count: typedProfile.follower_count ?? 0,
+        following_count: typedProfile.following_count ?? 0,
         is_following: isFollowing,
-        created_at: profile.created_at,
+        created_at: typedProfile.created_at,
       },
     }
   } catch (error) {

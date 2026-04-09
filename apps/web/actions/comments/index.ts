@@ -56,10 +56,10 @@ export async function getComments(
       throw error
     }
 
-    const comments: Comment[] = (data || []).map((row) => ({
+    const comments: Comment[] = (data ?? []).map((row) => ({
       ...row,
-      username: (row.profiles as { username: string }).username,
-      avatar_url: (row.profiles as { avatar_url: string | null }).avatar_url,
+      username: (row.profiles as { username: string })?.username ?? '',
+      avatar_url: (row.profiles as { avatar_url: string | null })?.avatar_url ?? null,
     }))
 
     // 获取回复
@@ -78,10 +78,10 @@ export async function getComments(
           .eq('status', 'approved')
           .order('created_at', { ascending: true })
 
-        comment.replies = (replies || []).map((row) => ({
+        comment.replies = (replies ?? []).map((row) => ({
           ...row,
-          username: (row.profiles as { username: string }).username,
-          avatar_url: (row.profiles as { avatar_url: string | null }).avatar_url,
+          username: (row.profiles as { username: string })?.username ?? '',
+          avatar_url: (row.profiles as { avatar_url: string | null })?.avatar_url ?? null,
         }))
 
         return comment
@@ -127,7 +127,7 @@ export async function createComment(
     // 设置 Sentry 用户上下文
     await setSentryUser({
       id: user.id,
-      email: user.email || undefined,
+      email: user.email ?? undefined,
     })
 
     // 检查风格是否存在
@@ -167,7 +167,7 @@ export async function createComment(
         user_id: user.id,
         parent_id: actualParentId,
         content: validatedData.content.trim(),
-        reply_to_user_id: validatedData.replyToUserId || null,  // 新增：记录回复关系
+        reply_to_user_id: validatedData.replyToUserId ?? null,  // 新增：记录回复关系
         status: 'approved',
       })
       .select(`
@@ -230,7 +230,7 @@ export async function deleteComment(
     // 设置 Sentry 用户上下文
     await setSentryUser({
       id: user.id,
-      email: user.email || undefined,
+      email: user.email ?? undefined,
     })
 
     // 检查评论是否存在且属于当前用户

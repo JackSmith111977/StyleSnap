@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import { useWorkspaceStore, DEFAULT_TOKENS, type WorkspaceStyle, type DesignTokens } from './workspace-store';
+import { useWorkspaceStore, DEFAULT_TOKENS, type WorkspaceStyle } from './workspace-store';
 
 /**
  * Workspace Store 单元测试
@@ -64,7 +64,7 @@ describe('useWorkspaceStore', () => {
     };
 
     it('应该正确设置当前风格', () => {
-      const { setCurrentStyle, currentStyle } = useWorkspaceStore.getState();
+      const { setCurrentStyle: _setCurrentStyle } = useWorkspaceStore.getState();
 
       setCurrentStyle(mockStyle);
 

@@ -3,15 +3,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import { ColorPicker } from './ColorPicker';
 
@@ -150,7 +142,7 @@ export function ShadowControl({
 
       // 200ms 防抖
       const timer = setTimeout(() => {
-        const shadow = generateShadow(newParams as any);
+        const shadow = generateShadow(newParams as unknown as { x: number; y: number; blur: number; spread: number; color: string });
         onChange({ [activeShadow]: shadow });
       }, 200);
       return () => clearTimeout(timer);

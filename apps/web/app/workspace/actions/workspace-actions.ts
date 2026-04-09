@@ -255,10 +255,12 @@ export async function saveStyleDraft(
  * 创建新风格
  * @param name 风格名称
  * @param categoryId 分类 ID（name_en 值，如 'Minimalist'）
+ * @param description 风格描述（可选，建议 ≥10 字符）
  */
 export async function createNewStyle(
   name: string,
-  categoryId: string
+  categoryId: string,
+  description?: string
 ): Promise<{
   success: boolean;
   styleId?: string;
@@ -299,7 +301,7 @@ export async function createNewStyle(
       .from('styles')
       .insert({
         title: name,
-        description: '',
+        description: description || '',
         category_id: category.id,
         author_id: user.id,
         status: 'draft',
@@ -377,7 +379,7 @@ export async function submitForReview(
     const { error: updateError } = await supabase
       .from('styles')
       .update({
-        status: 'pending',
+        status: 'pending_review',
         submitted_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       })
@@ -439,7 +441,7 @@ export async function getStyleDetail(
     }
 
     // 直接使用 design_tokens 字段
-    const designTokens: DesignTokens | null = (data as any).design_tokens || null;
+    const designTokens: DesignTokens | null = (data as { design_tokens?: DesignTokens }).design_tokens || null;
 
     return {
       success: true,

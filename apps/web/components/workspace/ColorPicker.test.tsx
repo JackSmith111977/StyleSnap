@@ -55,7 +55,7 @@ vi.mock('@/components/ui/popover', () => ({
 }));
 
 vi.mock('@/lib/utils', () => ({
-  cn: (...classes: (string | undefined | null | false)[]) => classes.filter(Boolean).join(' '),
+  cn: (...classes: Array<string | undefined | null | false>) => classes.filter(Boolean).join(' '),
 }));
 
 describe('ColorPicker', () => {

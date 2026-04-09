@@ -3,7 +3,7 @@
  * 将 DesignTokens 转换为可用的 HTML 代码
  */
 
-import { DesignTokens } from '@/stores/workspace-store';
+import { type DesignTokens } from '@/stores/workspace-store';
 
 /**
  * 生成的 HTML 结果
@@ -82,7 +82,7 @@ function generateIndexHTML(tokens: DesignTokens, styleName: string): string {
 /**
  * 生成 Hero Section 组件
  */
-function generateHeroHTML(tokens: DesignTokens): string {
+function generateHeroHTML(_tokens: DesignTokens): string {
   return `<!-- Hero Section Component -->
 <section class="hero">
   <div class="container">
@@ -99,7 +99,7 @@ function generateHeroHTML(tokens: DesignTokens): string {
 /**
  * 生成 Card 组件
  */
-function generateCardHTML(tokens: DesignTokens): string {
+function generateCardHTML(_tokens: DesignTokens): string {
   return `<!-- Card Component -->
 <div class="card">
   <div class="card-header">
@@ -112,7 +112,7 @@ function generateCardHTML(tokens: DesignTokens): string {
 /**
  * 生成 Button 组件
  */
-function generateButtonHTML(tokens: DesignTokens): string {
+function generateButtonHTML(_tokens: DesignTokens): string {
   return `<!-- Button Components -->
 <div style="display: flex; gap: var(--spacing-md);">
   <!-- Primary Button -->

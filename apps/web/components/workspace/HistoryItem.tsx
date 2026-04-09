@@ -19,7 +19,7 @@ interface HistoryItemProps {
  */
 export function HistoryItem({
   entry,
-  index,
+  _index,
   isCurrent,
   onClick,
   formatTime,

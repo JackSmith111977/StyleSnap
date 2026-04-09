@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { ZoomIn, ZoomOut, RotateCcw, Monitor, Tablet, Smartphone, Move } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { ColorTemplateSelector } from '@/components/workspace/ColorTemplateSelector';
 
 interface CanvasPreviewProps {
   designTokens: WorkspaceDesignTokens;
@@ -156,7 +157,7 @@ export function CanvasPreview({ designTokens, convertToPreviewTokens }: CanvasPr
 
   const previewTokens = convertToPreviewTokens(designTokens);
   const currentSize = CANVAS_SIZES[canvasSize];
-  const SizeIcon = currentSize.icon;
+  const _SizeIcon = currentSize.icon;
 
   // 处理画布尺寸切换
   const handleCanvasSizeChange = useCallback((size: CanvasSize) => {
@@ -233,10 +234,13 @@ export function CanvasPreview({ designTokens, convertToPreviewTokens }: CanvasPr
             })}
           </div>
 
-          {/* 右侧：平移提示 */}
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <Move className="h-3 w-3" />
-            <span>Shift/ 中键拖拽平移 | Ctrl+ 滚轮缩放 | Ctrl+0 重置</span>
+          {/* 右侧：模板选择器 + 平移提示 */}
+          <div className="flex items-center gap-4">
+            <ColorTemplateSelector />
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <Move className="h-3 w-3" />
+              <span>Shift/ 中键拖拽平移 | Ctrl+ 滚轮缩放 | Ctrl+0 重置</span>
+            </div>
           </div>
         </div>
       </div>

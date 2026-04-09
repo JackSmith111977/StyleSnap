@@ -5,7 +5,7 @@
 
 import * as JSZip from 'jszip';
 import { saveAs } from 'file-saver';
-import { DesignTokens } from '@/stores/workspace-store';
+import { type DesignTokens } from '@/stores/workspace-store';
 import { generateCSS } from './css-generator';
 import { generateHTML } from './html-generator';
 import { generateREADME } from './readme-generator';

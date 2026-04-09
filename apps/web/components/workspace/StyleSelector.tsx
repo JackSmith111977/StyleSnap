@@ -109,7 +109,7 @@ export function StyleSelector({ onStyleSelect, onCreateNew }: StyleSelectorProps
   const [selectedStatus, setSelectedStatus] = useState<StyleStatus>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStyleId, setSelectedStyleId] = useState<string | null>(null);
-  const { setCurrentStyle } = useWorkspaceStore();
+  const { setCurrentStyle: _setCurrentStyle } = useWorkspaceStore();
 
   // 加载风格列表
   const loadStyles = async () => {
@@ -133,7 +133,7 @@ export function StyleSelector({ onStyleSelect, onCreateNew }: StyleSelectorProps
   // 初始加载和筛选条件变化时重新加载
   useEffect(() => {
     const debounceTimer = setTimeout(() => {
-      loadStyles();
+      void loadStyles();
     }, 300);
 
     return () => clearTimeout(debounceTimer);
@@ -147,7 +147,7 @@ export function StyleSelector({ onStyleSelect, onCreateNew }: StyleSelectorProps
 
   // 过滤后的风格列表（前端二次筛选）
   const filteredStyles = useMemo(() => {
-    return styles.filter((style) => {
+    return styles.filter((_style) => {
       // 状态筛选已在服务端完成
       // 搜索筛选也在服务端完成
       return true;

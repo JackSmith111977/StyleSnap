@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { FontSelector } from './FontSelector';
 
 /**
@@ -7,35 +7,43 @@ import { FontSelector } from './FontSelector';
  */
 
 vi.mock('@/components/ui/input', () => ({
-  Input: ({ value, onChange, ...props }: any) => (
-    <input value={value} onChange={onChange} data-testid="font-input" {...props} />
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  Input: ({ value, onChange, ..._props }: any) => (
+    <input value={value} onChange={onChange} data-testid="font-input" {..._props} />
   ),
 }));
 
 vi.mock('@/components/ui/label', () => ({
-  Label: ({ children, ...props }: any) => <label data-testid="font-label" {...props}>{children}</label>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  Label: ({ children, ..._props }: any) => <label data-testid="font-label" {..._props}>{children}</label>,
 }));
 
 vi.mock('@/components/ui/button', () => ({
-  Button: ({ children, onClick, ...props }: any) => (
-    <button onClick={onClick} data-testid="font-button" {...props}>{children}</button>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  Button: ({ children, onClick, ..._props }: any) => (
+    <button onClick={onClick} data-testid="font-button" {..._props}>{children}</button>
   ),
 }));
 
 vi.mock('@/components/ui/select', () => ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   Select: ({ value, onValueChange, children }: any) => (
     <select value={value} onChange={(e) => onValueChange?.(e.target.value)} data-testid="font-select">
       {children}
     </select>
   ),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   SelectContent: ({ children }: any) => <div data-testid="select-content">{children}</div>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   SelectItem: ({ value, children }: any) => <option value={value}>{children}</option>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   SelectTrigger: ({ children }: any) => <button data-testid="select-trigger">{children}</button>,
   SelectValue: () => <span data-testid="select-value" />,
 }));
 
 vi.mock('@/components/ui/slider', () => ({
-  Slider: ({ value, onValueChange, ...props }: any) => (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  Slider: ({ value, onValueChange, ..._props }: any) => (
     <div
       data-testid="font-slider"
       data-value={value[0]}
@@ -47,6 +55,7 @@ vi.mock('@/components/ui/slider', () => ({
 }));
 
 vi.mock('@/lib/utils', () => ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   cn: (...classes: any[]) => classes.filter(Boolean).join(' '),
 }));
 

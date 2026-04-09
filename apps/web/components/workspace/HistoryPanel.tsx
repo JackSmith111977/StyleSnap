@@ -8,7 +8,6 @@ import { useWorkspaceStore } from '@/stores/workspace-store';
 import { History, RotateCcw, RotateCw, Trash2, Settings2 } from 'lucide-react';
 import { HistoryItem } from './HistoryItem';
 import { HistorySettings } from './HistorySettings';
-import { cn } from '@/lib/utils';
 
 interface HistoryPanelProps {
   open: boolean;

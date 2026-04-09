@@ -7,12 +7,16 @@ import { CanvasPreview } from '@/components/workspace/CanvasPreview';
 import { CodeExportDialog } from '@/components/workspace/CodeExportDialog';
 import { SubmissionDialog } from '@/components/workspace/SubmissionDialog';
 import { WithdrawDialog } from '@/components/workspace/WithdrawDialog';
+import { StyleBasicsEditor } from '@/components/workspace/StyleBasicsEditor';
+import { CompletenessIndicator } from '@/components/workspace/CompletenessIndicator';
+import { SubmissionErrorDialog } from '@/components/workspace/SubmissionErrorDialog';
 import { Button } from '@/components/ui/button';
-import { Code2, Send, Undo2 } from 'lucide-react';
+import { Code2, Send, Undo2, Pencil } from 'lucide-react';
 import { useWorkspaceStore, type DesignTokens as WorkspaceDesignTokens, type WorkspaceStyle } from '@/stores/workspace-store';
 import { type DesignTokens as PreviewDesignTokens } from '@/stores/preview-editor-store';
 import { getStyleDetail, createNewStyle, saveStyleDraft } from './actions/workspace-actions';
 import { toast } from 'sonner';
+import { checkStyleCompleteness } from '@/utils/completeness-check';
 
 /**
  * 分类选项（value 必须与数据库 categories.name_en 完全匹配）
@@ -48,6 +52,7 @@ export default function WorkspacePage() {
   const { currentStyle, setCurrentStyle, clearWorkspace, designTokens, startAutoSave, stopAutoSave, setSaveCallback } = useWorkspaceStore();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newStyleName, setNewStyleName] = useState('');
+  const [newStyleDescription, setNewStyleDescription] = useState('');
   const [newStyleCategory, setNewStyleCategory] = useState<string>(CATEGORY_OPTIONS[0]?.value || 'minimalist');
   const [isCreating, setIsCreating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -55,6 +60,9 @@ export default function WorkspacePage() {
   const [submitDialogOpen, setSubmitDialogOpen] = useState(false);
   const [withdrawDialogOpen, setWithdrawDialogOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [basicsEditorOpen, setBasicsEditorOpen] = useState(false);
+  const [submissionErrorOpen, setSubmissionErrorOpen] = useState(false);
+  const [submissionErrors, setSubmissionErrors] = useState<ReturnType<typeof checkStyleCompleteness>['errors']>({});
 
   // 设置保存回调 - 使用 useRef 确保始终使用最新的 currentStyle
   const currentStyleRef = React.useRef<WorkspaceStyle | null>(currentStyle);
@@ -132,14 +140,19 @@ export default function WorkspacePage() {
       toast.error('请输入风格名称');
       return;
     }
+    if (newStyleDescription.trim().length < 10) {
+      toast.error('描述至少需要 10 个字符');
+      return;
+    }
 
     setIsCreating(true);
     try {
-      const response = await createNewStyle(newStyleName, newStyleCategory);
+      const response = await createNewStyle(newStyleName, newStyleCategory, newStyleDescription);
       if (response.success && response.styleId) {
         toast.success('风格创建成功');
         setShowCreateModal(false);
         setNewStyleName('');
+        setNewStyleDescription('');
         // 跳转到新风格的编辑页面
         void handleStyleSelect(response.styleId);
       } else {
@@ -166,6 +179,7 @@ export default function WorkspacePage() {
   const closeCreateModal = () => {
     setShowCreateModal(false);
     setNewStyleName('');
+    setNewStyleDescription('');
     setNewStyleCategory(CATEGORY_OPTIONS[0]?.value || 'minimalist');
   };
 
@@ -189,7 +203,14 @@ export default function WorkspacePage() {
         });
         setSubmitDialogOpen(false);
       } else {
-        toast.error(result.error || '提交失败');
+        // 检查是否是完整性检查失败
+        if (result.error?.includes('完整性检查失败')) {
+          const check = checkStyleCompleteness(state.designTokens, state.basics);
+          setSubmissionErrors(check.errors);
+          setSubmissionErrorOpen(true);
+        } else {
+          toast.error(result.error || '提交失败');
+        }
       }
     } catch (error) {
       console.error('提交审核失败:', error);
@@ -232,15 +253,34 @@ export default function WorkspacePage() {
       <header className="border-b bg-card">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div>
+            <div className="flex-1 min-w-0">
               <h1 className="text-2xl font-bold">工作台</h1>
-              <p className="text-sm text-muted-foreground mt-1">
-                {currentStyle ? (
-                  <span>编辑中：<span className="font-medium text-foreground">{currentStyle.name}</span></span>
-                ) : (
-                  '创建和编辑您的设计风格'
-                )}
-              </p>
+              {currentStyle ? (
+                <div className="mt-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-muted-foreground">
+                      编辑中：<span className="font-medium text-foreground">{currentStyle.name}</span>
+                    </span>
+                    <CompletenessIndicator />
+                    <button
+                      onClick={() => setBasicsEditorOpen(true)}
+                      className="p-0.5 rounded hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
+                      title="编辑基本信息"
+                    >
+                      <Pencil className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                  {currentStyle.description && (
+                    <p className="text-xs text-muted-foreground mt-0.5 truncate max-w-md" title={currentStyle.description}>
+                      {currentStyle.description}
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground mt-1">
+                  创建和编辑您的设计风格
+                </p>
+              )}
             </div>
             <div className="flex items-center gap-2">
               {currentStyle && (
@@ -331,25 +371,11 @@ export default function WorkspacePage() {
             <div>
               <h3 className="text-lg font-semibold">创建新风格</h3>
               <p className="text-sm text-muted-foreground">
-                选择分类并填写风格名称
+                选择分类并填写风格信息
               </p>
             </div>
 
             <div className="space-y-3">
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  风格名称
-                </label>
-                <input
-                  type="text"
-                  value={newStyleName}
-                  onChange={(e) => setNewStyleName(e.target.value)}
-                  placeholder="输入风格名称"
-                  className="w-full px-3 py-2 border rounded-md bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                  autoFocus
-                />
-              </div>
-
               <div>
                 <label className="block text-sm font-medium mb-1">
                   分类
@@ -366,6 +392,42 @@ export default function WorkspacePage() {
                   ))}
                 </select>
               </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  风格名称 <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={newStyleName}
+                  onChange={(e) => setNewStyleName(e.target.value)}
+                  placeholder="输入风格名称"
+                  className="w-full px-3 py-2 border rounded-md bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                  maxLength={50}
+                  autoFocus
+                />
+                {!newStyleName.trim() && (
+                  <p className="text-xs text-red-500 mt-1">名称为必填项</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  描述 <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  value={newStyleDescription}
+                  onChange={(e) => setNewStyleDescription(e.target.value)}
+                  placeholder="描述你的设计理念和特点..."
+                  rows={3}
+                  maxLength={500}
+                  className="w-full px-3 py-2 border rounded-md bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+                />
+                <p className={`text-xs mt-1 ${newStyleDescription.length >= 10 ? 'text-green-500' : 'text-muted-foreground'}`}>
+                  {newStyleDescription.length}/500 字符
+                  {newStyleDescription.length >= 10 ? ' ✅' : '（至少需要 10 个字符）'}
+                </p>
+              </div>
             </div>
 
             <div className="flex gap-2 pt-4">
@@ -380,7 +442,7 @@ export default function WorkspacePage() {
               <Button
                 onClick={handleCreateNew}
                 className="flex-1"
-                disabled={isCreating || !newStyleName.trim()}
+                disabled={isCreating || !newStyleName.trim() || newStyleDescription.trim().length < 10}
               >
                 {isCreating ? '创建中...' : '创建'}
               </Button>
@@ -400,6 +462,19 @@ export default function WorkspacePage() {
         onOpenChange={setWithdrawDialogOpen}
         onConfirm={handleWithdraw}
         isSubmitting={isSubmitting}
+      />
+      <StyleBasicsEditor
+        open={basicsEditorOpen}
+        onOpenChange={setBasicsEditorOpen}
+      />
+      <SubmissionErrorDialog
+        open={submissionErrorOpen}
+        onOpenChange={setSubmissionErrorOpen}
+        errors={submissionErrors}
+        onGoToEdit={() => {
+          setSubmissionErrorOpen(false);
+          setBasicsEditorOpen(true);
+        }}
       />
     </div>
   );
