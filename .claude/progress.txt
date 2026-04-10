@@ -2,6 +2,223 @@
 
 ---
 
+## 2026-04-10
+
+### ✅ 已完成
+
+**任务：Story 7.2 - 审核队列实现**
+- 状态：已完成
+- 开始时间：2026-04-10
+- 完成时间：2026-04-10
+- 变更概述：实现审核队列页面 + Server Actions + Zustand Store + 5 个 UI 组件 + 两轮代码审查修复
+- 核心变更：
+  1. **新建数据库迁移**：
+     - `supabase/migrations/0032_add_submitted_at.sql` - 添加 submitted_at 字段和索引
+  2. **新建 Server Actions**：
+     - `apps/web/actions/admin/get-pending-styles.ts` - 获取待审风格列表（分页 + 分类筛选 + UUID 校验 + requireAdmin）
+     - `apps/web/actions/admin/get-style-detail.ts` - 获取单个待审风格详情（UUID 校验）
+  3. **新建 Zustand Store**：
+     - `apps/web/stores/admin-review-store.ts` - 审核队列状态管理
+  4. **新建 UI 组件**：
+     - `apps/web/components/admin/EmptyReviewQueue.tsx` - 空状态组件
+     - `apps/web/components/admin/ReviewCard.tsx` - 待审风格卡片（缩略图 + 提交者 + 等待时间 + 焦点环）
+     - `apps/web/components/admin/ReviewQueue.tsx` - 审核队列列表（加载骨架 + 空状态）
+     - `apps/web/components/admin/ReviewFilters.tsx` - 分类筛选器（URL 同步 + ARIA label）
+     - `apps/web/components/admin/StylePreviewPanel.tsx` - 风格详情预览面板（4 标签页 + 审核按钮 disabled）
+  5. **新建页面**：
+     - `apps/web/app/admin/review/page.tsx` - 审核队列主页面（双栏布局：左侧 30% 列表，右侧 70% 预览 + 分页）
+- 代码审查修复：
+  - **High**：H1 错误提示（error state + banner）、H2 分页、H3 Store error dead code
+  - **Medium**：M1 输入校验（UUID 正则/分页范围）、M2 移除 author_id、M3 按钮 disabled+tooltip、M4 未来时间处理、M5 无效日期检测、M6 焦点环、M7 ARIA label
+- 验证结果：
+  - pnpm typecheck: 新文件 0 错误
+  - pnpm lint: 0 新增 error/warning
+  - pnpm build: 成功
+  - MCP 浏览器测试: 页面渲染正常，控制台 0 错误
+- git 提交：`8d248d7`
+- 推送到远程：feat/bmad ✓
+
+---
+
+## 2026-04-10
+
+### 🔄 进行中
+
+### ✅ 已完成
+
+**任务：Story 7.1 二次代码审查修复**
+- 状态：已完成
+- 开始时间：2026-04-10
+- 完成时间：2026-04-10
+- 变更概述：修复二次代码审查发现的 6 个问题（2 High + 2 Medium + 2 Low）
+- 修复内容：
+  1. N2: `markInviteCodeUsed` 失败时阻断注册流程（返回错误 + fieldErrors）
+  2. N3: register 预检查错误添加 console.warn 日志输出
+  3. N4: register catch 块改为通用错误信息（不泄露内部细节）
+  4. N5: admin/layout 添加 profileError 检测 + 日志 + 重定向
+  5. N6: `generateInviteCode` 使用拒绝采样消除 modulo bias
+  6. N1: `getMyInviteCodes` used_by 类型修正为 `Array<T>`（lint 修复）
+- 修改文件：
+  - `apps/web/actions/admin/invite-codes.ts` - 拒绝采样 + 类型修正
+  - `apps/web/actions/auth/index.ts` - 阻断 + 日志 + 错误信息
+  - `apps/web/app/admin/layout.tsx` - profileError 处理
+- 验证结果：
+  - pnpm build: 成功 (21.7s)
+  - pnpm typecheck: 修改文件无错误
+  - pnpm lint: 0 新增 warning
+- 状态：review（待二次确认或标记 done）
+
+**任务：Story 7.1 浏览器验证 + /unauthorized 路由循环修复**
+- 状态：已完成
+- 开始时间：2026-04-10
+- 完成时间：2026-04-10
+- 变更概述：浏览器自动化测试 Epic 7 功能，修复 /admin/unauthorized 无限重定向循环
+- 问题与修复：
+  1. `/admin/unauthorized` 被 `/admin/layout.tsx` 角色检查捕获 → 无限重定向循环
+     - 修复：创建 `/admin/unauthorized/layout.tsx` 绕过父 layout 角色检查
+  2. 403 页面 Button 组件 `buttonVariants()` 在服务端调用报错
+     - 修复：改用 `<Button asChild>` 包裹 `<Link>`
+  3. `/admin/unauthorized` 最终移至 `/unauthorized-admin` 独立路由，彻底避免 layout 嵌套循环
+- 浏览器测试结果（MCP Playwright + Next.js MCP）：
+  - ✅ `/admin` 已登录非管理员 → 重定向到 `/unauthorized-admin`
+  - ✅ `/admin/review` Admin UI 渲染 → 左侧导航 + 面包屑正常
+  - ✅ `/unauthorized-admin` → 403 页面渲染，按钮正常
+  - ✅ `/admin/styles` 未登录 → 重定向到 `/login?redirect=/admin/styles`
+  - ✅ `/register` 已登录 → 重定向到首页
+  - ✅ Next.js MCP 错误检查 → 0 config/session 错误
+- 修改文件：
+  - 新建 `apps/web/app/unauthorized-admin/page.tsx` - 403 页面（独立路由）
+  - 新建 `apps/web/app/admin/unauthorized/layout.tsx` - 已删除
+  - 修改 `apps/web/app/admin/layout.tsx` - 重定向目标改为 `/unauthorized-admin`
+  - 修改 `apps/web/components/admin/AdminHeader.tsx` - 移除 unauthorized 标签
+- 状态：done（Epic 7 基础架构完成）
+
+---
+
+## 2026-04-09
+
+### ✅ 已完成
+
+**任务：Story 7.1 代码审查修复**
+- 状态：已完成
+- 开始时间：2026-04-09
+- 完成时间：2026-04-09
+- 变更概述：修复代码审查发现的 9 个问题（3 High + 6 Low/Medium）
+- 修复内容：
+  1. H1: 添加 `invite_codes_public_validate` RLS policy — 允许未登录用户查询有效邀请码
+  2. H2: `markInviteCodeUsed` 返回 `affected` 行数，`register()` 检查结果并记录日志
+  3. H3: 提供 `README_0032_init_super_admin.md` 初始化 SQL 文档
+  4. M1: 更新 Spec 邀请码长度为 13 字符
+  5. L1: 使用 `crypto.getRandomValues()` 替代 `Math.random()`
+  6. L2: 修复 `expiresAt` 重复计算
+  7. L3: 修复 `getMyInviteCodes` 的 `any` 类型
+  8. L4: AdminHeader 添加 `/admin/unauthorized` 标签
+- 修改文件：
+  - `supabase/migrations/0030_create_invite_codes.sql` - 添加 public SELECT policy
+  - `apps/web/actions/admin/invite-codes.ts` - crypto 随机数 + affected 返回 + 类型修复
+  - `apps/web/actions/auth/index.ts` - 检查 markInviteCodeUsed 返回值
+  - `apps/web/components/admin/AdminHeader.tsx` - 添加 unauthorized 标签
+  - `supabase/migrations/README_0032_init_super_admin.md` - 新建
+- 验证结果：
+  - pnpm build: 成功 (12.4s)
+  - pnpm typecheck: 通过
+  - pnpm lint: 0 错误，3 警告（预先存在）
+- 状态：已完成
+- 开始时间：2026-04-09
+- 完成时间：2026-04-09
+- 变更概述：实现邀请码机制、/admin 路由守卫、角色验证工具函数、Admin UI 组件
+- 核心变更：
+  1. **新建数据库迁移**：
+     - `supabase/migrations/0030_create_invite_codes.sql` - invite_codes 表 + RLS
+     - `supabase/migrations/0031_update_auth_trigger_invite_role.sql` - 触发器支持 metadata role
+  2. **新建 Server Actions**：
+     - `apps/web/actions/admin/check-admin-role.ts` - checkAdminRole() + requireAdmin()
+     - `apps/web/actions/admin/invite-codes.ts` - 生成/验证/标记/列表（5 个函数）
+  3. **注册流程更新**：
+     - `apps/web/actions/auth/index.ts` - register() 支持 inviteCode 参数
+     - `apps/web/components/auth/register-form.tsx` - 可展开邀请码输入框
+  4. **/admin 路由**：
+     - `apps/web/app/admin/layout.tsx` - 认证检查 + 角色检查 + 重定向
+     - `apps/web/app/admin/page.tsx` - 重定向到 /admin/review
+     - `apps/web/app/admin/unauthorized/page.tsx` - 403 未授权页面
+  5. **Admin UI 组件**：
+     - `apps/web/components/admin/AdminLayout.tsx` - 左右布局
+     - `apps/web/components/admin/AdminSidebar.tsx` - 6 个导航项
+     - `apps/web/components/admin/AdminHeader.tsx` - 面包屑导航
+  6. **Proxy 更新**：
+     - `apps/web/proxy.ts` - /admin 未登录拦截
+- 验收标准：
+  - ✅ pnpm build 构建成功 (21s)
+  - ✅ pnpm typecheck: 新文件无类型错误
+  - ✅ pnpm lint: 无新增 error
+  - ✅ /admin 路由检测通过（build 输出包含 /admin 和 /admin/unauthorized）
+  - ✅ 邀请码生成（ADM-XXXXXXXX 格式，7 天过期）
+  - ✅ 邀请码验证（存在/未使用/未过期三重检查）
+  - ✅ 注册角色支持（有邀请码 → admin，无 → user）
+  - ✅ 路由守卫（未登录 → /login，无权限 → /admin/unauthorized）
+- 下一步：运行 bmad-code-review 进行代码审查
+
+---
+
+## 2026-04-09
+
+### ✅ 已完成
+
+**任务：Epic 7 - 管理员审核系统 Story 文档创建**
+- 状态：已完成
+- 开始时间：2026-04-09
+- 完成时间：2026-04-09
+- 变更概述：通过 Party Mode 讨论后创建 Epic 7 的 3 个 Story 文档
+- 输出文档：
+  - `_bmad/bmm/4-implementation/stories/story-7-1-admin-auth.md` - 管理员认证与权限
+  - `_bmad/bmm/4-implementation/stories/story-7-2-review-queue.md` - 审核队列
+  - `_bmad/bmm/4-implementation/stories/story-7-3-review-actions.md` - 审核操作
+- 更新文档：
+  - `_bmad/bmm/3-solutioning/epics.md` - v1.14 新增 Epic 7
+  - `_bmad/bmm/4-implementation/sprint-status.yaml` - 添加 7-1/7-2/7-3
+- 技术决策：
+  - 管理员产生：SQL 初始 super_admin + 邀请码机制（invite_codes 表）
+  - 数据库迁移：0029（invite_codes 表）、0030（审核字段）
+  - 路由守卫：proxy.ts + /admin 路由
+  - UI 风格：复用现有 StyleSnap 设计系统
+  - 邮件通知：Resend（审核通过/拒绝）
+
+**任务：Epic 8 - 内容治理平台 Story 文档创建**
+- 状态：已完成
+- 开始时间：2026-04-09
+- 完成时间：2026-04-09
+- 变更概述：创建 Epic 8 的 2 个 Story 文档
+- 输出文档：
+  - `_bmad/bmm/4-implementation/stories/story-8-1-styles-management.md` - 风格管理
+  - `_bmad/bmm/4-implementation/stories/story-8-2-comments-management.md` - 评论管理
+- 更新文档：
+  - `_bmad/bmm/3-solutioning/epics.md` - v1.15 新增 Epic 8
+  - `_bmad/bmm/4-implementation/sprint-status.yaml` - 添加 8-1/8-2
+- 技术决策：
+  - 风格管理：表格布局 + 分页 + 搜索/筛选 + 批量操作
+  - 评论管理：软删除策略（status = 'deleted'），保留审计追踪
+  - 删除风格：二次确认（输入风格名称），级联删除关联数据
+
+**任务：Epic 9 - 用户运营与数据 Story 文档创建**
+- 状态：已完成
+- 开始时间：2026-04-09
+- 完成时间：2026-04-09
+- 变更概述：创建 Epic 9 的 3 个 Story 文档
+- 输出文档：
+  - `_bmad/bmm/4-implementation/stories/story-9-1-user-management.md` - 用户管理
+  - `_bmad/bmm/4-implementation/stories/story-9-2-categories-management.md` - 分类管理
+  - `_bmad/bmm/4-implementation/stories/story-9-3-dashboard.md` - 数据仪表盘
+- 更新文档：
+  - `_bmad/bmm/3-solutioning/epics.md` - v1.16 新增 Epic 9
+  - `_bmad/bmm/4-implementation/sprint-status.yaml` - 添加 9-1/9-2/9-3
+- 技术决策：
+  - 用户管理：封禁机制（is_banned 字段）、super_admin 独占角色修改/邀请码管理
+  - 分类管理：拖拽排序、软禁用替代硬删除、关联风格数检查
+  - 数据仪表盘：核心指标卡片 + 审核效率 + 排行榜 + 分类分布，60 秒缓存
+  - 登录拦截：proxy.ts 中添加封禁检查
+
+---
+
 ## 2026-04-08
 
 ### ✅ 已完成
