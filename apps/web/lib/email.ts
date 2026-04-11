@@ -7,7 +7,7 @@ export const resend = new Resend(env.RESEND_API_KEY)
  * 带重试的邮件发送辅助函数
  * 使用指数退避策略：1s, 2s, 4s, 8s...
  */
-async function sendEmailWithRetry<T>(
+export async function sendEmailWithRetry<T>(
   sendFn: () => Promise<T>,
   maxRetries: number = 3
 ): Promise<T> {

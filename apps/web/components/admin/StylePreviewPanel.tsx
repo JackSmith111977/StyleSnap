@@ -1,12 +1,17 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import Image from 'next/image'
 import type { PendingStyleDetail } from '@/actions/admin/get-style-detail'
+import { approveStyle } from '@/actions/admin/approve-style'
+import { rejectStyle } from '@/actions/admin/reject-style'
+import { ApproveDialog } from '@/components/admin/ApproveDialog'
+import { RejectDialog } from '@/components/admin/RejectDialog'
 
 interface StylePreviewPanelProps {
   style: PendingStyleDetail
   onClose: () => void
+  onReviewComplete?: () => void
 }
 
 /**
@@ -42,12 +47,58 @@ function formatDateTime(dateStr: string | null): string {
 
 type PreviewMode = 'light' | 'dark'
 
-export function StylePreviewPanel({ style, onClose }: StylePreviewPanelProps) {
+export function StylePreviewPanel({ style, onClose, onReviewComplete }: StylePreviewPanelProps) {
   const [previewMode, setPreviewMode] = useState<PreviewMode>('light')
   const [activeTab, setActiveTab] = useState<'preview' | 'tokens' | 'code' | 'submitter'>('preview')
+  const [showApprove, setShowApprove] = useState(false)
+  const [showReject, setShowReject] = useState(false)
+  const [isPending, setIsPending] = useState(false)
+  const [actionError, setActionError] = useState<string | null>(null)
+  const [actionSuccess, setActionSuccess] = useState<string | null>(null)
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const tokens = safeParseTokens(style.design_tokens)
   const previewUrl = previewMode === 'light' ? style.preview_light : style.preview_dark
+
+  const handleApprove = async () => {
+    setIsPending(true)
+    setActionError(null)
+    try {
+      const result = await approveStyle({ styleId: style.id })
+      if (result.success) {
+        setActionSuccess('审核通过，风格已发布')
+        onReviewComplete?.()
+        if (closeTimerRef.current) clearTimeout(closeTimerRef.current)
+        closeTimerRef.current = setTimeout(() => onClose(), 1000)
+      } else {
+        setActionError(result.error ?? '审核失败')
+      }
+    } catch {
+      setActionError('服务器错误，请稍后重试')
+    } finally {
+      setIsPending(false)
+    }
+  }
+
+  const handleReject = async (reviewNotes: string) => {
+    setIsPending(true)
+    setActionError(null)
+    try {
+      const result = await rejectStyle({ styleId: style.id, reviewNotes })
+      if (result.success) {
+        setActionSuccess('审核已拒绝，已通知用户')
+        onReviewComplete?.()
+        if (closeTimerRef.current) clearTimeout(closeTimerRef.current)
+        closeTimerRef.current = setTimeout(() => onClose(), 1000)
+      } else {
+        setActionError(result.error ?? '审核失败')
+      }
+    } catch {
+      setActionError('服务器错误，请稍后重试')
+    } finally {
+      setIsPending(false)
+    }
+  }
 
   return (
     <div className="h-full flex flex-col bg-background">
@@ -378,35 +429,58 @@ export function StylePreviewPanel({ style, onClose }: StylePreviewPanelProps) {
         )}
       </div>
 
-      {/* 底部操作按钮（Story 7.3 占位） */}
-      <div className="flex gap-3 px-4 py-3 border-t border-border/50 bg-muted/20">
-        <button
-          type="button"
-          disabled
-          title="审核功能将在后续版本开放"
-          className="
-            flex-1 py-2 text-sm font-medium rounded-md
-            bg-emerald-600 text-white
-            hover:bg-emerald-700 transition-colors
-            disabled:opacity-50 disabled:cursor-not-allowed
-          "
-        >
-          通过
-        </button>
-        <button
-          type="button"
-          disabled
-          title="审核功能将在后续版本开放"
-          className="
-            flex-1 py-2 text-sm font-medium rounded-md
-            bg-destructive text-destructive-foreground
-            hover:bg-destructive/90 transition-colors
-            disabled:opacity-50 disabled:cursor-not-allowed
-          "
-        >
-          拒绝
-        </button>
+      {/* 底部操作按钮 */}
+      <div className="flex flex-col gap-2 px-4 py-3 border-t border-border/50 bg-muted/20">
+        {actionError && (
+          <p className="text-sm text-destructive text-center">{actionError}</p>
+        )}
+        {actionSuccess && (
+          <p className="text-sm text-emerald-600 text-center">{actionSuccess}</p>
+        )}
+        <div className="flex gap-3">
+          <button
+            type="button"
+            onClick={() => setShowApprove(true)}
+            disabled={isPending}
+            className="
+              flex-1 py-2 text-sm font-medium rounded-md
+              bg-emerald-600 text-white
+              hover:bg-emerald-700 transition-colors
+              disabled:opacity-50 disabled:cursor-not-allowed
+            "
+          >
+            通过
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowReject(true)}
+            disabled={isPending}
+            className="
+              flex-1 py-2 text-sm font-medium rounded-md
+              bg-destructive text-destructive-foreground
+              hover:bg-destructive/90 transition-colors
+              disabled:opacity-50 disabled:cursor-not-allowed
+            "
+          >
+            拒绝
+          </button>
+        </div>
       </div>
+
+      <ApproveDialog
+        open={showApprove}
+        styleName={style.title}
+        isPending={isPending}
+        onConfirm={handleApprove}
+        onCancel={() => setShowApprove(false)}
+      />
+      <RejectDialog
+        open={showReject}
+        styleName={style.title}
+        isPending={isPending}
+        onConfirm={handleReject}
+        onCancel={() => setShowReject(false)}
+      />
     </div>
   )
 }

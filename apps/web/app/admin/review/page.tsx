@@ -90,6 +90,12 @@ export default function AdminReviewPage() {
     clearSelection()
   }
 
+  // 审核完成后刷新列表
+  const handleReviewComplete = () => {
+    clearSelection()
+    loadPendingStyles(1, filterCategory)
+  }
+
   // 分类筛选变化
   const handleCategoryChange = (category: string | null) => {
     setFilterCategory(category)
@@ -188,6 +194,7 @@ export default function AdminReviewPage() {
             <StylePreviewPanel
               style={selectedStyle}
               onClose={handleCloseDetail}
+              onReviewComplete={handleReviewComplete}
             />
           ) : (
             <div className="h-full flex items-center justify-center text-muted-foreground">

@@ -90,11 +90,11 @@ development_status:
   6-11-color-template-v2: done  # ✅ 颜色模板 v2.0 + v2.1 Phase 2 完成 - Phase 1A/B/C/D + Phase 2 全部通过，构建验证成功，科技现代模板 Bug 已修复
   epic-6-retrospective: optional
 
-  # Epic 7: 管理员审核系统 (当前 Sprint)
-  epic-7: in-progress
+  # Epic 7: 管理员审核系统
+  epic-7: done
   7-1-admin-auth: done  # ✅ 两轮代码审查 + 浏览器验证通过
   7-2-review-queue: done  # ✅ 两轮代码审查 + MCP 浏览器验证 + Medium 修复
-  7-3-review-actions: ready-for-dev  # ✅ Story 文档已创建
+  7-3-review-actions: done  # ✅ 代码审查完成 + 修复验证通过
   epic-7-retrospective: optional
 
   # Epic 8: 内容治理平台

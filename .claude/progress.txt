@@ -6,6 +6,42 @@
 
 ### ✅ 已完成
 
+**任务：Story 7.3 - 审核操作实现**
+- 状态：已完成（done）
+- 开始时间：2026-04-10
+- 完成时间：2026-04-10
+- 变更概述：实现审核通过/拒绝操作、邮件通知、审核对话框、拒绝原因模板，完成代码审查修复
+- 代码审查修复：
+  1. 移除 `isReviewing`/`setReviewing` 死代码
+  2. 修正 RejectDialog 标签为「至少选择一项原因或填写备注」
+  3. 邮件发送改用 `sendEmailWithRetry` 指数退避重试
+  4. Zod 错误检测改用 message 关键词匹配
+  5. setTimeout 添加 ref 清理
+  6. 导出 `sendEmailWithRetry` 供复用
+- 验证结果：pnpm typecheck ✅ / pnpm lint 0 errors / pnpm test 7/7 / pnpm build ✅
+- 核心变更：
+  1. **新建数据库迁移**：
+     - `supabase/migrations/0033_add_review_fields.sql` - review_notes, reviewed_by, reviewed_at
+  2. **新建 Server Actions**：
+     - `apps/web/actions/admin/approve-style.ts` - 通过审核（requireAdmin + Zod + TOCTOU 防护 + 邮件）
+     - `apps/web/actions/admin/reject-style.ts` - 拒绝审核（同上 + 审核备注必填）
+  3. **新建邮件通知**：
+     - `apps/web/lib/email-review.ts` - sendReviewApprovedEmail / sendReviewRejectedEmail
+  4. **新建 UI 组件**：
+     - `apps/web/components/admin/ApproveDialog.tsx` - 通过确认对话框
+     - `apps/web/components/admin/RejectDialog.tsx` - 拒绝对话框（6 种原因模板 + 500 字自由输入）
+  5. **集成**：
+     - `apps/web/components/admin/StylePreviewPanel.tsx` - 审核按钮 + 对话框 + 成功/错误反馈
+     - `apps/web/app/admin/review/page.tsx` - onReviewComplete 回调自动刷新列表
+     - `apps/web/stores/admin-review-store.ts` - isReviewing 状态
+  6. **单元测试**：
+     - `apps/web/tests/unit/approve-style.test.ts` - 7 个用例（权限/验证/TOCTOU/成功路径）
+- 验收结果：
+  - pnpm build: 成功 (21.5s)
+  - pnpm typecheck: 新文件 0 错误
+  - vitest: 7/7 通过
+- 下一步：代码审查
+
 **任务：Story 7.2 - 审核队列实现**
 - 状态：已完成
 - 开始时间：2026-04-10
